@@ -35,7 +35,6 @@ export function ExportControls({
 
   return (
     <Button
-      variant="default"
       size="sm"
       className="gap-2"
       onClick={handleExport}

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { HomePage } from '@/pages/HomePage'
 
 /**
@@ -26,6 +27,15 @@ vi.mock('react-router-dom', async () => {
 
 // Mock fetch at the network boundary
 const mockFetch = vi.fn()
+
+// Default mock for LLM config endpoint (used by AppHeader via useLlmConfig)
+function mockConfigResponse() {
+  return {
+    ok: true,
+    status: 200,
+    json: () => Promise.resolve({ endpoint: null, modelName: null }),
+  }
+}
 
 beforeEach(() => {
   mockFetch.mockReset()
@@ -61,19 +71,30 @@ const mockDocuments = [
 ]
 
 function mockFetchDocuments(documents = mockDocuments) {
-  mockFetch.mockResolvedValueOnce({
-    ok: true,
-    status: 200,
-    json: () => Promise.resolve({ documents }),
+  // Mock both the config fetch (from useLlmConfig) and the documents fetch
+  mockFetch.mockImplementation((url: string) => {
+    if (url.includes('/api/config/llm')) {
+      return Promise.resolve(mockConfigResponse())
+    }
+    return Promise.resolve({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ documents }),
+    })
   })
 }
 
 function mockFetchError(status = 500, message = 'Internal Server Error') {
-  mockFetch.mockResolvedValueOnce({
-    ok: false,
-    status,
-    statusText: message,
-    json: () => Promise.resolve({ message }),
+  mockFetch.mockImplementation((url: string) => {
+    if (url.includes('/api/config/llm')) {
+      return Promise.resolve(mockConfigResponse())
+    }
+    return Promise.resolve({
+      ok: false,
+      status,
+      statusText: message,
+      json: () => Promise.resolve({ message }),
+    })
   })
 }
 
@@ -85,7 +106,9 @@ describe('HomePage', () => {
   function renderHomePage() {
     return render(
       <MemoryRouter>
-        <HomePage />
+        <TooltipProvider>
+          <HomePage />
+        </TooltipProvider>
       </MemoryRouter>
     )
   }
@@ -152,8 +175,13 @@ describe('HomePage', () => {
 
   describe('loading state', () => {
     it('shows loading indicator while fetching documents', () => {
-      // Don't resolve the fetch - keep it pending
-      mockFetch.mockReturnValueOnce(new Promise(() => {}))
+      // Config endpoint returns immediately, documents fetch stays pending
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/config/llm')) {
+          return Promise.resolve(mockConfigResponse())
+        }
+        return new Promise(() => {})
+      })
       renderHomePage()
 
       expect(screen.getByText(/loading/i)).toBeInTheDocument()

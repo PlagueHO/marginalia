@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDocument } from "@/hooks/useDocument";
 import { useSuggestions } from "@/hooks/useSuggestions";
@@ -10,7 +10,7 @@ import { DocumentUploader } from "@/components/DocumentUploader";
 import { DocumentHeader } from "@/components/DocumentHeader";
 import { DocumentEditor } from "@/components/DocumentEditor";
 import { SuggestionPanel } from "@/components/SuggestionPanel";
-import { AnalysisControls } from "@/components/AnalysisControls";
+import { AnalysisDialog } from "@/components/AnalysisDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import type { SuggestionStatus } from "@/types";
@@ -23,6 +23,7 @@ export function EditorPage() {
   const suggestions = useSuggestions();
   const analysis = useAnalysis();
   const llmConfig = useLlmConfig();
+  const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
 
   useEffect(() => {
     if (documentId && !doc.document) {
@@ -33,6 +34,9 @@ export function EditorPage() {
       }).catch(() => {
         toast.error("Failed to load document");
       });
+    } else if (!documentId && doc.document) {
+      doc.clearDocument();
+      suggestions.setSuggestions([]);
     }
   }, [documentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -121,16 +125,6 @@ export function EditorPage() {
     }
   }, [doc.document, suggestions]);
 
-  const handleNewSession = useCallback(() => {
-    doc.clearDocument();
-    suggestions.setSuggestions([]);
-    navigate("/");
-  }, [doc, suggestions, navigate]);
-
-  const handleCheckHealth = useCallback(async () => {
-    await llmConfig.checkHealth();
-  }, [llmConfig]);
-
   const error = doc.error ?? analysis.error;
 
   const editorContent = doc.document ? (
@@ -172,15 +166,6 @@ export function EditorPage() {
     />
   ) : null;
 
-  const controlsContent = doc.document ? (
-    <AnalysisControls
-      documentId={doc.document.id}
-      isAnalyzing={analysis.isAnalyzing}
-      progress={analysis.progress}
-      onAnalyze={handleAnalyze}
-    />
-  ) : null;
-
   return (
     <div className="flex flex-col h-screen">
       <AppHeader
@@ -190,8 +175,8 @@ export function EditorPage() {
         isConfigLoading={llmConfig.isLoading}
         isCheckingHealth={llmConfig.isCheckingHealth}
         healthResult={llmConfig.healthResult}
-        onNewSession={handleNewSession}
-        onCheckHealth={handleCheckHealth}
+        onCheckHealth={llmConfig.checkHealth}
+        onAnalyze={doc.document ? () => setIsAnalysisOpen(true) : undefined}
       />
 
       {error && (
@@ -204,9 +189,18 @@ export function EditorPage() {
       <MainLayout
         editor={editorContent}
         panel={panelContent}
-        controls={controlsContent}
         hasDocument={!!doc.document}
       />
+
+      {doc.document && (
+        <AnalysisDialog
+          open={isAnalysisOpen}
+          onOpenChange={setIsAnalysisOpen}
+          isAnalyzing={analysis.isAnalyzing}
+          progress={analysis.progress}
+          onAnalyze={handleAnalyze}
+        />
+      )}
     </div>
   );
 }

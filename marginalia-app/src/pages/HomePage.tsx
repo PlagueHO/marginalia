@@ -1,15 +1,18 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDocuments } from "@/hooks/useDocuments";
+import { useLlmConfig } from "@/hooks/useLlmConfig";
+import { AppHeader } from "@/components/AppHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, FileText, Loader2, AlertCircle, BookOpen } from "lucide-react";
+import { PlusCircle, FileText, Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function HomePage() {
   const { documents, isLoading, error, loadDocuments } = useDocuments();
   const navigate = useNavigate();
+  const llmConfig = useLlmConfig();
 
   useEffect(() => {
     void loadDocuments();
@@ -17,12 +20,13 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <header className="flex items-center justify-between px-4 py-2.5 border-b border-border/50 bg-linear-to-r from-background via-background to-muted/30 dark:from-zinc-950 dark:via-zinc-900/80 dark:to-zinc-800/40 backdrop-blur-md supports-backdrop-filter:bg-background/60 sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-3">
-          <BookOpen className="h-5 w-5 text-violet-400" aria-hidden="true" />
-          <h1 className="text-lg font-bold tracking-tight bg-linear-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">Marginalia</h1>
-        </div>
-      </header>
+      <AppHeader
+        llmConfig={llmConfig.config}
+        isConfigLoading={llmConfig.isLoading}
+        isCheckingHealth={llmConfig.isCheckingHealth}
+        healthResult={llmConfig.healthResult}
+        onCheckHealth={llmConfig.checkHealth}
+      />
 
       <div className="flex-1 overflow-auto">
         <div className="flex flex-col items-center gap-8 w-full max-w-4xl mx-auto px-4 py-12">
