@@ -1,0 +1,59 @@
+@Marginalia.Api_HostAddress = http://localhost:5279
+
+### Upload a Word document
+POST {{Marginalia.Api_HostAddress}}/api/documents/upload
+Content-Type: multipart/form-data; boundary=----FormBoundary
+
+------FormBoundary
+Content-Disposition: form-data; name="file"; filename="test.docx"
+Content-Type: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+< ./test.docx
+------FormBoundary--
+
+### Paste text as document
+POST {{Marginalia.Api_HostAddress}}/api/documents/paste
+Content-Type: application/json
+
+{
+  "content": "This is a sample manuscript text for analysis.",
+  "filename": "draft.txt"
+}
+
+### Get document by ID
+GET {{Marginalia.Api_HostAddress}}/api/documents/{{documentId}}
+Accept: application/json
+
+### Get suggestions for a document
+GET {{Marginalia.Api_HostAddress}}/api/documents/{{documentId}}/suggestions
+Accept: application/json
+
+### Trigger AI analysis
+POST {{Marginalia.Api_HostAddress}}/api/documents/{{documentId}}/analyze
+Content-Type: application/json
+
+{
+  "documentId": "{{documentId}}",
+  "userInstructions": "Focus on expanding compressed narratives",
+  "toneGuidance": "professional but warm"
+}
+
+### Create a new session
+POST {{Marginalia.Api_HostAddress}}/api/sessions
+Accept: application/json
+
+### Get LLM config
+GET {{Marginalia.Api_HostAddress}}/api/config/llm
+Accept: application/json
+
+### Update LLM config
+PUT {{Marginalia.Api_HostAddress}}/api/config/llm
+Content-Type: application/json
+
+{
+  "endpoint": "https://your-account.services.ai.azure.com/openai/deployments/gpt-4o",
+  "apiKey": "your-api-key",
+  "modelName": "gpt-4o"
+}
+
+###

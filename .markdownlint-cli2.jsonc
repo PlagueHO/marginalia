@@ -1,0 +1,11 @@
+{
+  "config": {
+    "extends": ".markdownlint.json"
+  },
+  "globs": [
+    "**/*.md",
+    "!**/node_modules/**",
+    "!**/obj/**",
+    "!**/bin/**"
+  ]
+}

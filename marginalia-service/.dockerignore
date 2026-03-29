@@ -1,0 +1,12 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/out
+**/node_modules
+**/.gitignore
+**/TestResults
+**/*.user
+**/*.suo
+**/launchSettings.json

@@ -1,0 +1,15 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.2.0">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Marginalia.AppHost</RootNamespace>
+    <UserSecretsId>a3f2d8e1-7b45-4c9a-b6d3-1e8f5a2c7d09</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure.AIFoundry" />
+    <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" />
+    <PackageReference Include="Aspire.Hosting.JavaScript" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Api\Marginalia.Api.csproj" />
+  </ItemGroup>
+</Project>
