@@ -39,11 +39,41 @@ public sealed class DocumentsController : ControllerBase
     }
 
     /// <summary>
+    /// List all documents for the current user.
+    /// </summary>
+    [HttpGet]
+    public async Task<ActionResult<DocumentListResponse>> List(CancellationToken cancellationToken)
+    {
+        var userId = GetUserId(Request);
+        var documents = await _documentRepository.GetByUserAsync(userId, cancellationToken);
+
+        var summaries = documents
+            .OrderByDescending(d => d.UpdatedAt)
+            .Select(d => new DocumentSummary
+            {
+                Id = d.Id,
+                Title = string.IsNullOrEmpty(d.Title) ? d.Filename : d.Title,
+                Filename = d.Filename,
+                Source = d.Source,
+                Status = d.Suggestions.Count > 0 ? DocumentStatus.Analyzed : d.Status,
+                CreatedAt = d.CreatedAt,
+                UpdatedAt = d.UpdatedAt,
+                SuggestionCount = d.Suggestions.Count
+            })
+            .ToList()
+            .AsReadOnly();
+
+        _logger.LogInformation("Listed {Count} documents for UserId: {UserId}", summaries.Count, userId);
+
+        return Ok(new DocumentListResponse { Documents = summaries });
+    }
+
+    /// <summary>
     /// Upload a Word document (.docx) for analysis.
     /// </summary>
     [HttpPost("upload")]
     [RequestSizeLimit(52_428_800)] // 50 MB
-    public async Task<ActionResult<UploadDocumentResponse>> Upload(IFormFile file, CancellationToken cancellationToken)
+    public async Task<ActionResult<UploadDocumentResponse>> Upload(IFormFile file, [FromForm] string? title, CancellationToken cancellationToken)
     {
         if (file is null || file.Length == 0)
         {
@@ -57,12 +87,20 @@ public sealed class DocumentsController : ControllerBase
         }
 
         var userId = GetUserId(Request);
+        var now = DateTimeOffset.UtcNow;
 
         using var stream = file.OpenReadStream();
         var document = await _wordDocumentService.ParseAsync(stream, file.FileName, cancellationToken);
         
-        // Set userId on document
-        document = document with { UserId = userId };
+        // Set userId and new metadata fields
+        document = document with
+        {
+            UserId = userId,
+            Title = title ?? $"{now:yyyy-MM-dd HH:mm} - {file.FileName}",
+            Status = DocumentStatus.Draft,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
         
         await _documentRepository.SaveAsync(document, cancellationToken);
 
@@ -94,6 +132,7 @@ public sealed class DocumentsController : ControllerBase
         }
 
         var userId = GetUserId(Request);
+        var now = DateTimeOffset.UtcNow;
 
         var document = new Document
         {
@@ -101,7 +140,11 @@ public sealed class DocumentsController : ControllerBase
             UserId = userId,
             Filename = request.Filename ?? "pasted-text.txt",
             Source = DocumentSource.Local,
-            Content = request.Content
+            Content = request.Content,
+            Title = request.Title ?? $"{now:yyyy-MM-dd HH:mm} - {request.Filename ?? "Untitled"}",
+            Status = DocumentStatus.Draft,
+            CreatedAt = now,
+            UpdatedAt = now
         };
 
         await _documentRepository.SaveAsync(document, cancellationToken);
@@ -184,7 +227,12 @@ public sealed class DocumentsController : ControllerBase
 
         // Merge new suggestions with existing ones
         var updatedSuggestions = document.Suggestions.Concat(suggestions).ToList().AsReadOnly();
-        var updatedDocument = document with { Suggestions = updatedSuggestions };
+        var updatedDocument = document with
+        {
+            Suggestions = updatedSuggestions,
+            Status = DocumentStatus.Analyzed,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
         await _documentRepository.SaveAsync(updatedDocument, cancellationToken);
 
         _logger.LogInformation("Analysis complete for document: {DocumentId}, SuggestionsGenerated: {Count}", id, suggestions.Count);

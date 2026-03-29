@@ -66,7 +66,7 @@ describe('DocumentUploader', () => {
       const fileInput = screen.getByLabelText(/upload document file/i)
       await user.upload(fileInput, file)
 
-      expect(defaultProps.onFileUpload).toHaveBeenCalledWith(file)
+      expect(defaultProps.onFileUpload).toHaveBeenCalledWith(file, undefined)
     })
 
     it('disables file input when loading', () => {
@@ -99,7 +99,9 @@ describe('DocumentUploader', () => {
       await user.click(screen.getByRole('button', { name: /load text/i }))
 
       expect(defaultProps.onPaste).toHaveBeenCalledWith(
-        'The morning light filtered through the study window.'
+        'The morning light filtered through the study window.',
+        undefined,
+        undefined
       )
     })
 

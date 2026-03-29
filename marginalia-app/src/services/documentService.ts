@@ -2,13 +2,18 @@ import type {
   Document,
   UploadResponse,
   PasteRequest,
+  DocumentListResponse,
   AnalyzeRequest,
   Suggestion,
 } from "@/types";
 import { apiGet, apiPost, apiPostFile, apiGetBlob } from "./api";
 
-export async function uploadDocument(file: File): Promise<UploadResponse> {
-  return apiPostFile<UploadResponse>("/api/documents/upload", file);
+export async function listDocuments(): Promise<DocumentListResponse> {
+  return apiGet<DocumentListResponse>("/api/documents");
+}
+
+export async function uploadDocument(file: File, title?: string): Promise<UploadResponse> {
+  return apiPostFile<UploadResponse>("/api/documents/upload", file, title ? { title } : undefined);
 }
 
 export async function pasteDocument(

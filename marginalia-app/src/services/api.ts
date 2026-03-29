@@ -90,10 +90,16 @@ export async function apiPut<T>(path: string, body: unknown): Promise<T> {
 
 export async function apiPostFile<T>(
   path: string,
-  file: File
+  file: File,
+  extraFields?: Record<string, string>
 ): Promise<T> {
   const formData = new FormData();
   formData.append("file", file);
+  if (extraFields) {
+    for (const [key, value] of Object.entries(extraFields)) {
+      formData.append(key, value);
+    }
+  }
 
   const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",

@@ -12,4 +12,7 @@ public sealed record PasteDocumentRequest
 
     [JsonPropertyName("filename")]
     public string? Filename { get; init; }
+
+    [JsonPropertyName("title")]
+    public string? Title { get; init; }
 }

@@ -1,4 +1,4 @@
-import type { Document } from "./document";
+import type { Document, DocumentSummary } from "./document";
 import type { Suggestion, SuggestionStatus } from "./suggestion";
 import type { UserSession } from "./session";
 
@@ -10,6 +10,11 @@ export interface UploadResponse {
 export interface PasteRequest {
   content: string;
   filename?: string;
+  title?: string;
+}
+
+export interface DocumentListResponse {
+  documents: DocumentSummary[];
 }
 
 export interface AnalyzeRequest {

@@ -1,9 +1,10 @@
-export type { Document, DocumentSource, TextRange } from "./document";
+export type { Document, DocumentSource, DocumentStatus, TextRange, DocumentSummary } from "./document";
 export type { Suggestion, SuggestionStatus } from "./suggestion";
 export type { UserSession } from "./session";
 export type {
   UploadResponse,
   PasteRequest,
+  DocumentListResponse,
   AnalyzeRequest,
   SuggestionUpdateRequest,
   LlmConfig,

@@ -19,6 +19,18 @@ public sealed record Document
     [JsonPropertyName("source")]
     public required DocumentSource Source { get; init; }
 
+    [JsonPropertyName("title")]
+    public string Title { get; init; } = "";
+
+    [JsonPropertyName("status")]
+    public DocumentStatus Status { get; init; } = DocumentStatus.Draft;
+
+    [JsonPropertyName("createdAt")]
+    public DateTimeOffset CreatedAt { get; init; } = DateTimeOffset.MinValue;
+
+    [JsonPropertyName("updatedAt")]
+    public DateTimeOffset UpdatedAt { get; init; } = DateTimeOffset.MinValue;
+
     [JsonPropertyName("content")]
     public required string Content { get; init; }
 

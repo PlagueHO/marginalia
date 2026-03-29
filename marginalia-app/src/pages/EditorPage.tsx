@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useDocument } from "@/hooks/useDocument";
 import { useSuggestions } from "@/hooks/useSuggestions";
 import { useAnalysis } from "@/hooks/useAnalysis";
@@ -16,35 +17,51 @@ import type { SuggestionStatus } from "@/types";
 import { toast } from "sonner";
 
 export function EditorPage() {
+  const { documentId } = useParams<{ documentId: string }>();
+  const navigate = useNavigate();
   const doc = useDocument();
   const suggestions = useSuggestions();
   const analysis = useAnalysis();
   const llmConfig = useLlmConfig();
 
+  useEffect(() => {
+    if (documentId && !doc.document) {
+      doc.loadDocument(documentId).then((loaded) => {
+        if (loaded?.suggestions) {
+          suggestions.setSuggestions(loaded.suggestions);
+        }
+      }).catch(() => {
+        toast.error("Failed to load document");
+      });
+    }
+  }, [documentId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleFileUpload = useCallback(
-    async (file: File) => {
+    async (file: File, title?: string) => {
       try {
-        const response = await doc.uploadFile(file);
+        const response = await doc.uploadFile(file, title);
         suggestions.setSuggestions(response.document.suggestions);
         toast.success("Document loaded successfully");
+        navigate(`/editor/${response.document.id}`, { replace: true });
       } catch {
         toast.error("Failed to upload document");
       }
     },
-    [doc, suggestions]
+    [doc, suggestions, navigate]
   );
 
   const handlePaste = useCallback(
-    async (content: string, filename?: string) => {
+    async (content: string, filename?: string, title?: string) => {
       try {
-        const response = await doc.pasteContent(content, filename);
+        const response = await doc.pasteContent(content, filename, title);
         suggestions.setSuggestions(response.document.suggestions);
         toast.success("Text loaded successfully");
+        navigate(`/editor/${response.document.id}`, { replace: true });
       } catch {
         toast.error("Failed to process text");
       }
     },
-    [doc, suggestions]
+    [doc, suggestions, navigate]
   );
 
   const handleAnalyze = useCallback(
@@ -107,8 +124,8 @@ export function EditorPage() {
   const handleNewSession = useCallback(() => {
     doc.clearDocument();
     suggestions.setSuggestions([]);
-    toast.info("Starting fresh session");
-  }, [doc, suggestions]);
+    navigate("/");
+  }, [doc, suggestions, navigate]);
 
   const handleCheckHealth = useCallback(async () => {
     await llmConfig.checkHealth();

@@ -1,12 +1,13 @@
 import { useCallback, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, FileText, ClipboardPaste } from "lucide-react";
 
 interface DocumentUploaderProps {
-  onFileUpload: (file: File) => Promise<void>;
-  onPaste: (content: string, filename?: string) => Promise<void>;
+  onFileUpload: (file: File, title?: string) => Promise<void>;
+  onPaste: (content: string, filename?: string, title?: string) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -18,6 +19,7 @@ export function DocumentUploader({
   const [isDragOver, setIsDragOver] = useState(false);
   const [showPaste, setShowPaste] = useState(false);
   const [pasteContent, setPasteContent] = useState("");
+  const [title, setTitle] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDragOver = useCallback(
@@ -46,32 +48,42 @@ export function DocumentUploader({
 
       const file = e.dataTransfer.files[0];
       if (file) {
-        await onFileUpload(file);
+        await onFileUpload(file, title || undefined);
       }
     },
-    [onFileUpload]
+    [onFileUpload, title]
   );
 
   const handleFileSelect = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (file) {
-        await onFileUpload(file);
+        await onFileUpload(file, title || undefined);
       }
     },
-    [onFileUpload]
+    [onFileUpload, title]
   );
 
   const handlePasteSubmit = useCallback(async () => {
     if (pasteContent.trim()) {
-      await onPaste(pasteContent.trim());
+      await onPaste(pasteContent.trim(), undefined, title || undefined);
       setPasteContent("");
       setShowPaste(false);
     }
-  }, [pasteContent, onPaste]);
+  }, [pasteContent, onPaste, title]);
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
+      <Input
+        type="text"
+        placeholder="Enter manuscript title (optional)"
+        value={title}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+        className="w-full"
+        aria-label="Manuscript title"
+        disabled={isLoading}
+      />
+
       <Card
         className={`w-full border-2 border-dashed transition-colors cursor-pointer ${
           isDragOver

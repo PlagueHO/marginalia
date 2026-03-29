@@ -15,10 +15,10 @@ export function useDocument() {
     error: null,
   });
 
-  const uploadFile = useCallback(async (file: File) => {
+  const uploadFile = useCallback(async (file: File, title?: string) => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
     try {
-      const response = await documentService.uploadDocument(file);
+      const response = await documentService.uploadDocument(file, title);
       setState({
         document: response.document,
         isLoading: false,
@@ -34,12 +34,13 @@ export function useDocument() {
   }, []);
 
   const pasteContent = useCallback(
-    async (content: string, filename?: string) => {
+    async (content: string, filename?: string, title?: string) => {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
       try {
         const response = await documentService.pasteDocument({
           content,
           filename,
+          title,
         });
         setState({
           document: response.document,

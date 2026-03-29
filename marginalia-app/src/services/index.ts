@@ -1,5 +1,6 @@
 export { setApiBaseUrl, getApiBaseUrl } from "./api";
 export {
+  listDocuments,
   uploadDocument,
   pasteDocument,
   getDocument,
