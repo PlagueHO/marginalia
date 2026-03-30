@@ -1,5 +1,7 @@
 ﻿# Marginalia
 
+[![CI][ci-shield]][ci-url]
+[![CD][cd-shield]][cd-url]
 [![License: MIT][license-shield]][license-url]
 
 Marginalia is an AI-powered narrative flow editor for long-form non-fiction writers. Upload your manuscript, add editorial guidance, and receive intelligent suggestions for expanding compressed sections, polishing style, and strengthening narrative flow. Accept, reject, or refine suggestions before exporting—all while maintaining your unique authorial voice.
@@ -63,6 +65,10 @@ For detailed troubleshooting, prerequisites verification, and model configuratio
 MIT
 
 <!-- Badge reference links -->
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/marymacgregorreid/marginalia/continuous-integration.yml?branch=main&label=CI
+[ci-url]: https://github.com/marymacgregorreid/marginalia/actions/workflows/continuous-integration.yml
+[cd-shield]: https://img.shields.io/github/actions/workflow/status/marymacgregorreid/marginalia/continuous-delivery.yml?branch=main&label=CD
+[cd-url]: https://github.com/marymacgregorreid/marginalia/actions/workflows/continuous-delivery.yml
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
 [license-url]: https://github.com/marymacgregorreid/marginalia/blob/main/LICENSE
 

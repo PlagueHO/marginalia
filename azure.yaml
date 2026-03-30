@@ -1,0 +1,24 @@
+# azure.yaml — Azure Developer CLI manifest
+name: marginalia
+metadata:
+  template: marginalia@0.0.1
+hooks:
+  preprovision:
+    shell: sh
+    run: ./infra/hooks/preprovision.sh
+    windows:
+      shell: pwsh
+      run: ./infra/hooks/preprovision.ps1
+services:
+  api:
+    host: containerapp
+    language: dotnet
+    project: ./marginalia-service/src/Api
+    docker:
+      path: ./Dockerfile
+      context: ../../
+  frontend:
+    project: ./marginalia-app
+    language: js
+    host: staticwebapp
+    dist: dist
