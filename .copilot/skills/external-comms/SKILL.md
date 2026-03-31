@@ -89,6 +89,7 @@ Use exactly one template as the base draft. Replace placeholders with issue-spec
 | 🔴 Needs Review | Technical uncertainty, policy/roadmap question, potential reputational risk, author is frustrated/angry, question about unreleased features | "When will Squad support Claude?" |
 
 **Auto-escalation rules:**
+
 - Any mention of competitors → 🔴
 - Any mention of pricing/licensing → 🔴
 - Author has >3 follow-up comments without resolution → 🔴
@@ -156,6 +157,7 @@ If a posted response turns out to be wrong, inappropriate, or needs correction:
 4. **Postmortem:** If the error reveals a pattern gap, update humanizer anti-patterns or add a new test case
 
 **Safe word — `banana`:**
+
 - Immediately freezes all pending drafts in the review queue
 - No new scans or drafts until `pao resume` is issued
 - Audit entry logged with halter identity and reason

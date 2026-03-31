@@ -22,6 +22,7 @@
 **`AnalyzeResponse` type removed** — it was only used for the now-corrected wrapping assumption. Removed from `api.ts` and the re-export in `index.ts`. `documentService.ts` now imports `Suggestion` directly.
 
 **Key files:**
+
 - `marginalia-app/src/services/documentService.ts`
 - `marginalia-app/src/hooks/useAnalysis.ts`
 - `marginalia-app/src/types/api.ts`
@@ -32,6 +33,7 @@
 **Status:** ✅ COMPLETE — Build clean (tsc 0 errors), 82 tests pass (2 pre-existing failures in api.test.ts unrelated to this work).
 
 **What was built:**
+
 1. **React Router (v7.13.2):** Routes `/` (Home), `/new` (upload), `/editor/:documentId` (editor). BrowserRouter in App.tsx.
 2. **HomePage (`pages/HomePage.tsx`):** Lists manuscripts from `GET /api/documents`. Shows title, status badge (Draft/Analyzed), date, suggestion count. Empty state with "No manuscripts yet" message.
 3. **useDocuments hook (`hooks/useDocuments.ts`):** `{ documents, isLoading, error, loadDocuments }` — follows existing hook pattern.
@@ -44,6 +46,7 @@
 10. **listDocuments service:** Added `apiGet<DocumentListResponse>('/api/documents')`.
 
 **Key files changed:**
+
 - `marginalia-app/src/App.tsx` — BrowserRouter + Routes
 - `marginalia-app/src/pages/HomePage.tsx` — NEW
 - `marginalia-app/src/pages/EditorPage.tsx` — react-router params + navigation
@@ -60,6 +63,7 @@
 - `marginalia-app/tests/components/DocumentUploader.test.tsx` — updated assertions for new signatures
 
 **Design decisions:**
+
 - HomePage has its own minimal header (not full AppHeader) since it doesn't need editor controls.
 - Title is optional — backend generates default per Richard's spec.
 - `navigate(replace: true)` after upload/paste prevents back-button loops.
@@ -80,15 +84,18 @@
 **Summary:** Wired Aspire service discovery env vars into the Vite build so the frontend uses the Aspire-managed API URL when running under Aspire, and falls back to `http://localhost:5279` when running standalone.
 
 **Changes:**
+
 - `marginalia-app/vite.config.ts` — Added `__API_BASE_URL__` via Vite `define`, reading `process.env.services__api__https__0` (prefer HTTPS) then `services__api__http__0`, defaulting to empty string if neither is set.
 - `marginalia-app/src/services/api.ts` — Added `declare const __API_BASE_URL__: string` ambient declaration; `DEFAULT_BASE_URL` now uses `__API_BASE_URL__` when it is defined and non-empty, otherwise falls back to `http://localhost:5279`.
 
 **Pattern (from prompt-babbler reference):**
+
 - Aspire injects `services__{name}__{scheme}__{index}` env vars for non-.NET resources via `WithReference()`.
 - Vite's `define` feature replaces `__API_BASE_URL__` at build time — the TypeScript `declare const` is required to satisfy the compiler without a type error.
 - Fallback guard (`typeof __API_BASE_URL__ !== 'undefined' && __API_BASE_URL__ !== ''`) handles local dev where `define` emits `""`.
 
 **Key files:**
+
 - `marginalia-app/vite.config.ts`
 - `marginalia-app/src/services/api.ts`
 
@@ -103,6 +110,7 @@
 **Summary:** Config dialog fully converted from editable form to readonly status view. Configuration now exclusively backend-owned via Aspire environment variables. Frontend never sends credentials or modifies config.
 
 **Architectural Shift:**
+
 - `LlmConfigDialog` is a pure status display — no input fields, no forms.
 - `apiKey` completely removed from `LlmConfig` type. `authMethod` is always `"entraId"`.
 - New `LlmHealthResult` type replaces `LlmConfigTestResult`: `{ healthy: boolean; message: string }`.
@@ -110,30 +118,32 @@
 - Health status display: Spinner (loading), CheckCircle2 (healthy), XCircle (unhealthy).
 
 **Service/Hook Simplification:**
+
 - `configService.ts` now exports only `getLlmConfig` (GET) and `checkHealth` (GET to `/api/config/llm/health`).
 - Removed: `updateLlmConfig`, `testLlmConnection`, all write operations.
 - `useLlmConfig` hook exposes: `{ config, isLoading, isCheckingHealth, healthResult, error, loadConfig, checkHealth }`.
 - Removed: `updateConfig`, `testConnection`, `setLocalConfig`, and related state.
 
 **Component Updates:**
+
 - `LlmConfigDialog.tsx` — Full rewrite: readonly display layout, Entra ID badge (ShieldCheck) always visible, health check button.
 - `AppHeader.tsx` — Simplified props: removed `onSaveConfig`, `onTestConfig`, `onConfigChange`.
 - `EditorPage.tsx` — `handleCheckHealth` replaces `handleSaveConfig` and `handleTestConfig`.
 - `LlmConfigDialog.test.tsx` — Full rewrite matching new readonly UI; tests badge visibility, health button, no input elements.
 
 **Type Changes:**
+
 - `src/types/api.ts` — removed `apiKey` from `LlmConfig`; removed `LlmConfigTestResult`; added `LlmHealthResult`.
 - `LlmConfig` now: `{ endpoint: string; modelName: string; isConfigured: boolean; authMethod: string }`.
 
 **Key Learnings:**
+
 - `testing-library` `getByText` throws on multiple element matches — use `getByTestId` or `getAllByText` when text appears in composite elements (badge + description).
 - `toHaveTextContent` on container is correct tool for status displays spanning multiple inline `<span>` elements.
 - Readonly design eliminates form validation, state synchronization, and credential handling complexity.
 
 **Orchestration Log:** `.squad/orchestration-log/2026-03-22T07_20_00Z-dinesh.md`
 **Decision:** `.squad/decisions/decisions.md` → Config Dialog Becomes Readonly Health Check View section
-
-
 
 ### Frontend Implementation (2025-07-22)
 
@@ -197,17 +207,20 @@
 **Summary:** Added full OpenTelemetry browser instrumentation (traces + metrics) matching the prompt-babbler reference. Telemetry gracefully no-ops when the OTLP endpoint is absent (standalone dev).
 
 **Changes:**
+
 - `marginalia-app/package.json` — Added 13 `@opentelemetry/*` dependencies (api, context-zone, exporter-metrics-otlp-http, exporter-trace-otlp-proto, instrumentation, instrumentation-document-load, instrumentation-fetch, instrumentation-user-interaction, resources, sdk-metrics, sdk-trace-base, sdk-trace-web, semantic-conventions).
 - `marginalia-app/src/telemetry.ts` — NEW FILE. Initializes WebTracerProvider + MeterProvider with OTLP exporters. Auto-instruments document load, fetch, and user interactions. Exports `tracer`, `meter`, and `endSpanWithDuration` helper for custom spans.
 - `marginalia-app/src/main.tsx` — Calls `initTelemetry()` before React render.
 - `marginalia-app/vite.config.ts` — Forwards `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS`, `OTEL_RESOURCE_ATTRIBUTES`, `OTEL_SERVICE_NAME` env vars via Vite `define` (same pattern as `__API_BASE_URL__`).
 
 **Pattern:**
+
 - Aspire injects OTEL env vars when the dashboard is running. Vite's `define` replaces `__OTEL_*__` globals at build time.
 - `typeof __VAR__ !== 'undefined'` guard handles standalone dev where define emits `""`.
 - `initTelemetry()` checks for endpoint presence and skips all SDK setup if absent — zero runtime cost in standalone mode.
 
 **Key files:**
+
 - `marginalia-app/src/telemetry.ts`
 - `marginalia-app/src/main.tsx`
 - `marginalia-app/vite.config.ts`
@@ -241,6 +254,7 @@
 **Status:** ✅ COMPLETE — Build 0 warnings/errors, 84 unit tests pass.
 
 **Outcome Verification:**
+
 - Orchestration log: `.squad/orchestration-log/2026-03-22T08_15_00Z-dinesh.md`
 - Decision merged: `.squad/decisions.md` → OpenTelemetry Browser SDK section
 - 13 new `@opentelemetry/*` packages integrated and bundled
@@ -249,6 +263,7 @@
 - No-op path verified: standalone `pnpm dev` unaffected (zero cost when OTLP endpoint absent)
 
 **Integration with Telemetry Stack:**
+
 - Backend structured logging (Gilfoyle) + Frontend OTel SDK (this work) provide end-to-end tracing
 - Session log: `.squad/log/2026-03-22T08_15_00Z-telemetry-improvement.md`
 - Next: Verify trace correlation in Aspire dashboard; consider custom spans in FoundrySuggestionService for chunk-level visibility
@@ -285,6 +300,7 @@
 3. **Hooks** — No changes required. All hooks (`useDocument`, `useSuggestions`, `useAnalysis`) call service functions which now automatically include the header.
 
 **Pattern:**
+
 - Single source of truth for userId: `currentUserId` module variable in `api.ts`
 - Header sent on every request — backend can extract and use for partitioning
 - Default `"_anonymous"` ensures backward compatibility with existing data
@@ -293,6 +309,7 @@
 **Verification:** `npx pnpm run build` succeeded with zero TypeScript errors. Bundle size unchanged (header is just a string).
 
 **Key Files:**
+
 - `marginalia-app/src/services/api.ts` — userId management + header injection
 - `marginalia-app/src/types/document.ts`, `session.ts`, `suggestion.ts` — Type additions
 

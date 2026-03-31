@@ -45,10 +45,12 @@ npm token list
 ```
 
 Look for:
+
 - ✅ `read-write` tokens with NO 2FA requirement = Automation token (correct)
 - ❌ Tokens requiring OTP = User token (WRONG, will fail in CI)
 
 **How to create an Automation token:**
+
 1. Go to npmjs.com → Settings → Access Tokens
 2. Click "Generate New Token"
 3. Select **"Automation"** (NOT "Publish")
@@ -87,6 +89,7 @@ echo $SKIP_BUILD_BUMP
 ```
 
 **For Windows PowerShell:**
+
 ```powershell
 $env:SKIP_BUILD_BUMP = "1"
 ```
@@ -176,12 +179,14 @@ gh run view --log
 ```
 
 **Expected flow:**
+
 1. `publish-sdk` job runs → publishes `@bradygaster/squad-sdk`
 2. Verify step runs with retry loop (up to 5 attempts, 15s interval) to confirm SDK on npm registry
 3. `publish-cli` job runs → publishes `@bradygaster/squad-cli`
 4. Verify step runs with retry loop to confirm CLI on npm registry
 
 **If workflow fails:** Check the logs. Common issues:
+
 - EOTP error = wrong NPM_TOKEN type (use Automation token)
 - Verify step timeout = npm propagation delay (retry loop should handle this, but propagation can take up to 2 minutes in rare cases)
 - Version mismatch = package.json version doesn't match tag
@@ -414,6 +419,7 @@ After dev sync:
 This skill was created after the v0.8.22 release disaster. Full retrospective: `.squad/decisions/inbox/keaton-v0822-retrospective.md`
 
 **Key learnings:**
+
 1. No release without a runbook = improvisation = disaster
 2. Semver validation is mandatory — 4-part versions break npm
 3. NPM_TOKEN type matters — User tokens with 2FA fail in CI

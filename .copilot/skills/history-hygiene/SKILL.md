@@ -20,10 +20,12 @@ History files (.md files tracking decisions, spawns, outcomes) are read cold by 
 ## Examples
 
 ✓ **Correct:**
+
 - "Migration target: v0.8.17 (initially discussed as v0.6.0, corrected by Brady)"
 - "Reverted to Node 18 per Brady's explicit request on 2024-01-15"
 
 ✗ **Incorrect:**
+
 - "Brady directed v0.6.0" (when later reversed)
 - Recording what was *requested* instead of what *actually happened*
 - Logging entries before outcome is confirmed

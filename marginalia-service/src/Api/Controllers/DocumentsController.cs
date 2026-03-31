@@ -91,7 +91,7 @@ public sealed class DocumentsController : ControllerBase
 
         using var stream = file.OpenReadStream();
         var document = await _wordDocumentService.ParseAsync(stream, file.FileName, cancellationToken);
-        
+
         // Set userId and new metadata fields
         document = document with
         {
@@ -101,7 +101,7 @@ public sealed class DocumentsController : ControllerBase
             CreatedAt = now,
             UpdatedAt = now
         };
-        
+
         await _documentRepository.SaveAsync(document, cancellationToken);
 
         var session = new UserSession

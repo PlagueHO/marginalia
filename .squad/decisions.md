@@ -88,7 +88,6 @@
     - **Scope:** Name changes appear in AppHost.cs (orchestration) and Program.cs (`AddChatClient` registration). No breaking changes — deployment name used internally only.
     - **Consequences:** Clearer contributor experience; reduced confusion with account naming.
 
-
 ### Cosmos DB & Multi-Tenancy (2026-03-28)
 
 1. **Cosmos DB Persistence with Preview Emulator:** Replace in-memory ConcurrentDictionary storage with Cosmos DB persistence using the Azure Cosmos DB preview emulator. Follow the PlagueHO/prompt-babbler reference pattern.
@@ -117,13 +116,13 @@
 
 8. **HomePage as Standalone Page:** HomePage has its own minimal header (branding only). Full AppHeader (with export, config, "New" button) is editor-only. AppHeader logo is a `<Link to="/">` for navigation home.
 
-2. **Frontend userId Support via X-User-Id Header:** Frontend sends `X-User-Id` header on every API request for multi-tenant support.
+9. **Frontend userId Support via X-User-Id Header:** Frontend sends `X-User-Id` header on every API request for multi-tenant support.
     - **Implementation:** Module-level `currentUserId` variable in `api.ts` (defaults to `"_anonymous"`). All fetch wrappers inject header transparently. Exports `setUserId(userId)` and `getUserId()` for future auth integration.
     - **Types:** Document, UserSession, and Suggestion interfaces now include `userId: string` field.
     - **Rationale:** Single source of truth for userId in one module variable. Transparent to services and hooks. Future-proof for auth integration via `setUserId()`.
     - **Consequences:** All API requests carry userId context; backend can enforce strict multi-tenant isolation; ready for MSAL integration.
 
-3. **UserId Multi-Tenancy Test Strategy:** Write comprehensive contract-first tests (43 total) validating multi-tenant data isolation and userId behavior.
+10. **UserId Multi-Tenancy Test Strategy:** Write comprehensive contract-first tests (43 total) validating multi-tenant data isolation and userId behavior.
     - **Coverage:** 14 tests for Document repository contract, 12 for Session repository contract, 9 for domain model userId defaulting, 8 for controller header extraction and isolation.
     - **Approach:** Test doubles implementing new interface signatures; integration tests using WebApplicationFactory; NoOpChatClient to avoid external dependencies.
     - **Validation:** User isolation enforced (user-bob cannot access user-alice data); proper 404s; whitespace handling; record `with` syntax preserves userId.

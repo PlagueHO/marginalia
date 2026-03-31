@@ -35,6 +35,7 @@ A personal squad is a user-level collection of AI agents that travel with you ac
 ## Ghost Protocol
 
 See `templates/ghost-protocol.md` for the full rules. Key points:
+
 - Personal agents advise; project agents execute
 - No writes to project `.squad/` state
 - Transparent origin tagging in logs
@@ -43,6 +44,7 @@ See `templates/ghost-protocol.md` for the full rules. Key points:
 ## Configuration
 
 Optional `config.json` in the personal squad directory:
+
 ```json
 {
   "defaultModel": "auto",

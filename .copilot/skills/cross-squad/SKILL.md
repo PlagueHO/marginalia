@@ -14,9 +14,11 @@ tools:
 ---
 
 ## Context
+
 When an organization runs multiple Squad instances (e.g., platform-squad, frontend-squad, data-squad), those squads need to discover each other, share context, and hand off work across repository boundaries. This skill teaches agents how to coordinate across squads without creating tight coupling.
 
 Cross-squad orchestration applies when:
+
 - A task requires capabilities owned by another squad
 - An architectural decision affects multiple squads
 - A feature spans multiple repositories with different squads
@@ -25,7 +27,9 @@ Cross-squad orchestration applies when:
 ## Patterns
 
 ### Discovery via Manifest
+
 Each squad publishes a `.squad/manifest.json` declaring its name, capabilities, and contact information. Squads discover each other through:
+
 1. **Well-known paths**: Check `.squad/manifest.json` in known org repos
 2. **Upstream config**: Squads already listed in `.squad/upstream.json` are checked for manifests
 3. **Explicit registry**: A central `squad-registry.json` can list all squads in an org
@@ -46,17 +50,21 @@ Each squad publishes a `.squad/manifest.json` declaring its name, capabilities, 
 ```
 
 ### Context Sharing
+
 When delegating work, share only what the target squad needs:
+
 - **Capability list**: What this squad can do (from manifest)
 - **Relevant decisions**: Only decisions that affect the target squad
 - **Handoff context**: A concise description of why this work is being delegated
 
 Do NOT share:
+
 - Internal team state (casting history, session logs)
 - Full decision archives (send only relevant excerpts)
 - Authentication credentials or secrets
 
 ### Work Handoff Protocol
+
 1. **Check manifest**: Verify the target squad accepts the work type (issues, PRs)
 2. **Create issue**: Use `gh issue create` in the target repo with:
    - Title: `[cross-squad] <description>`
@@ -66,7 +74,9 @@ Do NOT share:
 4. **Poll**: Periodically check if the delegated issue is closed/completed
 
 ### Feedback Loop
+
 Track delegated work completion:
+
 - Poll target issue status via `gh issue view`
 - Update originating issue with status changes
 - Close the feedback loop when delegated work merges
@@ -74,6 +84,7 @@ Track delegated work completion:
 ## Examples
 
 ### Discovering squads
+
 ```bash
 # List all squads discoverable from upstreams and known repos
 squad discover
@@ -85,6 +96,7 @@ squad discover
 ```
 
 ### Delegating work
+
 ```bash
 # Delegate a task to the platform squad
 squad delegate platform-squad "Add Prometheus metrics endpoint for the auth service"
@@ -93,6 +105,7 @@ squad delegate platform-squad "Add Prometheus metrics endpoint for the auth serv
 ```
 
 ### Manifest in squad.config.ts
+
 ```typescript
 export default defineSquad({
   manifest: {
@@ -106,6 +119,7 @@ export default defineSquad({
 ```
 
 ## Anti-Patterns
+
 - **Direct file writes across repos** — Never modify another squad's `.squad/` directory. Use issues and PRs as the communication protocol.
 - **Tight coupling** — Don't depend on another squad's internal structure. Use the manifest as the public API contract.
 - **Unbounded delegation** — Always include acceptance criteria and a timeout. Don't create open-ended requests.

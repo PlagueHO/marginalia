@@ -9,11 +9,13 @@ source: "manual"
 ## SCOPE
 
 ✅ THIS SKILL PRODUCES:
+
 - A modified Layer 3 model selection table applied when economy mode is active
 - `economyMode: true` written to `.squad/config.json` when activated persistently
 - Spawn acknowledgments with `💰` indicator when economy mode is active
 
 ❌ THIS SKILL DOES NOT PRODUCE:
+
 - Code, tests, or documentation
 - Cost reports or billing artifacts
 - Changes to Layer 0, Layer 1, or Layer 2 resolution (user intent always wins)
@@ -87,6 +89,7 @@ When economy mode is **active**, Layer 3 auto-selection uses this table instead 
 ### STOP
 
 After updating economy mode state and including the `💰` indicator in spawn acknowledgments, this skill is done. Do NOT:
+
 - Change Layer 0, Layer 1, or Layer 2 model choices
 - Override charter-specified models
 - Generate cost reports or comparisons

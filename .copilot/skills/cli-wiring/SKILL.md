@@ -8,6 +8,7 @@
    - Export a `run<Name>(cwd, options)` async function (or class with static methods for utility modules)
 
 2. **Add routing block** in `packages/squad-cli/src/cli-entry.ts` inside `main()`:
+
    ```ts
    if (cmd === '<name>') {
      const { run<Name> } = await import('./cli/commands/<name>.js');
@@ -18,6 +19,7 @@
    ```
 
 3. **Add help text** in the help section of `cli-entry.ts` (search for `Commands:`):
+
    ```ts
    console.log(`  ${BOLD}<name>${RESET}     <description>`);
    console.log(`             Usage: <name> [flags]`);

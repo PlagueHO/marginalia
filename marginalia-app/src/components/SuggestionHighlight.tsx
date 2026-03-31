@@ -23,8 +23,6 @@ const statusMarkerColors = {
   Modified: "bg-sky-500 text-white dark:bg-sky-500",
 } as const;
 
-export { statusMarkerColors };
-
 export function SuggestionMarker({
   suggestion,
   number,

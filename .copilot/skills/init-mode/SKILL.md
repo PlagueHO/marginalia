@@ -40,7 +40,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
 🔄  Ralph        — (monitor)     Work queue, backlog, keep-alive
 ```
 
-5. Use the `ask_user` tool to confirm the roster. Provide choices so the user sees a selectable menu:
+1. Use the `ask_user` tool to confirm the roster. Provide choices so the user sees a selectable menu:
    - **question:** *"Look right?"*
    - **choices:** `["Yes, hire this team", "Add someone", "Change a role"]`
 
@@ -52,7 +52,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
 
 > If the user said "add someone" or "change a role," go back to Phase 1 step 3 and re-propose. Do NOT enter Phase 2 until the user confirms.
 
-6. Create the `.squad/` directory structure (see `.squad/templates/` for format guides or use the standard structure: team.md, routing.md, ceremonies.md, decisions.md, decisions/inbox/, casting/, agents/, orchestration-log/, skills/, log/).
+1. Create the `.squad/` directory structure (see `.squad/templates/` for format guides or use the standard structure: team.md, routing.md, ceremonies.md, decisions.md, decisions/inbox/, casting/, agents/, orchestration-log/, skills/, log/).
 
 **Casting state initialization:** Copy `.squad/templates/casting-policy.json` to `.squad/casting/policy.json` (or create from defaults). Create `registry.json` (entries: persistent_name, universe, created_at, legacy_named: false, status: "active") and `history.json` (first assignment snapshot with unique assignment_id).
 
@@ -61,17 +61,19 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
 **Team.md structure:** `team.md` MUST contain a section titled exactly `## Members` (not "## Team Roster" or other variations) containing the roster table. This header is hard-coded in GitHub workflows (`squad-heartbeat.yml`, `squad-issue-assign.yml`, `squad-triage.yml`, `sync-squad-labels.yml`) for label automation. If the header is missing or titled differently, label routing breaks.
 
 **Merge driver for append-only files:** Create or update `.gitattributes` at the repo root to enable conflict-free merging of `.squad/` state across branches:
+
 ```
 .squad/decisions.md merge=union
 .squad/agents/*/history.md merge=union
 .squad/log/** merge=union
 .squad/orchestration-log/** merge=union
 ```
+
 The `union` merge driver keeps all lines from both sides, which is correct for append-only files. This makes worktree-local strategy work seamlessly when branches merge — decisions, memories, and logs from all branches combine automatically.
 
-7. Say: *"✅ Team hired. Try: '{FirstCastName}, set up the project structure'"*
+1. Say: *"✅ Team hired. Try: '{FirstCastName}, set up the project structure'"*
 
-8. **Post-setup input sources** (optional — ask after team is created, not during casting):
+2. **Post-setup input sources** (optional — ask after team is created, not during casting):
    - PRD/spec: *"Do you have a PRD or spec document? (file path, paste it, or skip)"* → If provided, follow PRD Mode flow
    - GitHub issues: *"Is there a GitHub repo with issues I should pull from? (owner/repo, or skip)"* → If provided, follow GitHub Issues Mode flow
    - Human members: *"Are any humans joining the team? (names and roles, or just AI for now)"* → If provided, add per Human Team Members section
@@ -81,6 +83,7 @@ The `union` merge driver keeps all lines from both sides, which is correct for a
 ## Examples
 
 **Example flow:**
+
 1. Coordinator detects no team.md → Init Mode
 2. Runs `git config user.name` → "Brady"
 3. Asks: *"Hey Brady, what are you building?"*

@@ -59,6 +59,7 @@ A shared JSON file (`~/.squad/rate-pool.json`) distributes API quota:
 ```
 
 **Rules:**
+
 - P0 agents (Lead) get 40% of quota
 - P1 agents (specialists) get 35%
 - P2 agents (Ralph, Scribe) get 25%

@@ -9,18 +9,22 @@ author: tamirdresher
 # GitHub Multi-Account — AI-Driven Setup
 
 ## When to Activate
+
 When the user has multiple GitHub accounts (check with `gh auth status`). If you see 2+ accounts listed, this skill applies.
 
 ## What to Do (as the AI agent)
 
 ### Step 1: Detect accounts
+
 Run: `gh auth status`
 Look for multiple accounts. Note which usernames are listed.
 
 ### Step 2: Ask the user
+
 Ask: "I see you have multiple GitHub accounts: {list them}. Which one is your personal account and which is your work/EMU account?"
 
 ### Step 3: Run the setup automatically
+
 Once the user confirms, do ALL of this for them:
 
 ```powershell
@@ -65,13 +69,16 @@ Set-Alias ghw gh-work
 ```
 
 ### Step 4: Verify for the user
+
 Run these and show the results:
+
 ```powershell
 ghp api user --jq '.login'   # should show personal username
 ghw api user --jq '.login'   # should show work username
 ```
 
 ### Step 5: Tell the user
+
 "All set! From now on use `ghp` for personal repos and `ghw` for work repos. I'll use them too."
 
 ## After Setup — Usage Rules
@@ -88,7 +95,9 @@ This repo (`bradygaster/squad`) is bound to the **bradygaster** (personal) accou
 All `gh` operations in this repo MUST use `ghp` / `gh-personal`.
 
 ## For Squad Agents
+
 At the TOP of any script touching GitHub, define:
+
 ```powershell
 function gh-personal { gh auth switch --user bradygaster 2>$null | Out-Null; gh @args }
 function gh-work { gh auth switch --user bradyg_microsoft 2>$null | Out-Null; gh @args }

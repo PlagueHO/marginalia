@@ -203,17 +203,20 @@ Adopted .NET Aspire 13.1.3 as orchestration layer following prompt-babbler refer
 **Root Cause:** Two disconnected config paths — `LlmEndpointOptions` (appsettings) vs. Aspire's `ai-foundry` connection string. The controller read from the former; the actual client used the latter.
 
 **Decision:**
+
 - `ConfigController.GetLlmConfig()` calls `_chatClient?.GetService<ChatClientMetadata>()` to extract `ProviderUri` and `DefaultModelId` from the live client
 - Falls back to `LlmEndpointOptions` when no metadata available (standalone/non-Aspire scenarios)
 - Removed placeholder endpoint/model and stale `ApiKey` fields from `appsettings.Development.json` and `appsettings.json`
 
 **Rationale:**
+
 - No AppHost changes — bug is in the API service, not orchestration
 - No hardcoded values — metadata comes from the actual client instance
 - Backward compatible — `LlmEndpointOptions` fallback preserves non-Aspire path
 - Zero new dependencies — `ChatClientMetadata` is part of `Microsoft.Extensions.AI.Abstractions` already referenced
 
 **Consequences:**
+
 - Frontend Model Configuration dialog now shows actual endpoint and model name when running under Aspire
 - `LlmEndpointOptions` remains available for standalone configuration via env vars (`FOUNDRY_ENDPOINT`, `FOUNDRY_MODEL_NAME`)
 - Build: 0 errors, 78 tests passing
@@ -273,7 +276,8 @@ Remove all API key authentication paths for Azure AI Foundry. The backend now au
 
 **Context:** The previous implementation supported three auth paths (API key via OpenAI SDK, Entra ID fallback via `AzureOpenAIClient`, Aspire-provided `IChatClient`). This added complexity, surface area for credential leakage, and required unnecessary NuGet packages.
 
-**Decision:** 
+**Decision:**
+
 - **Frontend** can no longer POST/PUT `/api/config/llm` — that endpoint is removed. No credentials are ever sent from the browser.
 - **Backend** registers `IChatClient` exclusively via `builder.AddAzureChatCompletionsClient("ai-foundry").AddChatClient("chat")` — the Aspire integration uses DefaultAzureCredential automatically.
 - **Analysis endpoints** fail with a DI exception if `IChatClient` is not registered (i.e., not running under Aspire). This is intentional — Aspire is the required runtime.
@@ -282,6 +286,7 @@ Remove all API key authentication paths for Azure AI Foundry. The backend now au
 - **Added package:** `Aspire.Azure.AI.Inference` 13.1.3-preview.1.26166.8
 
 **Trade-offs:**
+
 - **Loses:** Standalone mode (running without Aspire). Previously users could supply an API key and run without Aspire orchestration.
 - **Gains:** Simpler codebase, no credential handling, no masked API key storage, smaller dependency footprint.
 
@@ -299,6 +304,7 @@ Configuration is fully backend-owned. The frontend config dialog is readonly.
 **Context:** The LLM configuration was previously editable from the frontend — users could set endpoint URL, API key, and model name via the config dialog, and the frontend would POST to `/api/config/llm`. Gilfoyle's backend now fully owns configuration via Aspire environment variables/appsettings, and always uses Entra ID authentication. There is no longer a POST endpoint for config.
 
 **Decision:**
+
 - `LlmConfigDialog` no longer contains any `<Input>` elements. Endpoint URL and model name are displayed as styled readonly text.
 - API key concept eliminated from the frontend entirely (`apiKey` removed from `LlmConfig` type).
 - Auth method is always "Entra ID" — always shown as a fixed badge (ShieldCheck icon).
@@ -307,12 +313,14 @@ Configuration is fully backend-owned. The frontend config dialog is readonly.
 - Green CheckCircle2 for healthy, red XCircle for unhealthy, Loader2 spinner while checking.
 
 **Consequences:**
+
 - Frontend never modifies backend config. Zero chance of frontend accidentally overwriting Aspire-managed settings.
 - `configService` is now read-only: only `getLlmConfig` and `checkHealth` remain.
 - `useLlmConfig` hook no longer exposes `updateConfig`, `testConnection`, or `setLocalConfig`.
 - `AppHeader` and `EditorPage` are simpler — three props and two callbacks removed.
 
 **API Contract (Gilfoyle):**
+
 - `GET /api/config/llm` → `{ endpoint, modelName, isConfigured, authMethod }`
 - `GET /api/config/llm/health` → `{ healthy: boolean, message: string }`
 - `POST /api/config/llm` — **REMOVED**
@@ -329,12 +337,14 @@ Both `/api/documents/upload` and `/api/documents/{id}/paste` endpoints now wrap 
 **Context:** Frontend `useDocument` hook expected `{ document, sessionId }` structure from both endpoints, but the backend returned raw `Document` objects. This caused `response.document` to be undefined, triggering a deserialization error caught as "Failed to process text".
 
 **Decision:**
+
 - Added `UploadDocumentResponse` record: `record UploadDocumentResponse(Document Document, string SessionId)` in `src/Domain/Models/`
 - Both `Upload` and `Paste` endpoints now create a `UserSession` with generated GUID `SessionId`, persist via `ISessionRepository.SaveAsync()`, and return `new UploadDocumentResponse(document, sessionId)`
 - Added `[RequestSizeLimit(52_428_800)]` (50 MB) to `Paste` endpoint to match `Upload` (was missing)
 - Response wrapped in `CreatedAtAction` per REST convention
 
 **Consequences:**
+
 - Frontend receives correct `{ document, sessionId }` structure — no more undefined access errors
 - Session infrastructure now activated at document creation time
 - Every upload/paste creates a new session (multi-document session grouping would require different flow, out of scope)
@@ -342,6 +352,7 @@ Both `/api/documents/upload` and `/api/documents/{id}/paste` endpoints now wrap 
 - 78 unit tests pass unchanged
 
 **API Contract:**
+
 - `POST /api/documents/upload` → `{ document: Document, sessionId: string }`
 - `POST /api/documents/{id}/paste` → `{ document: Document, sessionId: string }`
 

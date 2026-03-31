@@ -15,6 +15,7 @@
 **Summary:** Frontend was calling `/api/documents/analyze` (missing document ID) and expected `AnalyzeResponse` wrapper instead of direct `Suggestion[]`. Fixed URL to include `{id}` path parameter, updated response type contract, and removed obsolete wrapper type.
 
 **Files Updated:**
+
 - `src/services/documentService.ts` — URL and response type corrected
 - `src/hooks/useAnalysis.ts` — adapted to `Suggestion[]` response
 - `src/types/api.ts`, `src/types/index.ts` — removed `AnalyzeResponse` export
@@ -32,19 +33,23 @@
 **Root Cause:** Two disconnected config paths — `LlmEndpointOptions` (bound to appsettings) vs Aspire's `ai-foundry` connection string. The controller read from path #1; the actual client used path #2.
 
 **Fix (Approach A — IChatClient metadata):**
+
 - `ConfigController.GetLlmConfig()` now calls `_chatClient?.GetService<ChatClientMetadata>()` to get `ProviderUri` and `DefaultModelId`
 - Falls back to `LlmEndpointOptions` when no metadata available (non-Aspire scenarios)
 - No changes to AppHost, no hardcoded values
 
 **Cleanup:**
+
 - `appsettings.Development.json` — removed placeholder endpoint/model and stale `ApiKey` field; `LlmEndpoint` section now has empty values (Aspire provides real ones)
 - `appsettings.json` — removed stale `ApiKey` field from `LlmEndpoint` section
 
 **Key API:**
+
 - `IChatClient.GetService<ChatClientMetadata>()` returns `ChatClientMetadata` with `ProviderUri` (Uri), `DefaultModelId` (string), `ProviderName` (string)
 - Aspire's `AddAzureChatCompletionsClient().AddChatClient()` populates this metadata automatically
 
 **Key Files:**
+
 - `src/Api/Controllers/ConfigController.cs` — metadata-aware `GetLlmConfig()`
 - `src/Api/appsettings.Development.json` — cleaned up
 - `src/Api/appsettings.json` — cleaned up
@@ -61,6 +66,7 @@
 **Key File:** `marginalia-service/src/Api/Program.cs` (lines ~54–80)
 
 **Pattern:**
+
 - Read `CORS:AllowedOrigins` from config (supports `CORS__AllowedOrigins` env var double-underscore convention from Bicep).
 - If empty (dev): `SetIsOriginAllowed(IsLocalOrigin)` — any localhost/127.0.0.1 port allowed.
 - If set (prod): explicit list + localhost always permitted.
@@ -77,11 +83,13 @@
 **Summary:** Removed all API key authentication paths. Backend now authenticates to Azure AI Foundry exclusively via DefaultAzureCredential (Entra ID) through the Aspire Azure AI Inference client integration.
 
 **Package Changes:**
-- Removed: `Aspire.Azure.AI.OpenAI`, `Azure.AI.OpenAI`, `OpenAI` 
+
+- Removed: `Aspire.Azure.AI.OpenAI`, `Azure.AI.OpenAI`, `OpenAI`
 - Added: `Aspire.Azure.AI.Inference` 13.1.3-preview.1.26166.8
 - Kept: `Azure.Identity`, `Microsoft.Extensions.AI.Abstractions`
 
 **Key File Changes:**
+
 - `Directory.Packages.props` — replaced OpenAI Aspire/SDK packages with Aspire.Azure.AI.Inference
 - `LlmEndpointOptions.cs` — removed `ApiKey` property; Entra ID only
 - `Program.cs` — removed `FOUNDRY_API_KEY` env var block; replaced `AddAzureOpenAIClient` + manual IChatClient singleton with `AddAzureChatCompletionsClient("ai-foundry").AddChatClient("chat")`
@@ -93,12 +101,11 @@
 - `LlmEndpointOptionsTests.cs` — removed ApiKey tests (Constructor_WithAllFields, Record_With, ApiKey_CanBeEmptyString)
 
 **Patterns:**
+
 - `AddAzureChatCompletionsClient(name).AddChatClient(deployment)` is the Aspire AI Inference one-liner that auto-registers `IChatClient` with DefaultAzureCredential
 - `IChatClient?` (nullable) in ConfigController enables health check to return false without crashing when Aspire not running
 - `IChatClient` (required, non-nullable) in FoundrySuggestionService means analysis endpoints fail gracefully with DI error when not under Aspire
 - Health endpoint `GET /api/config/llm/health` is lightweight (no token spend) — checks presence of IChatClient registration only
-
-
 
 ### Backend Implementation (2026-03-22)
 
@@ -224,17 +231,20 @@
 **Summary:** Removed all API key authentication paths. Backend now authenticates to Azure AI Foundry exclusively via DefaultAzureCredential (Entra ID) through the Aspire Azure AI Inference client integration. No dual-path fallbacks; Aspire is required at runtime.
 
 **Breaking Changes:**
+
 - Standalone mode (API key + HttpClient) removed entirely.
 - `/api/config/llm` POST/PUT endpoints removed.
 - Frontend can no longer POST credentials.
 - `FoundrySuggestionService.AnalyzeAsync` requires registered `IChatClient` — fails with DI exception if not under Aspire.
 
 **Package Changes:**
+
 - Removed: `Aspire.Azure.AI.OpenAI`, `Azure.AI.OpenAI`, `OpenAI`, `Azure.Identity`
 - Added: `Aspire.Azure.AI.Inference` 13.1.3-preview.1.26166.8
 - Kept: `Azure.Identity`, `Microsoft.Extensions.AI.Abstractions`
 
 **Key File Changes:**
+
 - `Directory.Packages.props` — removed OpenAI Aspire/SDK packages; added Aspire.Azure.AI.Inference
 - `LlmEndpointOptions.cs` — removed `ApiKey` property
 - `Program.cs` — one-liner: `builder.AddAzureChatCompletionsClient("ai-foundry").AddChatClient("chat")`
@@ -246,6 +256,7 @@
 - Tests — removed ApiKey-related tests from `LlmEndpointOptionsTests.cs`
 
 **Patterns:**
+
 - `AddAzureChatCompletionsClient(name).AddChatClient(deployment)` auto-registers `IChatClient` with `DefaultAzureCredential`
 - `IChatClient?` (nullable) in ConfigController enables health check to return false without crashing when Aspire not running
 - `IChatClient` (required, non-nullable) in FoundrySuggestionService ensures analysis fails gracefully with DI error when not under Aspire
@@ -278,7 +289,8 @@
 
 **Status:** ✅ COMPLETE — Build 0 warnings/errors, 78 unit tests pass.
 
-**Outcome Verification:** 
+**Outcome Verification:**
+
 - Orchestration log: `.squad/orchestration-log/2026-03-22T08_15_00Z-gilfoyle.md`
 - Decision merged: `.squad/decisions.md` → Backend Structured Logging Pattern section
 - All 4 files compile and pass tests
@@ -286,6 +298,7 @@
 - All 3 controllers emit structured logs with zero sensitive data exposure
 
 **Integration with Telemetry Stack:**
+
 - Backend logs (this work) + Frontend OTel SDK (Dinesh) provide end-to-end tracing
 - Session log: `.squad/log/2026-03-22T08_15_00Z-telemetry-improvement.md`
 - Next: Monitor Aspire dashboard trace correlation quality
@@ -299,23 +312,26 @@
 **Root Cause:** Two disconnected config paths — `LlmEndpointOptions` (bound to appsettings) vs Aspire's `ai-foundry` connection string. The controller read from path #1; the actual client used path #2.
 
 **Fix (Approach A — IChatClient metadata):**
+
 - `ConfigController.GetLlmConfig()` now calls `_chatClient?.GetService<ChatClientMetadata>()` to get `ProviderUri` and `DefaultModelId`
 - Falls back to `LlmEndpointOptions` when no metadata available (non-Aspire scenarios)
 - No changes to AppHost, no hardcoded values
 
 **Cleanup:**
+
 - `appsettings.Development.json` — removed placeholder endpoint/model and stale `ApiKey` field; `LlmEndpoint` section now has empty values (Aspire provides real ones)
 - `appsettings.json` — removed stale `ApiKey` field from `LlmEndpoint` section
 
 **Key API:**
+
 - `IChatClient.GetService<ChatClientMetadata>()` returns `ChatClientMetadata` with `ProviderUri` (Uri), `DefaultModelId` (string), `ProviderName` (string)
 - Aspire's `AddAzureChatCompletionsClient().AddChatClient()` populates this metadata automatically
 
 **Key Files:**
+
 - `src/Api/Controllers/ConfigController.cs` — metadata-aware `GetLlmConfig()`
 - `src/Api/appsettings.Development.json` — cleaned up
 - `src/Api/appsettings.json` — cleaned up
-
 
 ### Upload/Paste Response Type Fix (2026-03-22)
 
@@ -326,10 +342,12 @@
 **Root Cause:** `CreatedAtAction(..., document)` returned the document directly. `response.document` was `undefined` in the frontend → TypeError silently swallowed → "Failed to process text" toast.
 
 **Key Changes:**
+
 - `src/Domain/Models/UploadDocumentResponse.cs` — NEW sealed record with `[JsonPropertyName]` attributes
 - `src/Api/Controllers/DocumentsController.cs` — `ISessionRepository` injected; `Upload` and `Paste` return `ActionResult<UploadDocumentResponse>`; `[RequestSizeLimit]` added to `Paste`
 
 **Patterns:**
+
 - `UploadDocumentResponse` lives in Domain/Models alongside other response DTOs
 - Session created at document ingestion time (not deferred); one session per upload/paste
 - `ISessionRepository` was already registered as singleton — zero Program.cs changes needed
@@ -343,10 +361,12 @@
 **Summary:** Renamed the AI model deployment from `foundry` to `reviewer` across the codebase. The old name was ambiguous. The new name reflects the deployment's purpose: reviewing/analyzing manuscripts.
 
 **Changes:**
+
 - AppHost.cs — deployment resource name foundry -> reviewer; variable modelDeployment -> reviewerDeployment
 - Program.cs — AddChatClient(foundry) -> AddChatClient(reviewer)
 
 **Not changed:** ai-foundry references (account/resource name, not deployment name) remain untouched.
+
 ### Cosmos DB Persistence with Preview Emulator (2026-03-29T00:10:33Z)
 
 **Status:** ✅ COMPLETE — Build succeeded, 78 unit tests pass.
@@ -354,6 +374,7 @@
 **Summary:** Replaced in-memory ConcurrentDictionary storage with Cosmos DB persistence using the Azure Cosmos DB preview emulator. Followed the PlagueHO/prompt-babbler reference pattern exactly.
 
 **Package Changes:**
+
 - AppHost: Added Aspire.Hosting.Azure.CosmosDB 13.2.0
 - Api: Added Aspire.Microsoft.Azure.Cosmos 13.2.0
 - Infrastructure: Added Microsoft.Azure.Cosmos 3.58.0, Newtonsoft.Json 13.0.4
@@ -361,32 +382,39 @@
 **Key File Changes:**
 
 **AppHost.cs:**
+
 - Added Cosmos preview emulator with Data Explorer
 - Created database "marginalia" with 3 containers: documents, sessions, suggestions
 - Partition key /userId for all containers
 - Wired containers to API service
 
 **Domain Models:**
+
 - Document.cs, UserSession.cs, Suggestion.cs — Added UserId property with default "_anonymous"
 
 **Repository Interfaces:**
+
 - IDocumentRepository — Added userId parameter; replaced GetBySessionAsync with GetByUserAsync; added DeleteAsync
 - ISessionRepository — Added userId parameter to all methods
 
 **Repository Implementations:**
+
 - CosmosDocumentRepository.cs — NEW: Uses CosmosClient.GetContainer(), PartitionKey(userId)
 - CosmosSessionRepository.cs — NEW: Same pattern
 - InMemory repositories updated to match new interface
 
 **API:**
+
 - Program.cs — Added CosmosClient registration with System.Text.Json serializer
 - DocumentsController.cs — Added GetUserId(Request) helper; extracts X-User-Id header
 - SessionsController.cs — Same userId extraction pattern
 
 **Tests:**
+
 - DocumentRepositoryContractTests.cs — Updated to pass userId parameter
 
 **Patterns:**
+
 - Partition key /userId enables multi-tenant data isolation
 - X-User-Id header extraction with "_anonymous" default
 - Structured logging for all Cosmos CRUD operations
@@ -399,21 +427,25 @@
 **Summary:** Implemented backend changes for home page document listing feature per Richard's API design.
 
 **Model Changes:**
+
 - `Document.cs` — added `Title`, `Status` (DocumentStatus), `CreatedAt`, `UpdatedAt` with record defaults for backward-compatible Cosmos deserialization
 - New: `DocumentStatus.cs` (Draft/Analyzed), `DocumentSummary.cs` (listing DTO), `DocumentListResponse.cs` (wrapper)
 - `PasteDocumentRequest.cs` — added optional `Title`
 
 **API Changes:**
+
 - `GET /api/documents` — `DocumentListResponse` with projections sorted by UpdatedAt desc; handles legacy docs (missing title → filename, missing status → inferred from suggestion count)
 - `POST /api/documents/upload` — accepts `[FromForm] string? title`, defaults to `"{now} - {filename}"`, sets Draft + timestamps
 - `POST /api/documents/paste` — accepts `title` in body, defaults to `"{now} - {filename|Untitled}"`, sets Draft + timestamps
 - `POST /api/documents/{id}/analyze` — sets `Status=Analyzed`, `UpdatedAt=UtcNow` after analysis
 
 **Key Files:**
+
 - `src/Domain/Models/Document.cs`, `DocumentStatus.cs`, `DocumentSummary.cs`, `DocumentListResponse.cs`, `PasteDocumentRequest.cs`
 - `src/Api/Controllers/DocumentsController.cs`
 
 **Design Notes:**
+
 - No repository or interface changes needed — `GetByUserAsync` already existed
 - Legacy Cosmos documents deserialize cleanly — new fields use record defaults (empty title, Draft status, MinValue timestamps)
 - List endpoint projection handles fallbacks at query time (empty title → filename, status inferred from suggestion count)

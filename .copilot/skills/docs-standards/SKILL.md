@@ -13,6 +13,7 @@ Squad documentation follows the Microsoft Style Guide with Squad-specific conven
 ## Patterns
 
 ### Microsoft Style Guide Rules
+
 - **Sentence-case headings:** "Getting started" not "Getting Started"
 - **Active voice:** "Run the command" not "The command should be run"
 - **Second person:** "You can configure..." not "Users can configure..."
@@ -20,20 +21,24 @@ Squad documentation follows the Microsoft Style Guide with Squad-specific conven
 - **No ampersands in prose:** "and" not "&" (except in code, brand names, or UI elements)
 
 ### Squad Formatting Patterns
+
 - **Scannability first:** Paragraphs for narrative (3-4 sentences max), bullets for scannable lists, tables for structured data
 - **"Try this" prompts at top:** Start feature/scenario pages with practical prompts users can copy
 - **Experimental warnings:** Features in preview get callout at top
 - **Cross-references at bottom:** Related pages linked after main content
 
 ### Structure
+
 - **Title (H1)** → **Warning/callout** → **Try this code** → **Overview** → **HR** → **Content (H2 sections)**
 
 ### Test Sync Rule
+
 - **Always update test assertions:** When adding docs pages to `features/`, `scenarios/`, `guides/`, update corresponding `EXPECTED_*` arrays in `test/docs-build.test.ts` in the same commit
 
 ## Examples
 
 ✓ **Correct:**
+
 ```markdown
 # Getting started with Squad
 
@@ -54,6 +59,7 @@ Run the following command...
 ```
 
 ✗ **Incorrect:**
+
 ```markdown
 # Getting Started With Squad  // Title case
 

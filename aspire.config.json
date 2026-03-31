@@ -1,0 +1,5 @@
+{
+    "appHost": {
+        "path": "marginalia-service\\src\\Orchestration\\AppHost\\Marginalia.AppHost.csproj"
+    }
+}

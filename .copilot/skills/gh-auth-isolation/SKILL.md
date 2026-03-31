@@ -27,6 +27,7 @@ gh auth status
 ```
 
 Look for:
+
 - `Logged in to github.com as USERNAME` — the active account
 - `Token scopes: ...` — what permissions are available
 - Multiple accounts will show separate entries
@@ -89,6 +90,7 @@ gh auth status  # Back to EMU account
 ```
 
 **Setup (one-time):**
+
 ```bash
 # Create isolated config for personal account
 mkdir ~/.config/gh-public

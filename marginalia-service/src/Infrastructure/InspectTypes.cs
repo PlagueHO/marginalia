@@ -18,13 +18,13 @@ namespace InspectTypes
             Console.WriteLine("=== IChatClient Interface ===");
             Console.WriteLine($"Namespace: {iType.Namespace}");
             Console.WriteLine($"FullName: {iType.FullName}");
-            
+
             Console.WriteLine("\nProperties:");
             foreach (var prop in iType.GetProperties())
             {
                 Console.WriteLine($"  {prop.Name}: {prop.PropertyType.Name}");
             }
-            
+
             Console.WriteLine("\nMethods (Public Instance):");
             foreach (var method in iType.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase))
             {
@@ -45,7 +45,7 @@ namespace InspectTypes
                 {
                     Console.WriteLine("\n=== ChatClientMetadata Class ===");
                     Console.WriteLine($"Type: {type.FullName}");
-                    
+
                     Console.WriteLine("\nProperties:");
                     foreach (var prop in type.GetProperties())
                     {

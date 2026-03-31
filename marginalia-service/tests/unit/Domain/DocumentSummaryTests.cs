@@ -20,16 +20,16 @@ public sealed class DocumentSummaryTests
         DocumentSource source = DocumentSource.Local,
         DocumentStatus status = DocumentStatus.Draft,
         int suggestionCount = 0) => new()
-    {
-        Id = id,
-        Title = title,
-        Filename = filename,
-        Source = source,
-        Status = status,
-        CreatedAt = new DateTimeOffset(2026, 3, 29, 10, 15, 0, TimeSpan.Zero),
-        UpdatedAt = new DateTimeOffset(2026, 3, 29, 14, 30, 0, TimeSpan.Zero),
-        SuggestionCount = suggestionCount
-    };
+        {
+            Id = id,
+            Title = title,
+            Filename = filename,
+            Source = source,
+            Status = status,
+            CreatedAt = new DateTimeOffset(2026, 3, 29, 10, 15, 0, TimeSpan.Zero),
+            UpdatedAt = new DateTimeOffset(2026, 3, 29, 14, 30, 0, TimeSpan.Zero),
+            SuggestionCount = suggestionCount
+        };
 
     [TestMethod]
     public void Constructor_WithRequiredFields_CreatesSummary()

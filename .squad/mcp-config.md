@@ -7,6 +7,7 @@ MCP (Model Context Protocol) servers extend Squad with tools for external servic
 ## Config File Locations
 
 Users configure MCP servers at these locations (checked in priority order):
+
 1. **Repository-level:** `.copilot/mcp-config.json` (team-shared, committed to repo)
 2. **Workspace-level:** `.vscode/mcp.json` (VS Code workspaces)
 3. **User-level:** `~/.copilot/mcp-config.json` (personal)
@@ -82,8 +83,8 @@ Users configure MCP servers at these locations (checked in priority order):
 
 ## Authentication Notes
 
-- **GitHub MCP requires a separate token** from the `gh` CLI auth. Generate at https://github.com/settings/tokens
-- **Trello requires API key + token** from https://trello.com/power-ups/admin
+- **GitHub MCP requires a separate token** from the `gh` CLI auth. Generate at <https://github.com/settings/tokens>
+- **Trello requires API key + token** from <https://trello.com/power-ups/admin>
 - **Azure requires service principal credentials** — see Azure docs for setup
 - **Aspire uses the dashboard URL** — typically `http://localhost:18888` during local dev
 

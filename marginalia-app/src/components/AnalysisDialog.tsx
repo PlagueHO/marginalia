@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -43,15 +43,15 @@ export function AnalysisDialog({
 }: AnalysisDialogProps) {
   const [guidance, setGuidance] = useState("");
   const [tone, setTone] = useState<string>("");
-  const [wasAnalyzing, setWasAnalyzing] = useState(false);
+  const wasAnalyzingRef = useRef(false);
 
   // Auto-close the dialog when analysis completes
   useEffect(() => {
-    if (wasAnalyzing && !isAnalyzing) {
+    if (wasAnalyzingRef.current && !isAnalyzing) {
       onOpenChange(false);
     }
-    setWasAnalyzing(isAnalyzing);
-  }, [isAnalyzing, wasAnalyzing, onOpenChange]);
+    wasAnalyzingRef.current = isAnalyzing;
+  }, [isAnalyzing, onOpenChange]);
 
   const handleAnalyze = useCallback(() => {
     onAnalyze(guidance.trim() || undefined, tone || undefined);

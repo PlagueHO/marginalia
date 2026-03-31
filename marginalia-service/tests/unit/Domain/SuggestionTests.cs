@@ -11,15 +11,15 @@ public sealed class SuggestionTests
     private static Suggestion CreateSuggestion(
         SuggestionStatus status = SuggestionStatus.Pending,
         string? userSteeringInput = null) => new()
-    {
-        Id = "sug-1",
-        DocumentId = "doc-1",
-        TextRange = new TextRange { Start = 0, End = 50 },
-        Rationale = "Narrative is compressed here",
-        ProposedChange = "Consider expanding with sensory detail",
-        Status = status,
-        UserSteeringInput = userSteeringInput
-    };
+        {
+            Id = "sug-1",
+            DocumentId = "doc-1",
+            TextRange = new TextRange { Start = 0, End = 50 },
+            Rationale = "Narrative is compressed here",
+            ProposedChange = "Consider expanding with sensory detail",
+            Status = status,
+            UserSteeringInput = userSteeringInput
+        };
 
     [TestMethod]
     public void Constructor_WithRequiredFields_CreatesSuggestion()

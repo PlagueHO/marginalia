@@ -68,6 +68,7 @@
 - `tests/hooks/useDocuments.test.ts` — useDocuments hook: fetch on mount, loading state, error handling, empty list, correct API endpoint. Won't compile until `src/hooks/useDocuments.ts` is created.
 
 **Testing decisions:**
+
 - Mock at the `fetch` boundary for frontend tests (not at service layer) — tests the full request chain
 - Backend DTO tests verify serialization excludes heavyweight fields (content, suggestions) — enforces the lightweight listing contract
 - Title generation format tests use string interpolation to verify the expected format without depending on controller logic
@@ -132,6 +133,7 @@ Created comprehensive test suite for the userId partitioning changes being imple
 **Build Status:**
 
 Tests do NOT compile yet — expected, as Gilfoyle is implementing source changes in parallel:
+
 - Domain models need `UserId` property added (Document, UserSession, Suggestion)
 - Repository interfaces need userId parameters added (IDocumentRepository, ISessionRepository)
 - Controllers need X-User-Id header extraction logic
