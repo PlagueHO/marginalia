@@ -17,7 +17,7 @@
 
 1. **Wrong URL (405 Method Not Allowed):** `documentService.ts` was posting to `/api/documents/analyze` (a flat path with no `{id}` segment). The backend route is `POST /api/documents/{id}/analyze`. Fixed to use `` `/api/documents/${request.documentId}/analyze` ``.
 
-2. **Response type mismatch:** The backend's analyze endpoint returns `Ok(suggestions)` which serializes as a JSON array `[...]`. The frontend declared return type as `Promise<AnalyzeResponse>` (a wrapper `{ suggestions: Suggestion[] }`), so `response.suggestions` was always `undefined`. Fixed `analyzeDocument()` to return `Promise<Suggestion[]>` and updated `useAnalysis.ts` to use `response` directly (not `response.suggestions`).
+1. **Response type mismatch:** The backend's analyze endpoint returns `Ok(suggestions)` which serializes as a JSON array `[...]`. The frontend declared return type as `Promise<AnalyzeResponse>` (a wrapper `{ suggestions: Suggestion[] }`), so `response.suggestions` was always `undefined`. Fixed `analyzeDocument()` to return `Promise<Suggestion[]>` and updated `useAnalysis.ts` to use `response` directly (not `response.suggestions`).
 
 **`AnalyzeResponse` type removed** — it was only used for the now-corrected wrapping assumption. Removed from `api.ts` and the re-export in `index.ts`. `documentService.ts` now imports `Suggestion` directly.
 
@@ -35,15 +35,15 @@
 **What was built:**
 
 1. **React Router (v7.13.2):** Routes `/` (Home), `/new` (upload), `/editor/:documentId` (editor). BrowserRouter in App.tsx.
-2. **HomePage (`pages/HomePage.tsx`):** Lists manuscripts from `GET /api/documents`. Shows title, status badge (Draft/Analyzed), date, suggestion count. Empty state with "No manuscripts yet" message.
-3. **useDocuments hook (`hooks/useDocuments.ts`):** `{ documents, isLoading, error, loadDocuments }` — follows existing hook pattern.
-4. **DocumentSummary type:** Added to `types/document.ts` along with `DocumentStatus` and `DocumentListResponse` in `types/api.ts`.
-5. **Document model updated:** Added `title`, `status`, `createdAt`, `updatedAt` fields.
-6. **DocumentUploader title input:** Optional text input above the upload area. Title flows through to `uploadDocument(file, title)` and `pasteDocument({ content, filename, title })`.
-7. **apiPostFile extended:** Now accepts optional `extraFields` record for additional FormData fields (used for title on upload).
-8. **EditorPage routing:** Uses `useParams` for documentId, loads existing doc on mount, navigates to `/editor/{id}` after upload/paste (replace: true to avoid back-button loops). "New" button navigates to `/`.
-9. **AppHeader home link:** Marginalia logo is now a `<Link to="/">`.
-10. **listDocuments service:** Added `apiGet<DocumentListResponse>('/api/documents')`.
+1. **HomePage (`pages/HomePage.tsx`):** Lists manuscripts from `GET /api/documents`. Shows title, status badge (Draft/Analyzed), date, suggestion count. Empty state with "No manuscripts yet" message.
+1. **useDocuments hook (`hooks/useDocuments.ts`):** `{ documents, isLoading, error, loadDocuments }` — follows existing hook pattern.
+1. **DocumentSummary type:** Added to `types/document.ts` along with `DocumentStatus` and `DocumentListResponse` in `types/api.ts`.
+1. **Document model updated:** Added `title`, `status`, `createdAt`, `updatedAt` fields.
+1. **DocumentUploader title input:** Optional text input above the upload area. Title flows through to `uploadDocument(file, title)` and `pasteDocument({ content, filename, title })`.
+1. **apiPostFile extended:** Now accepts optional `extraFields` record for additional FormData fields (used for title on upload).
+1. **EditorPage routing:** Uses `useParams` for documentId, loads existing doc on mount, navigates to `/editor/{id}` after upload/paste (replace: true to avoid back-button loops). "New" button navigates to `/`.
+1. **AppHeader home link:** Marginalia logo is now a `<Link to="/">`.
+1. **listDocuments service:** Added `apiGet<DocumentListResponse>('/api/documents')`.
 
 **Key files changed:**
 
@@ -287,7 +287,7 @@
    - `src/types/session.ts` — Added `userId` to `UserSession` interface
    - `src/types/suggestion.ts` — Added `userId` to `Suggestion` interface
 
-2. **API Service** — `src/services/api.ts`:
+1. **API Service** — `src/services/api.ts`:
    - Module-level `currentUserId` variable initialized to `"_anonymous"`
    - Exported `setUserId(userId: string)` and `getUserId()` functions for future auth integration
    - Added `X-User-Id: currentUserId` header to ALL fetch wrapper functions:
@@ -297,7 +297,7 @@
      - `apiPostFile` — Added to headers object (FormData upload)
      - `apiGetBlob` — Added to headers object
 
-3. **Hooks** — No changes required. All hooks (`useDocument`, `useSuggestions`, `useAnalysis`) call service functions which now automatically include the header.
+1. **Hooks** — No changes required. All hooks (`useDocument`, `useSuggestions`, `useAnalysis`) call service functions which now automatically include the header.
 
 **Pattern:**
 

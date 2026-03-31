@@ -11,13 +11,13 @@ When installing shadcn/ui components in a Vite + React (non-Next.js) project:
 
 1. **Path alias resolution**: The shadcn CLI may create a literal `@/` directory instead of resolving the path alias to `src/`. After running `pnpm dlx shadcn@latest add ...`, verify files landed in `src/components/ui/`. If they're in `@/components/ui/`, move them manually.
 
-2. **Sonner (toast replacement)**: The `toast` component is deprecated — use `sonner` instead. The generated `sonner.tsx` may:
+1. **Sonner (toast replacement)**: The `toast` component is deprecated — use `sonner` instead. The generated `sonner.tsx` may:
    - Import from itself (circular reference)
    - Use `next-themes` which isn't available in Vite projects
 
    **Fix**: Replace the import to use the `sonner` npm package directly and remove the `useTheme()` call.
 
-3. **react-refresh lint warnings**: shadcn components like `badge.tsx`, `button.tsx`, and `tabs.tsx` export both components and helper functions (e.g., `badgeVariants`, `buttonVariants`), triggering `react-refresh/only-export-components`. These are safe to ignore — they're generated code.
+1. **react-refresh lint warnings**: shadcn components like `badge.tsx`, `button.tsx`, and `tabs.tsx` export both components and helper functions (e.g., `badgeVariants`, `buttonVariants`), triggering `react-refresh/only-export-components`. These are safe to ignore — they're generated code.
 
 ### Recommended Install Command
 

@@ -43,10 +43,10 @@ Use shadcn/ui (New York style, Radix UI primitives, TailwindCSS v4) for React co
 All Foundry calls route through the backend. Frontend never calls Foundry directly (CORS blocks it).
 
 1. **Frontend Config Push:** Frontend sends Foundry config (endpoint URL, API key, model) to `POST /api/config/llm`
-2. **Proxy Analysis:** `POST /api/documents/{id}/analyze` triggers backend to call Foundry via `FoundrySuggestionService`
-3. **Foundry URL Format:** `{endpoint}/openai/deployments/{modelName}/chat/completions?api-version=2025-04-01-preview`
-4. **Auth Header:** `api-key: {value}` (Foundry project endpoints require this, not Bearer token)
-5. **Dual-Path Architecture:** `FoundrySuggestionService` uses `IChatClient` (Aspire) or `HttpClient` (standalone/BYO)
+1. **Proxy Analysis:** `POST /api/documents/{id}/analyze` triggers backend to call Foundry via `FoundrySuggestionService`
+1. **Foundry URL Format:** `{endpoint}/openai/deployments/{modelName}/chat/completions?api-version=2025-04-01-preview`
+1. **Auth Header:** `api-key: {value}` (Foundry project endpoints require this, not Bearer token)
+1. **Dual-Path Architecture:** `FoundrySuggestionService` uses `IChatClient` (Aspire) or `HttpClient` (standalone/BYO)
 
 **Consequences:**
 
@@ -64,11 +64,11 @@ All Foundry calls route through the backend. Frontend never calls Foundry direct
 **Status:** Implemented
 
 1. **Clean Architecture Enforced:** Domain project has zero NuGet dependencies. Only `System.Text.Json` attributes. All external deps in Infrastructure.
-2. **Central Package Management:** All versions pinned in `Directory.Packages.props`. Individual csproj files reference without versions.
-3. **BYO Model Pattern:** `LlmEndpointOptions` supports both environment variables and user-provided config. Env vars take precedence.
-4. **Domain Model Contracts:** All models are `sealed record` with `required init` properties and `[JsonPropertyName("camelCase")]`. Enums serialize as strings.
-5. **Frontend Toolchain:** React 19 + Vite 8 + TypeScript strict + TailwindCSS v4 + shadcn/ui (New York) + Vitest.
-6. **Path Alias:** `@/*` maps to `./src/*` in TypeScript and Vite resolve config.
+1. **Central Package Management:** All versions pinned in `Directory.Packages.props`. Individual csproj files reference without versions.
+1. **BYO Model Pattern:** `LlmEndpointOptions` supports both environment variables and user-provided config. Env vars take precedence.
+1. **Domain Model Contracts:** All models are `sealed record` with `required init` properties and `[JsonPropertyName("camelCase")]`. Enums serialize as strings.
+1. **Frontend Toolchain:** React 19 + Vite 8 + TypeScript strict + TailwindCSS v4 + shadcn/ui (New York) + Vitest.
+1. **Path Alias:** `@/*` maps to `./src/*` in TypeScript and Vite resolve config.
 
 **Impacts:**
 
@@ -84,13 +84,13 @@ All Foundry calls route through the backend. Frontend never calls Foundry direct
 **Status:** Implemented
 
 1. **In-Memory Storage Only:** No database. `ConcurrentDictionary` in singleton repositories. Matches spec requirement for local/session-based persistence.
-2. **IOptionsMonitor for LLM Config:** Uses `IOptionsMonitor<LlmEndpointOptions>` instead of `IOptions` for runtime config updates without restart. Env vars take precedence on startup.
-3. **Document Chunking Strategy:** ~6000 characters per chunk (~3 pages). Breaks on paragraph boundaries (`\n\n`), falls back to line breaks. Character offsets tracked for suggestion TextRange mapping.
-4. **DocumentFormat.OpenXml for Word:** Added DocumentFormat.OpenXml 3.3.0 for .docx parsing/export. Type alias pattern (`DomainDocument`) resolves namespace collision.
-5. **Source-Generated JSON Serialization:** `FoundrySerializerContext` for Foundry API DTOs. Avoids reflection, supports trimming/AOT.
-6. **CORS Policy:** Default allows `http://localhost:5173` (Vite dev server). Any header, any method. Production requires tightening.
-7. **API Route Convention:** All routes under `/api/` prefix. Controllers use `[Route("api/[controller]")]`.
-8. **Export Applies Accepted Suggestions:** `/api/documents/{id}/export` applies all accepted suggestions before generating .docx. Applied in reverse offset order.
+1. **IOptionsMonitor for LLM Config:** Uses `IOptionsMonitor<LlmEndpointOptions>` instead of `IOptions` for runtime config updates without restart. Env vars take precedence on startup.
+1. **Document Chunking Strategy:** ~6000 characters per chunk (~3 pages). Breaks on paragraph boundaries (`\n\n`), falls back to line breaks. Character offsets tracked for suggestion TextRange mapping.
+1. **DocumentFormat.OpenXml for Word:** Added DocumentFormat.OpenXml 3.3.0 for .docx parsing/export. Type alias pattern (`DomainDocument`) resolves namespace collision.
+1. **Source-Generated JSON Serialization:** `FoundrySerializerContext` for Foundry API DTOs. Avoids reflection, supports trimming/AOT.
+1. **CORS Policy:** Default allows `http://localhost:5173` (Vite dev server). Any header, any method. Production requires tightening.
+1. **API Route Convention:** All routes under `/api/` prefix. Controllers use `[Route("api/[controller]")]`.
+1. **Export Applies Accepted Suggestions:** `/api/documents/{id}/export` applies all accepted suggestions before generating .docx. Applied in reverse offset order.
 
 **Open Questions:**
 
@@ -108,11 +108,11 @@ All Foundry calls route through the backend. Frontend never calls Foundry direct
 Adopted .NET Aspire 13.1.3 as orchestration layer following prompt-babbler reference pattern:
 
 1. **AppHost** orchestrates API + Vite frontend + Azure AI Foundry with chat deployment
-2. **ServiceDefaults** provides shared infrastructure (OpenTelemetry, health checks, resilience, service discovery)
-3. **IChatClient** from `Microsoft.Extensions.AI` injected via Aspire when connection string `ai-foundry` present
-4. **Dual-Path AI Calls:** `FoundrySuggestionService` uses `IChatClient` when Aspire available, falls back to `HttpClient` + env vars for standalone/BYO
-5. **No Cosmos DB** — in-memory storage per spec
-6. **No Auth** — not in spec
+1. **ServiceDefaults** provides shared infrastructure (OpenTelemetry, health checks, resilience, service discovery)
+1. **IChatClient** from `Microsoft.Extensions.AI` injected via Aspire when connection string `ai-foundry` present
+1. **Dual-Path AI Calls:** `FoundrySuggestionService` uses `IChatClient` when Aspire available, falls back to `HttpClient` + env vars for standalone/BYO
+1. **No Cosmos DB** — in-memory storage per spec
+1. **No Auth** — not in spec
 
 **Consequences:**
 
@@ -129,12 +129,12 @@ Adopted .NET Aspire 13.1.3 as orchestration layer following prompt-babbler refer
 **Status:** Proposed / Implemented
 
 1. **Test Double Strategy for Repositories:** Use contract-based test doubles (e.g., `TestDocumentRepository` with `ConcurrentDictionary`) instead of NSubstitute mocks. Concrete doubles validate behavioral contracts; mocking only tests the mock.
-2. **Accessibility Testing with Exclusions:** Axe tests for all UI components. Three components (DocumentUploader, SuggestionCard, SuggestionPanel) have known `nested-interactive` violations — buttons nested in focusable regions. Tests exclude with documenting comment.
-3. **Frontend Mock Strategy:** Mock `fetch` globally (via `vi.stubGlobal`) not individual service modules. Tests full request chain.
-4. **Test Naming Conventions:**
+1. **Accessibility Testing with Exclusions:** Axe tests for all UI components. Three components (DocumentUploader, SuggestionCard, SuggestionPanel) have known `nested-interactive` violations — buttons nested in focusable regions. Tests exclude with documenting comment.
+1. **Frontend Mock Strategy:** Mock `fetch` globally (via `vi.stubGlobal`) not individual service modules. Tests full request chain.
+1. **Test Naming Conventions:**
    - Backend: `MethodName_Scenario_ExpectedResult` with `[TestCategory("Unit")]`
    - Frontend: `describe/it` blocks organized by behavior group
-5. **jest-axe Setup:** Added `import 'jest-axe/extend-expect'` to `vitest.setup.ts` for global `toHaveNoViolations()` matcher.
+1. **jest-axe Setup:** Added `import 'jest-axe/extend-expect'` to `vitest.setup.ts` for global `toHaveNoViolations()` matcher.
 
 **Current Status:**
 
@@ -156,10 +156,10 @@ Adopted .NET Aspire 13.1.3 as orchestration layer following prompt-babbler refer
 **Status:** Implemented
 
 1. **Test Scope:** Orchestration integration tests verify Aspire app model only — resource existence, naming, relationships. Do NOT make HTTP calls (requires Azure credentials, avoided by design).
-2. **Test Pattern:** Use `DistributedApplicationTestingBuilder.CreateAsync<Projects.Marginalia_AppHost>()` to build app model, then query `DistributedApplicationModel.Resources` via DI.
-3. **Project SDK:** Uses `MSTest.Sdk/4.1.0` (not Microsoft.NET.Sdk) to match prompt-babbler reference pattern.
-4. **Location:** `tests/integration/Orchestration.IntegrationTests/` — separate from existing API integration tests.
-5. **Package Versions:** `Aspire.Hosting.Testing` (9.2.0) and `coverlet.collector` (6.0.4) in central `Directory.Packages.props`.
+1. **Test Pattern:** Use `DistributedApplicationTestingBuilder.CreateAsync<Projects.Marginalia_AppHost>()` to build app model, then query `DistributedApplicationModel.Resources` via DI.
+1. **Project SDK:** Uses `MSTest.Sdk/4.1.0` (not Microsoft.NET.Sdk) to match prompt-babbler reference pattern.
+1. **Location:** `tests/integration/Orchestration.IntegrationTests/` — separate from existing API integration tests.
+1. **Package Versions:** `Aspire.Hosting.Testing` (9.2.0) and `coverlet.collector` (6.0.4) in central `Directory.Packages.props`.
 
 **Implications:**
 
@@ -175,8 +175,8 @@ Adopted .NET Aspire 13.1.3 as orchestration layer following prompt-babbler refer
 **Status:** Implemented
 
 1. **State Management:** Custom hooks (no Redux/Zustand). At current scale, clean separation without external overhead. Reconsider if multi-page or broader cross-component sharing needed.
-2. **API Service Layer:** All calls through `src/services/api.ts` (`apiGet`, `apiPost`, `apiPut`, `apiPostFile`, `apiGetBlob`). Base URL `http://localhost:5279`, configurable via `setApiBaseUrl()`.
-3. **Expected Backend Endpoints:**
+1. **API Service Layer:** All calls through `src/services/api.ts` (`apiGet`, `apiPost`, `apiPut`, `apiPostFile`, `apiGetBlob`). Base URL `http://localhost:5279`, configurable via `setApiBaseUrl()`.
+1. **Expected Backend Endpoints:**
    - POST /api/documents/upload
    - POST /api/documents/paste
    - GET /api/documents/:id
@@ -187,9 +187,9 @@ Adopted .NET Aspire 13.1.3 as orchestration layer following prompt-babbler refer
    - GET/PUT /api/config/llm
    - POST /api/config/llm/test
    - POST/GET /api/sessions/:id
-4. **Suggestion Highlight Accessibility:** Both color AND status icons. Focusable, ARIA labels for colorblind support.
-5. **shadcn/ui Sonner:** Use `sonner` not deprecated `toast`. Stripped `next-themes` dependency.
-6. **Dark Mode:** CSS variables via `@media (prefers-color-scheme: dark)` in index.css. System preference, no toggle yet.
+1. **Suggestion Highlight Accessibility:** Both color AND status icons. Focusable, ARIA labels for colorblind support.
+1. **shadcn/ui Sonner:** Use `sonner` not deprecated `toast`. Stripped `next-themes` dependency.
+1. **Dark Mode:** CSS variables via `@media (prefers-color-scheme: dark)` in index.css. System preference, no toggle yet.
 
 ---
 

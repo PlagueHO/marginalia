@@ -27,8 +27,8 @@ Read all agent charters and histories. Measure byte sizes. Identify:
 For each identified pattern:
 
 1. Create or update a skill at `.squad/skills/{skill-name}/SKILL.md`
-2. Follow the skill template format (frontmatter + Context + Patterns + Examples + Anti-Patterns)
-3. Set confidence: low (first observation), medium (2+ agents), high (team-wide)
+1. Follow the skill template format (frontmatter + Context + Patterns + Examples + Anti-Patterns)
+1. Set confidence: low (first observation), medium (2+ agents), high (team-wide)
 
 ### Step 3: Trim
 
@@ -61,7 +61,7 @@ Include totals and percentage reduction.
 
 ### Minimal Charter Template (target format after reskill)
 
-```
+```markdown
 # {Name} — {Role}
 
 > {Tagline — one sentence capturing voice and philosophy}

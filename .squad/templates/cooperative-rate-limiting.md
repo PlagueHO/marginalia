@@ -190,7 +190,7 @@ interface ResourceLease {
 
 Track downstream failures and apply backpressure:
 
-```
+```text
 Agent A (rate limited) → Agent B (waiting for A) → Agent C (waiting for B)
                          ↑ Backpressure signal: "don't start new work"
 ```
@@ -219,9 +219,9 @@ See [keda-copilot-scaler](https://github.com/tamirdresher/keda-copilot-scaler) f
 ## Quick Start
 
 1. **Minimum viable:** Adopt Pattern 1 (Traffic Light) — read `X-RateLimit-Remaining` from API responses
-2. **Multi-machine:** Add Pattern 2 (Cooperative Pool) — shared `rate-pool.json`
-3. **Production:** Add Pattern 3 (Predictive CB) — prevent 429s entirely
-4. **Kubernetes:** Add KEDA scaler for automatic pod scaling
+1. **Multi-machine:** Add Pattern 2 (Cooperative Pool) — shared `rate-pool.json`
+1. **Production:** Add Pattern 3 (Predictive CB) — prevent 429s entirely
+1. **Kubernetes:** Add KEDA scaler for automatic pod scaling
 
 ## References
 

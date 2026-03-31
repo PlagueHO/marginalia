@@ -7,7 +7,7 @@
 1. **Create command file** in `packages/squad-cli/src/cli/commands/<name>.ts`
    - Export a `run<Name>(cwd, options)` async function (or class with static methods for utility modules)
 
-2. **Add routing block** in `packages/squad-cli/src/cli-entry.ts` inside `main()`:
+1. **Add routing block** in `packages/squad-cli/src/cli-entry.ts` inside `main()`:
 
    ```ts
    if (cmd === '<name>') {
@@ -18,14 +18,14 @@
    }
    ```
 
-3. **Add help text** in the help section of `cli-entry.ts` (search for `Commands:`):
+1. **Add help text** in the help section of `cli-entry.ts` (search for `Commands:`):
 
    ```ts
    console.log(`  ${BOLD}<name>${RESET}     <description>`);
    console.log(`             Usage: <name> [flags]`);
    ```
 
-4. **Verify both exist** — the recurring bug is doing step 1 but missing steps 2-3.
+1. **Verify both exist** — the recurring bug is doing step 1 but missing steps 2-3.
 
 ## Wiring Patterns by Command Type
 

@@ -11,9 +11,9 @@ source: "multi-model-consensus (Opus 4.6, Sonnet 4.5, GPT-5.4)"
 **✅ THIS SKILL PRODUCES (exactly these, nothing more):**
 
 1. **`mesh.json`** — Generated from user answers about zones and squads (which squads participate, what zone each is in, paths/URLs for each), using `mesh.json.example` in this skill's directory as the schema template
-2. **`sync-mesh.sh` and `sync-mesh.ps1`** — Copied from this skill's directory into the project root (these are bundled resources, NOT generated code)
-3. **Zone 2 state repo initialization** (if applicable) — If the user specified a Zone 2 shared state repo, run `sync-mesh.sh --init` to scaffold the state repo structure
-4. **A decision entry** in `.squad/decisions/inbox/` documenting the mesh configuration for team awareness
+1. **`sync-mesh.sh` and `sync-mesh.ps1`** — Copied from this skill's directory into the project root (these are bundled resources, NOT generated code)
+1. **Zone 2 state repo initialization** (if applicable) — If the user specified a Zone 2 shared state repo, run `sync-mesh.sh --init` to scaffold the state repo structure
+1. **A decision entry** in `.squad/decisions/inbox/` documenting the mesh configuration for team awareness
 
 **❌ THIS SKILL DOES NOT PRODUCE:**
 
@@ -57,7 +57,7 @@ The agent interface never changes. Agents always read local files. The distribut
 
 ### Agent Lifecycle (Distributed)
 
-```
+```text
 1. SYNC:    git pull (Zone 2) + curl (Zone 3) — materialize remote state
 2. READ:    cat .mesh/**/state.md — all files are local now
 3. WORK:    do their assigned work (the agent's normal task, NOT mesh-building)
@@ -149,15 +149,15 @@ When a user invokes this skill to set up a distributed mesh, follow these steps 
 Ask these questions (adapt phrasing naturally, but get these answers):
 
 1. **Which squads are participating?** (List of squad names)
-2. **For each squad, which zone is it in?**
+1. **For each squad, which zone is it in?**
    - `local` — same filesystem (just need a path)
    - `remote-trusted` — different machine, same org, shared git access (need git URL + ref)
    - `remote-opaque` — different org, no shared auth (need HTTPS URL to published contract)
-3. **For each squad, what's the connection info?**
+1. **For each squad, what's the connection info?**
    - Local: relative or absolute path to their `.mesh/` directory
    - Remote-trusted: git URL (SSH or HTTPS), ref (branch/tag), and where to sync it to locally
    - Remote-opaque: HTTPS URL to their SUMMARY.md, where to sync it, and auth type (none/bearer)
-4. **Where should the shared state live?** (For Zone 2 squads: git repo URL for the mesh state, or confirm each squad syncs independently)
+1. **Where should the shared state live?** (For Zone 2 squads: git repo URL for the mesh state, or confirm each squad syncs independently)
 
 ### Step 2: GENERATE `mesh.json`
 
@@ -258,7 +258,7 @@ Write this file. The Scribe will merge it into the main decisions file later.
 
 Output a simple completion message:
 
-```
+```text
 ✅ Mesh configured. Created:
 - mesh.json (<N> squads)
 - sync-mesh.sh and sync-mesh.ps1 (copied from skill bundle)

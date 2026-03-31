@@ -111,10 +111,10 @@ Use the humanizer skill for every draft.
 Before drafting, PAO MUST verify complete thread coverage:
 
 1. **Count verification:** Compare API comment count with actually-read comments. If mismatch, abort draft.
-2. **Deleted comment check:** Use `gh api` timeline to detect deleted comments. If found, flag as ⚠️ in review table.
-3. **Thread summary:** Include in every draft: "Thread: {N} comments, last activity {date}, {summary of key points}"
-4. **Long thread flag:** If >10 comments, add ⚠️ to review table and include condensed thread summary
-5. **Evidence line in review table:** Each draft row includes "Read: {N}/{total} comments" column
+1. **Deleted comment check:** Use `gh api` timeline to detect deleted comments. If found, flag as ⚠️ in review table.
+1. **Thread summary:** Include in every draft: "Thread: {N} comments, last activity {date}, {summary of key points}"
+1. **Long thread flag:** If >10 comments, add ⚠️ to review table and include condensed thread summary
+1. **Evidence line in review table:** Each draft row includes "Read: {N}/{total} comments" column
 
 ### 4. Present
 
@@ -152,9 +152,9 @@ If a posted response turns out to be wrong, inappropriate, or needs correction:
 1. **Delete the comment:**
    - Issues: `gh api -X DELETE /repos/{owner}/{repo}/issues/comments/{comment_id}`
    - Discussions: `gh api graphql -f query='mutation { deleteDiscussionComment(input: {id: "{node_id}"}) { comment { id } } }'`
-2. **Log the deletion:** Write audit entry with action `delete`, include reason and original content
-3. **Draft replacement** (if needed): PAO drafts a corrected response, goes through normal review cycle
-4. **Postmortem:** If the error reveals a pattern gap, update humanizer anti-patterns or add a new test case
+1. **Log the deletion:** Write audit entry with action `delete`, include reason and original content
+1. **Draft replacement** (if needed): PAO drafts a corrected response, goes through normal review cycle
+1. **Postmortem:** If the error reveals a pattern gap, update humanizer anti-patterns or add a new test case
 
 **Safe word — `banana`:**
 

@@ -52,9 +52,9 @@ Look for:
 **How to create an Automation token:**
 
 1. Go to npmjs.com → Settings → Access Tokens
-2. Click "Generate New Token"
-3. Select **"Automation"** (NOT "Publish")
-4. Copy token and save as GitHub secret: `NPM_TOKEN`
+1. Click "Generate New Token"
+1. Select **"Automation"** (NOT "Publish")
+1. Copy token and save as GitHub secret: `NPM_TOKEN`
 
 **If using a User token:** STOP. Create an Automation token first.
 
@@ -181,9 +181,9 @@ gh run view --log
 **Expected flow:**
 
 1. `publish-sdk` job runs → publishes `@bradygaster/squad-sdk`
-2. Verify step runs with retry loop (up to 5 attempts, 15s interval) to confirm SDK on npm registry
-3. `publish-cli` job runs → publishes `@bradygaster/squad-cli`
-4. Verify step runs with retry loop to confirm CLI on npm registry
+1. Verify step runs with retry loop (up to 5 attempts, 15s interval) to confirm SDK on npm registry
+1. `publish-cli` job runs → publishes `@bradygaster/squad-cli`
+1. Verify step runs with retry loop to confirm CLI on npm registry
 
 **If workflow fails:** Check the logs. Common issues:
 
@@ -421,9 +421,9 @@ This skill was created after the v0.8.22 release disaster. Full retrospective: `
 **Key learnings:**
 
 1. No release without a runbook = improvisation = disaster
-2. Semver validation is mandatory — 4-part versions break npm
-3. NPM_TOKEN type matters — User tokens with 2FA fail in CI
-4. Draft releases are a footgun — they don't trigger automation
-5. Retry logic is essential — npm propagation takes time
+1. Semver validation is mandatory — 4-part versions break npm
+1. NPM_TOKEN type matters — User tokens with 2FA fail in CI
+1. Draft releases are a footgun — they don't trigger automation
+1. Retry logic is essential — npm propagation takes time
 
 **Never again.**

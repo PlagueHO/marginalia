@@ -87,11 +87,11 @@ aspire run
 Aspire will:
 
 1. Install frontend dependencies (`pnpm install`)
-2. Build the .NET API project
-3. Provision Azure Microsoft Foundry resource with Foundry Project.
-4. Deploy a `gpt-5.3-chat` model to the provisioned Foundry Project.
-5. Start the API and frontend dev server.
-6. Open the Aspire Dashboard
+1. Build the .NET API project
+1. Provision Azure Microsoft Foundry resource with Foundry Project.
+1. Deploy a `gpt-5.3-chat` model to the provisioned Foundry Project.
+1. Start the API and frontend dev server.
+1. Open the Aspire Dashboard
 
 First run takes several minutes while Azure AI Foundry resources are provisioned. Subsequent runs are much faster.
 
@@ -107,10 +107,10 @@ First run takes several minutes while Azure AI Foundry resources are provisioned
 ## 4. First usage walkthrough
 
 1. **Open the Aspire Dashboard** — the URL is shown in the terminal output when Aspire starts (typically `https://localhost:17280`).
-2. **Find the frontend URL** — in the dashboard, locate the `frontend` resource and click its endpoint link (default: `http://localhost:5173`).
-3. **Upload a document** — upload a `.docx` file or paste text directly into the editor.
-4. **Configure AI model settings** — if you're not using the Aspire-provisioned model, update your endpoint and API key in the UI.
-5. **Click "Analyze"** — Marginalia sends your text to the AI model and returns suggestions for improving your narrative flow.
+1. **Find the frontend URL** — in the dashboard, locate the `frontend` resource and click its endpoint link (default: `http://localhost:5173`).
+1. **Upload a document** — upload a `.docx` file or paste text directly into the editor.
+1. **Configure AI model settings** — if you're not using the Aspire-provisioned model, update your endpoint and API key in the UI.
+1. **Click "Analyze"** — Marginalia sends your text to the AI model and returns suggestions for improving your narrative flow.
 
 ## Model configuration
 

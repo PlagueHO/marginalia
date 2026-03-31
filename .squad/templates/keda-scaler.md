@@ -9,9 +9,9 @@ When running Squad on Kubernetes, agent pods sit idle when no work exists. [KEDA
 The `keda-copilot-scaler` is a KEDA External Scaler (gRPC) that bridges this gap:
 
 1. Polls GitHub API for issues matching specific labels (e.g., `squad:copilot`)
-2. Reports queue depth as a KEDA metric
-3. Handles rate limits gracefully (Retry-After, exponential backoff)
-4. Supports composite scaling decisions
+1. Reports queue depth as a KEDA metric
+1. Handles rate limits gracefully (Retry-After, exponential backoff)
+1. Supports composite scaling decisions
 
 ## Quick Start
 
@@ -124,7 +124,7 @@ The scaler exposes rate limit metrics that feed into the cooperative rate limiti
 
 ## Architecture
 
-```
+```text
 GitHub API                    KEDA                    Kubernetes
 ┌──────────┐              ┌──────────┐           ┌──────────────┐
 │  Issues   │◄── poll ──►│  Scaler   │──metrics─►│ HPA / KEDA   │

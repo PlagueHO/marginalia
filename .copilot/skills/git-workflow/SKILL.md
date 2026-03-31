@@ -35,28 +35,28 @@ Examples:
    git checkout -b squad/{issue-number}-{slug}
    ```
 
-2. **Mark issue in-progress:**
+1. **Mark issue in-progress:**
 
    ```bash
    gh issue edit {number} --add-label "status:in-progress"
    ```
 
-3. **Create draft PR targeting dev:**
+1. **Create draft PR targeting dev:**
 
    ```bash
    gh pr create --base dev --title "{description}" --body "Closes #{issue-number}" --draft
    ```
 
-4. **Do the work.** Make changes, write tests, commit with issue reference.
+1. **Do the work.** Make changes, write tests, commit with issue reference.
 
-5. **Push and mark ready:**
+1. **Push and mark ready:**
 
    ```bash
    git push -u origin squad/{issue-number}-{slug}
    gh pr ready
    ```
 
-6. **After merge to dev:**
+1. **After merge to dev:**
 
    ```bash
    git checkout dev
@@ -147,7 +147,7 @@ When work spans multiple repositories (e.g., squad-cli changes need squad-sdk ch
 
 Clone downstream repos as siblings to the main repo:
 
-```
+```text
 ~/work/
   squad-pr/          # main repo
   squad-sdk/         # downstream dependency
@@ -161,7 +161,7 @@ Each repo gets its own issue branch following its own naming convention. If the 
 - Create PRs in each repo independently
 - Link them in PR descriptions:
 
-  ```
+  ```text
   Closes #42
 
   **Depends on:** squad-sdk PR #17 (squad-sdk changes required for this feature)

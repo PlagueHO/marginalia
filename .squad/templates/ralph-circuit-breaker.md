@@ -21,7 +21,7 @@ Premium models burn quota fast:
 
 ## Circuit Breaker States
 
-```
+```text
 ┌─────────┐   rate limit error    ┌────────┐
 │ CLOSED  │ ───────────────────►  │  OPEN  │
 │ (normal)│                       │(fallback)│
@@ -45,8 +45,8 @@ Premium models burn quota fast:
 
 - Fall back through the free-tier model chain:
   1. `gpt-5.4-mini`
-  2. `gpt-5-mini`
-  3. `gpt-4.1`
+  1. `gpt-5-mini`
+  1. `gpt-4.1`
 - Start cooldown timer (default: 10 minutes)
 - When cooldown expires → transition to HALF-OPEN
 

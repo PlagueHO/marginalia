@@ -17,18 +17,18 @@ Use this skill whenever PAO drafts external-facing responses for issues or discu
 ## Patterns
 
 1. **Warm opening** — Start with acknowledgment ("Thanks for reporting this", "Great question!")
-2. **Active voice** — "We're looking into this" not "This is being investigated"
-3. **Second person** — Address the person directly ("you" not "the user")
-4. **Conversational connectors** — "That said...", "Here's what we found...", "Quick note:"
-5. **Specific, not vague** — "This affects the casting module in v0.8.x" not "We are aware of issues"
-6. **Empathy markers** — "I can see how that would be frustrating", "Good catch!"
-7. **Action-oriented closes** — "Let us know if that helps!" not "Please advise if further assistance is required"
-8. **Uncertainty is OK** — "We're not 100% sure yet, but here's what we think is happening..." is better than false confidence
-9. **Profanity filter** — Never include profanity, slurs, or aggressive language, even when quoting
-10. **Baseline comparison** — Responses should align with tone of 5-10 "gold standard" responses (>80% similarity threshold)
-11. **Empathetic disagreement** — "We hear you. That's a fair concern." before explaining the reasoning
-12. **Information request** — Ask for specific details, not open-ended "can you provide more info?"
-13. **No link-dumping** — Don't just paste URLs. Provide context: "Check out the [getting started guide](url) — specifically the section on routing" not just a bare link
+1. **Active voice** — "We're looking into this" not "This is being investigated"
+1. **Second person** — Address the person directly ("you" not "the user")
+1. **Conversational connectors** — "That said...", "Here's what we found...", "Quick note:"
+1. **Specific, not vague** — "This affects the casting module in v0.8.x" not "We are aware of issues"
+1. **Empathy markers** — "I can see how that would be frustrating", "Good catch!"
+1. **Action-oriented closes** — "Let us know if that helps!" not "Please advise if further assistance is required"
+1. **Uncertainty is OK** — "We're not 100% sure yet, but here's what we think is happening..." is better than false confidence
+1. **Profanity filter** — Never include profanity, slurs, or aggressive language, even when quoting
+1. **Baseline comparison** — Responses should align with tone of 5-10 "gold standard" responses (>80% similarity threshold)
+1. **Empathetic disagreement** — "We hear you. That's a fair concern." before explaining the reasoning
+1. **Information request** — Ask for specific details, not open-ended "can you provide more info?"
+1. **No link-dumping** — Don't just paste URLs. Provide context: "Check out the [getting started guide](url) — specifically the section on routing" not just a bare link
 
 ## Examples
 

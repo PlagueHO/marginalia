@@ -84,8 +84,8 @@ ghw api user --jq '.login'   # should show work username
 ## After Setup — Usage Rules
 
 1. **NEVER** use bare `gh` for repo operations — always `ghp` or `ghw`
-2. **NEVER** manually `gh auth switch` — the aliases handle it
-3. Determine alias by repo owner:
+1. **NEVER** manually `gh auth switch` — the aliases handle it
+1. Determine alias by repo owner:
    - Personal account repos → `ghp` / `gh-personal`
    - Work/EMU account repos → `ghw` / `gh-work`
 

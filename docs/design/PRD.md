@@ -21,16 +21,16 @@ Narrative Flow Editor Assistant is an AI-powered tool for writers of long-form n
 ### Document Ingestion & Management
 
 1. Upload Microsoft Word documents from the local machine.
-2. Optionally import/export documents with Google Docs integration.
-3. Split documents into manageable sections/chunks for editing (e.g., by chapter or up to ~3 pages).
-4. Allow pasting text into an editor as an alternative to file upload.
+1. Optionally import/export documents with Google Docs integration.
+1. Split documents into manageable sections/chunks for editing (e.g., by chapter or up to ~3 pages).
+1. Allow pasting text into an editor as an alternative to file upload.
 
 ### Guidance & Control
 
 1. Let the author specify areas for improvement (e.g., compressed narrative, AI-like writing, lack of color).
-2. Allow the author to manually select text areas for editorial focus or review.
-3. Enable authors to provide custom written instructions per section or selection.
-4. Present the option to choose or describe desired tone adjustments (e.g., professional, narrative, academic), or free-form guidance (typed input).
+1. Allow the author to manually select text areas for editorial focus or review.
+1. Enable authors to provide custom written instructions per section or selection.
+1. Present the option to choose or describe desired tone adjustments (e.g., professional, narrative, academic), or free-form guidance (typed input).
 
 ### Suggestion Engine
 
@@ -39,22 +39,22 @@ Narrative Flow Editor Assistant is an AI-powered tool for writers of long-form n
    - Style is inconsistent or "AI-like."
    - Repetitive/awkward prosaic structures are found.
    - Additional narrative detail or expansion could be beneficial.
-2. Provide AI-generated suggestions with explanation for each.
-3. Allow batch or individual acceptance/rejection of suggestions.
-4. Enable users to modify, refine, or further steer the AI's suggestions before applying.
+1. Provide AI-generated suggestions with explanation for each.
+1. Allow batch or individual acceptance/rejection of suggestions.
+1. Enable users to modify, refine, or further steer the AI's suggestions before applying.
 
 ### User Interface
 
 1. Display editable text with visually distinct highlights for suggested areas (e.g., colored highlights).
-2. Show suggestion rationale (hover or sidebar).
-3. Checklist or review pane summarizing all pending suggestions.
-4. Apply selected changes to the document, maintaining original formatting where possible.
+1. Show suggestion rationale (hover or sidebar).
+1. Checklist or review pane summarizing all pending suggestions.
+1. Apply selected changes to the document, maintaining original formatting where possible.
 
 ### Export & Save
 
 1. Export revised document locally as a Word file.
-2. Optionally, export/save directly to Google Docs.
-3. Maintain a copy/history for further revisions if desired.
+1. Optionally, export/save directly to Google Docs.
+1. Maintain a copy/history for further revisions if desired.
 
 ## Non-Functional Requirements
 

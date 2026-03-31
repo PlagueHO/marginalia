@@ -71,14 +71,19 @@ jobs:
         run: dotnet restore Marginalia.slnx
 
       - name: Build solution
-        run: dotnet build Marginalia.slnx --no-restore --configuration ${{ inputs.build_configuration || 'Debug' }}
+        run: |
+          dotnet build Marginalia.slnx \
+            --no-restore \
+            --configuration ${{ inputs.build_configuration || 'Debug' }}
 
       - name: Run unit tests
         run: |
-          dotnet test --solution Marginalia.slnx \
+          dotnet test \
+            --solution Marginalia.slnx \
             --filter TestCategory=Unit \
             --ignore-exit-code 8 \
             --configuration ${{ inputs.build_configuration || 'Debug' }} \
+            --no-build \
             --no-restore \
             --results-directory ./TestResults \
             --coverage \

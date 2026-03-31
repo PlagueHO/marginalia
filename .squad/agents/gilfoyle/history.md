@@ -273,9 +273,9 @@
 
 **Key Changes:**
 
-- `ConfigController.cs` — ILogger<ConfigController> injected; logs LLM config requests (LogInformation) and health check results (LogInformation for healthy, LogWarning for unhealthy)
-- `SessionsController.cs` — ILogger<SessionsController> injected; logs session creation and retrieval (LogInformation), not-found as LogWarning
-- `DocumentsController.cs` — ILogger<DocumentsController> injected; logs document upload/paste/analysis/export (LogInformation), not-found and invalid file type as LogWarning
+- `ConfigController.cs` — `ILogger<ConfigController>` injected; logs LLM config requests (LogInformation) and health check results (LogInformation for healthy, LogWarning for unhealthy)
+- `SessionsController.cs` — `ILogger<SessionsController>` injected; logs session creation and retrieval (LogInformation), not-found as LogWarning
+- `DocumentsController.cs` — `ILogger<DocumentsController>` injected; logs document upload/paste/analysis/export (LogInformation), not-found and invalid file type as LogWarning
 - `Program.cs` — Startup diagnostic logger emits presence/absence of AI Foundry connection string, FOUNDRY_ENDPOINT, CORS mode, and OTEL exporter endpoint
 
 **Patterns:**

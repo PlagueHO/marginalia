@@ -103,7 +103,7 @@ describe('API base client', () => {
         'http://localhost:5279/api/documents/analyze',
         expect.objectContaining({
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json', 'X-User-Id': '_anonymous' },
           body: JSON.stringify({ documentId: 'doc-1', content: 'text' }),
         })
       )
@@ -282,7 +282,7 @@ describe('Document service', () => {
     })
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:5279/api/documents/analyze',
+      'http://localhost:5279/api/documents/doc-1/analyze',
       expect.objectContaining({
         method: 'POST',
         body: expect.stringContaining('more narrative'),

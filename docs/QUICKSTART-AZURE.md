@@ -74,10 +74,10 @@ azd up
 This single command will:
 
 1. Provision all Azure resources via Bicep templates
-2. Build the .NET API and React frontend
-3. Deploy the API to Azure Container Apps
-4. Deploy the frontend to Azure Static Web Apps
-5. Configure service connections and environment variables
+1. Build the .NET API and React frontend
+1. Deploy the API to Azure Container Apps
+1. Deploy the frontend to Azure Static Web Apps
+1. Configure service connections and environment variables
 
 ### What gets provisioned
 

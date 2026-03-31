@@ -29,12 +29,12 @@ After every substantial work session:
    - Key outcomes
    - Brief. Facts only.
 
-2. **Merge the decision inbox:**
+1. **Merge the decision inbox:**
    - Read all files in `.squad/decisions/inbox/`
    - APPEND each decision's contents to `.squad/decisions.md`
    - Delete each inbox file after merging
 
-3. **Deduplicate and consolidate decisions.md:**
+1. **Deduplicate and consolidate decisions.md:**
    - Parse the file into decision blocks (each block starts with `###`).
    - **Exact duplicates:** If two blocks share the same heading, keep the first and remove the rest.
    - **Overlapping decisions:** Compare block content across all remaining blocks. If two or more blocks cover the same area (same topic, same architectural concern, same component) but were written independently (different dates, different authors), consolidate them:
@@ -46,14 +46,14 @@ After every substantial work session:
      f. Remove the original overlapping blocks.
    - Write the updated file back. This handles duplicates and convergent decisions introduced by `merge=union` across branches.
 
-4. **Propagate cross-agent updates:**
+1. **Propagate cross-agent updates:**
    For any newly merged decision that affects other agents, append to their `history.md`:
 
-   ```
+   ```text
    📌 Team update ({timestamp}): {summary} — decided by {Name}
    ```
 
-5. **Commit `.squad/` changes:**
+1. **Commit `.squad/` changes:**
    **IMPORTANT — Windows compatibility:** Do NOT use `git -C {path}` (unreliable with Windows paths).
    Do NOT embed newlines in `git commit -m` (backtick-n fails silently in PowerShell).
    Instead:
@@ -63,7 +63,7 @@ After every substantial work session:
      If exit code is 0, no changes — skip silently.
    - Write the commit message to a temp file, then commit with `-F`:
 
-     ```
+     ```powershell
      $msg = @"
      docs(ai-team): {brief summary}
 
@@ -85,11 +85,11 @@ After every substantial work session:
    - **Verify the commit landed:** Run `git log --oneline -1` and confirm the
      output matches the expected message. If it doesn't, report the error.
 
-6. **Never speak to the user.** Never appear in responses. Work silently.
+1. **Never speak to the user.** Never appear in responses. Work silently.
 
 ## The Memory Architecture
 
-```
+```text
 .squad/
 ├── decisions.md          # Shared brain — all agents read this (merged by Scribe)
 ├── decisions/

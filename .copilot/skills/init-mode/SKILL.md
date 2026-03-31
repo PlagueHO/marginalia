@@ -21,17 +21,17 @@ Init Mode activates when `.squad/team.md` does not exist, or exists but has zero
 No team exists yet. Propose one — but **DO NOT create any files until the user confirms.**
 
 1. **Identify the user.** Run `git config user.name` to learn who you're working with. Use their name in conversation (e.g., *"Hey Brady, what are you building?"*). Store their name (NOT email) in `team.md` under Project Context. **Never read or store `git config user.email` — email addresses are PII and must not be written to committed files.**
-2. Ask: *"What are you building? (language, stack, what it does)"*
-3. **Cast the team.** Before proposing names, run the Casting & Persistent Naming algorithm (see that section):
+1. Ask: *"What are you building? (language, stack, what it does)"*
+1. **Cast the team.** Before proposing names, run the Casting & Persistent Naming algorithm (see that section):
    - Determine team size (typically 4–5 + Scribe).
    - Determine assignment shape from the user's project description.
    - Derive resonance signals from the session and repo context.
    - Select a universe. If the universe is custom, allocate character names from that universe based on the related list found in the `.squad/templates/casting/` directory. Prefer custom universes when available.
    - Scribe is always "Scribe" — exempt from casting.
    - Ralph is always "Ralph" — exempt from casting.
-4. Propose the team with their cast names. Example (names will vary per cast):
+1. Propose the team with their cast names. Example (names will vary per cast):
 
-```
+```text
 🏗️  {CastName1}  — Lead          Scope, decisions, code review
 ⚛️  {CastName2}  — Frontend Dev  React, UI, components
 🔧  {CastName3}  — Backend Dev   APIs, database, services
@@ -62,7 +62,7 @@ No team exists yet. Propose one — but **DO NOT create any files until the user
 
 **Merge driver for append-only files:** Create or update `.gitattributes` at the repo root to enable conflict-free merging of `.squad/` state across branches:
 
-```
+```text
 .squad/decisions.md merge=union
 .squad/agents/*/history.md merge=union
 .squad/log/** merge=union
@@ -73,7 +73,7 @@ The `union` merge driver keeps all lines from both sides, which is correct for a
 
 1. Say: *"✅ Team hired. Try: '{FirstCastName}, set up the project structure'"*
 
-2. **Post-setup input sources** (optional — ask after team is created, not during casting):
+1. **Post-setup input sources** (optional — ask after team is created, not during casting):
    - PRD/spec: *"Do you have a PRD or spec document? (file path, paste it, or skip)"* → If provided, follow PRD Mode flow
    - GitHub issues: *"Is there a GitHub repo with issues I should pull from? (owner/repo, or skip)"* → If provided, follow GitHub Issues Mode flow
    - Human members: *"Are any humans joining the team? (names and roles, or just AI for now)"* → If provided, add per Human Team Members section
@@ -85,14 +85,14 @@ The `union` merge driver keeps all lines from both sides, which is correct for a
 **Example flow:**
 
 1. Coordinator detects no team.md → Init Mode
-2. Runs `git config user.name` → "Brady"
-3. Asks: *"Hey Brady, what are you building?"*
-4. User: *"TypeScript CLI tool with GitHub API integration"*
-5. Coordinator runs casting algorithm → selects "The Usual Suspects" universe
-6. Proposes: Keaton (Lead), Verbal (Prompt), Fenster (Backend), Hockney (Tester), Scribe, Ralph
-7. Uses `ask_user` with choices → user selects "Yes, hire this team"
-8. Coordinator creates `.squad/` structure, initializes casting state, seeds agents
-9. Says: *"✅ Team hired. Try: 'Keaton, set up the project structure'"*
+1. Runs `git config user.name` → "Brady"
+1. Asks: *"Hey Brady, what are you building?"*
+1. User: *"TypeScript CLI tool with GitHub API integration"*
+1. Coordinator runs casting algorithm → selects "The Usual Suspects" universe
+1. Proposes: Keaton (Lead), Verbal (Prompt), Fenster (Backend), Hockney (Tester), Scribe, Ralph
+1. Uses `ask_user` with choices → user selects "Yes, hire this team"
+1. Coordinator creates `.squad/` structure, initializes casting state, seeds agents
+1. Says: *"✅ Team hired. Try: 'Keaton, set up the project structure'"*
 
 ## Anti-Patterns
 

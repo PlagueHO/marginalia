@@ -105,19 +105,19 @@ Created comprehensive test suite for the userId partitioning changes being imple
    - Concurrent operations with multiple users
    - Edge cases (not found returns null, duplicates handled)
 
-2. **`tests/unit/Repositories/UserIdSessionRepositoryContractTests.cs`** — 12 tests validating ISessionRepository contract with userId:
+1. **`tests/unit/Repositories/UserIdSessionRepositoryContractTests.cs`** — 12 tests validating ISessionRepository contract with userId:
    - GetByIdAsync with userId + sessionId composite key
    - SaveAsync stores userId correctly
    - AddDocumentToSessionAsync with userId parameter
    - User isolation (same sessionId for different users creates separate sessions)
    - Concurrent operations
 
-3. **`tests/unit/Domain/UserIdDefaultingTests.cs`** — 9 tests validating "_anonymous" default behavior:
+1. **`tests/unit/Domain/UserIdDefaultingTests.cs`** — 9 tests validating "_anonymous" default behavior:
    - Document, UserSession, and Suggestion all default to "_anonymous" when userId not specified
    - Explicit userId values are preserved
    - Record `with` syntax preserves userId
 
-4. **`tests/integration/Controllers/UserIdHeaderExtractionTests.cs`** — 8 tests validating controller X-User-Id header extraction:
+1. **`tests/integration/Controllers/UserIdHeaderExtractionTests.cs`** — 8 tests validating controller X-User-Id header extraction:
    - Controllers extract userId from X-User-Id header
    - Missing header defaults to "_anonymous"
    - Empty/whitespace header defaults to "_anonymous"

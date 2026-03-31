@@ -11,10 +11,10 @@ Marginalia is an AI-powered narrative flow editor for long-form non-fiction writ
 Marginalia guides you through a collaborative editorial workflow with AI-powered insights at every step:
 
 1. **Upload or Paste** — Import your Word document or paste text directly into the editor.
-2. **Provide Guidance** — Specify areas for improvement (compressed narrative, AI-like writing, tone adjustments) or select specific text.
-3. **Analyze** — AI analyzes your text and highlights passages where narrative expansion, style refinement, or consistency improvements could help.
-4. **Review & Refine** — Read suggestion rationales, modify them if desired, and see edits in real time with visual highlighting.
-5. **Accept & Export** — Batch-approve suggestions or fine-tune individual edits, then export your revised manuscript as Word or directly to Google Docs.
+1. **Provide Guidance** — Specify areas for improvement (compressed narrative, AI-like writing, tone adjustments) or select specific text.
+1. **Analyze** — AI analyzes your text and highlights passages where narrative expansion, style refinement, or consistency improvements could help.
+1. **Review & Refine** — Read suggestion rationales, modify them if desired, and see edits in real time with visual highlighting.
+1. **Accept & Export** — Batch-approve suggestions or fine-tune individual edits, then export your revised manuscript as Word or directly to Google Docs.
 
 ### Key Features
 

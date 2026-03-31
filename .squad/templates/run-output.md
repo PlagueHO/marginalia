@@ -45,6 +45,6 @@
 
 {Paste agent's verbatim response here, unedited}
 
-### {Name} ({Role}) — Raw Output
+### {Name2} ({Role2}) — Raw Output
 
 {Paste agent's verbatim response here, unedited}

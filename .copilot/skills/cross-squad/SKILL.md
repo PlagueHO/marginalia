@@ -31,8 +31,8 @@ Cross-squad orchestration applies when:
 Each squad publishes a `.squad/manifest.json` declaring its name, capabilities, and contact information. Squads discover each other through:
 
 1. **Well-known paths**: Check `.squad/manifest.json` in known org repos
-2. **Upstream config**: Squads already listed in `.squad/upstream.json` are checked for manifests
-3. **Explicit registry**: A central `squad-registry.json` can list all squads in an org
+1. **Upstream config**: Squads already listed in `.squad/upstream.json` are checked for manifests
+1. **Explicit registry**: A central `squad-registry.json` can list all squads in an org
 
 ```json
 {
@@ -66,12 +66,12 @@ Do NOT share:
 ### Work Handoff Protocol
 
 1. **Check manifest**: Verify the target squad accepts the work type (issues, PRs)
-2. **Create issue**: Use `gh issue create` in the target repo with:
+1. **Create issue**: Use `gh issue create` in the target repo with:
    - Title: `[cross-squad] <description>`
    - Label: `squad:cross-squad` (or the squad's configured label)
    - Body: Context, acceptance criteria, and link back to originating issue
-3. **Track**: Record the cross-squad issue URL in the originating squad's orchestration log
-4. **Poll**: Periodically check if the delegated issue is closed/completed
+1. **Track**: Record the cross-squad issue URL in the originating squad's orchestration log
+1. **Poll**: Periodically check if the delegated issue is closed/completed
 
 ### Feedback Loop
 
