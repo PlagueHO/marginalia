@@ -97,7 +97,14 @@ module virtualNetwork 'br/public:avm/res/network/virtual-network:0.1.5' = {
       {
         name: acaSubnetName
         addressPrefix: '10.0.0.0/23'
-        delegation: 'Microsoft.App/environments'
+        delegations: [
+          {
+            name: 'Microsoft.App.environments'
+            properties: {
+              serviceName: 'Microsoft.App/environments'
+            }
+          }
+        ]
       }
       {
         name: privateEndpointSubnetName
@@ -528,6 +535,7 @@ module containerAppCosmosDbRoles 'br/public:avm/res/document-db/database-account
     capabilitiesToAdd: [
       'EnableServerless'
     ]
+    zoneRedundant: false
     sqlRoleAssignments: [
       {
         principalId: containerApp.outputs.systemAssignedMIPrincipalId
@@ -549,6 +557,7 @@ module principalCosmosDbRoles 'br/public:avm/res/document-db/database-account:0.
     capabilitiesToAdd: [
       'EnableServerless'
     ]
+    zoneRedundant: false
     sqlRoleAssignments: [
       {
         principalId: principalId
