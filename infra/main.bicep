@@ -527,15 +527,11 @@ module containerAppFoundryRoles './core/security/role_foundry.bicep' = {
 
 // Assign Cosmos DB Built-in Data Contributor role to the Container App's managed identity
 // for data plane access. The built-in role GUID is 00000000-0000-0000-0000-000000000002.
-module containerAppCosmosDbRoles 'br/public:avm/res/document-db/database-account:0.19.0' = {
+module containerAppCosmosDbRoles './core/security/role_cosmosdb.bicep' = {
   name: 'container-app-cosmos-roles-${resourceToken}'
   scope: resourceGroup(resourceGroupName)
   params: {
-    name: cosmosDbAccountName
-    capabilitiesToAdd: [
-      'EnableServerless'
-    ]
-    zoneRedundant: false
+    cosmosDbAccountName: cosmosDbAccountName
     sqlRoleAssignments: [
       {
         principalId: containerApp.outputs.systemAssignedMIPrincipalId
@@ -546,18 +542,14 @@ module containerAppCosmosDbRoles 'br/public:avm/res/document-db/database-account
 }
 
 // Assign Cosmos DB Built-in Data Contributor to the deploying principal for local dev
-module principalCosmosDbRoles 'br/public:avm/res/document-db/database-account:0.19.0' = if (!empty(principalId)) {
+module principalCosmosDbRoles './core/security/role_cosmosdb.bicep' = if (!empty(principalId)) {
   name: 'principal-cosmos-roles-${resourceToken}'
   scope: resourceGroup(resourceGroupName)
   dependsOn: [
     cosmosDbAccount
   ]
   params: {
-    name: cosmosDbAccountName
-    capabilitiesToAdd: [
-      'EnableServerless'
-    ]
-    zoneRedundant: false
+    cosmosDbAccountName: cosmosDbAccountName
     sqlRoleAssignments: [
       {
         principalId: principalId
