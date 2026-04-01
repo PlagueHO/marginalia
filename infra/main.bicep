@@ -97,8 +97,7 @@ module virtualNetwork 'br/public:avm/res/network/virtual-network:0.1.5' = {
       {
         name: acaSubnetName
         addressPrefix: '10.0.0.0/23'
-        // NOTE: ACA Consumption environments DO NOT require subnet delegation to Microsoft.App/environments
-        // The delegation is only for Workload Profiles environments
+        delegation: 'Microsoft.App/environments'
       }
       {
         name: privateEndpointSubnetName
@@ -330,7 +329,6 @@ module cosmosDbAccount 'br/public:avm/res/document-db/database-account:0.19.0' =
     capabilitiesToAdd: [
       'EnableServerless'
     ]
-    enableBurstCapacity: false
     disableLocalAuthentication: false
     disableKeyBasedMetadataWriteAccess: false
     zoneRedundant: false

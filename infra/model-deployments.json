@@ -10,6 +10,6 @@
       "name": "GlobalStandard",
       "capacity": 50
     },
-    "raiPolicyName": "PromptBabblerContentPolicy"
+    "raiPolicyName": "MarginaliaContentPolicy"
   }
 ]

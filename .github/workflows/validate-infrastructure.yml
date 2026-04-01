@@ -36,34 +36,55 @@ jobs:
     name: Validate Infrastructure ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-latest
     environment: ${{ inputs.ENVIRONMENT }}
+    permissions:
+      id-token: write
+      contents: read
     env:
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_ENV_NAME: ${{ inputs.AZURE_ENV_NAME }}
-      AZURE_LOCATION: ${{ inputs.AZURE_LOCATION || 'eastus2' }}
+      AZURE_LOCATION: ${{ inputs.AZURE_LOCATION }}
       AZURE_PRINCIPAL_ID_TYPE: 'ServicePrincipal'
 
     steps:
-      - name: Download Build Artifacts
-        uses: actions/download-artifact@v8
+      - name: Checkout
+        uses: actions/checkout@v6
 
-      - name: Azure Login
+      - name: Install Azure Developer CLI
+        uses: Azure/setup-azd@v2.2.1
+
+      - name: Authenticate Azure Developer CLI (Federated Credentials)
+        run: |
+          azd auth login \
+            --client-id "$AZURE_CLIENT_ID" \
+            --federated-credential-provider "github" \
+            --tenant-id "$AZURE_TENANT_ID"
+
+      - name: Authenticate Azure CLI (Federated Credentials)
         uses: azure/login@v3
         with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
 
-      - name: Validate
-        id: validate-azure-infrastructure
-        uses: azure/bicep-deploy@v2
-        with:
-          type: deployment
-          operation: whatIf
-          name: ${{ inputs.AZURE_ENV_NAME }}-${{inputs.AZURE_LOCATION}}-${{ inputs.ENVIRONMENT }}-${{ github.action_ref }}-${{ github.run_number }}
-          scope: subscription
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          location: ${{ inputs.AZURE_LOCATION }}
-          template-file: ./infrastructure_bicep/main.bicep
-          parameters-file: ./infrastructure_bicep/main.bicepparam
+      - name: Create Azure Developer CLI environment
+        run: |
+          azd env new "$AZURE_ENV_NAME" --location "$AZURE_LOCATION"
+
+      - name: Set Azure Developer CLI environment variables
+        run: |
+          azd env set AZURE_PRINCIPAL_ID_TYPE "$AZURE_PRINCIPAL_ID_TYPE"
+          azd env set AZURE_RESOURCE_GROUP "rg-${AZURE_ENV_NAME}"
+          # Enable Entra ID app registrations via preprovision hook when configured.
+          # Requires Application.ReadWrite.All Graph permission on the deploying identity.
+          ENTRA_AUTH="${{ vars.ENABLE_ENTRA_AUTH }}"
+          if [ -n "$ENTRA_AUTH" ]; then
+            azd env set ENABLE_ENTRA_AUTH "$ENTRA_AUTH"
+          fi
+
+      - name: Set hook scripts executable
+        run: chmod +x infra/hooks/*.sh
+
+      - name: Preview Infrastructure using Azure Developer CLI
+        run: azd provision --preview --no-prompt
