@@ -41,6 +41,9 @@ param apiClientId string = ''
 @sys.description('Entra ID SPA app registration client ID. Leave empty to disable authentication.')
 param spaClientId string = ''
 
+@sys.description('Container image to deploy for the backend API Container App.')
+param containerImage string = 'ghcr.io/marymacgregorreid/marginalia-service:latest'
+
 var abbrs = loadJsonContent('./abbreviations.json')
 var modelDeployments = loadJsonContent('./model-deployments.json')
 
@@ -456,7 +459,7 @@ module containerApp 'br/public:avm/res/app/container-app:0.12.0' = {
     containers: [
       {
         name: 'api'
-        image: 'ghcr.io/marymacgregorreid/marginalia-service:latest'
+        image: containerImage
         resources: {
           cpu: '0.5'
           memory: '1Gi'

@@ -14,3 +14,6 @@ param enablePublicNetworkAccess = bool(readEnvironmentVariable('ENABLE_PUBLIC_NE
 // Entra ID app registration client IDs (set by preprovision hook when ENABLE_ENTRA_AUTH=true)
 param apiClientId = readEnvironmentVariable('AZURE_AD_API_CLIENT_ID', '')
 param spaClientId = readEnvironmentVariable('AZURE_AD_SPA_CLIENT_ID', '')
+
+// Backend container image to deploy to Azure Container Apps
+param containerImage = readEnvironmentVariable('AZURE_CONTAINER_APP_IMAGE', 'ghcr.io/marymacgregorreid/marginalia-service:latest')

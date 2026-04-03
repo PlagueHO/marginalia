@@ -86,6 +86,7 @@ jobs:
         run: |
           azd env set AZURE_PRINCIPAL_ID_TYPE "$AZURE_PRINCIPAL_ID_TYPE"
           azd env set AZURE_RESOURCE_GROUP "rg-${AZURE_ENV_NAME}"
+          azd env set AZURE_CONTAINER_APP_IMAGE "ghcr.io/${{ github.repository_owner }}/marginalia-service:latest"
           # Enable Entra ID app registrations via preprovision hook when configured.
           # Requires Application.ReadWrite.All Graph permission on the deploying identity.
           ENTRA_AUTH="${{ vars.ENABLE_ENTRA_AUTH }}"
