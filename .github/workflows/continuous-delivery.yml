@@ -84,7 +84,7 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: ./marginalia-service
-          file: ./marginalia-service/src/Api/Dockerfile
+          file: ./src/Api/Dockerfile
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: |
