@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "6376635846410765450"
+      "templateHash": "1889439885568981064"
     }
   },
   "parameters": {
@@ -76,9 +76,24 @@
         "description": "Entra ID SPA app registration client ID. Leave empty to disable authentication."
       }
     },
+    "staticWebAppLocation": {
+      "type": "string",
+      "defaultValue": "",
+      "allowedValues": [
+        "",
+        "centralus",
+        "eastasia",
+        "eastus2",
+        "westeurope",
+        "westus2"
+      ],
+      "metadata": {
+        "description": "Location for the Azure Static Web App. Must be one of the supported regions. Defaults to the primary location if not specified."
+      }
+    },
     "containerImage": {
       "type": "string",
-      "defaultValue": "ghcr.io/plagueho/marginalia-service:latest",
+      "defaultValue": "ghcr.io/marymacgregorreid/marginalia-service:latest",
       "metadata": {
         "description": "Container image to deploy for the backend API Container App."
       }
@@ -238,6 +253,7 @@
     ],
     "abbrs": "[variables('$fxv#0')]",
     "modelDeployments": "[variables('$fxv#1')]",
+    "effectiveStaticWebAppLocation": "[if(not(empty(parameters('staticWebAppLocation'))), parameters('staticWebAppLocation'), parameters('location'))]",
     "tags": {
       "azd-env-name": "[parameters('environmentName')]",
       "project": "marginalia"
@@ -32487,7 +32503,7 @@
             "value": "[variables('staticWebAppName')]"
           },
           "location": {
-            "value": "[parameters('location')]"
+            "value": "[variables('effectiveStaticWebAppLocation')]"
           },
           "tags": {
             "value": "[union(variables('tags'), createObject('azd-service-name', 'frontend'))]"

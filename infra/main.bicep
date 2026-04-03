@@ -41,11 +41,23 @@ param apiClientId string = ''
 @sys.description('Entra ID SPA app registration client ID. Leave empty to disable authentication.')
 param spaClientId string = ''
 
+@sys.description('Location for the Azure Static Web App. Must be one of the supported regions. Defaults to the primary location if not specified.')
+@allowed([
+  ''
+  'centralus'
+  'eastasia'
+  'eastus2'
+  'westeurope'
+  'westus2'
+])
+param staticWebAppLocation string = ''
+
 @sys.description('Container image to deploy for the backend API Container App.')
 param containerImage string = 'ghcr.io/marymacgregorreid/marginalia-service:latest'
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var modelDeployments = loadJsonContent('./model-deployments.json')
+var effectiveStaticWebAppLocation = !empty(staticWebAppLocation) ? staticWebAppLocation : location
 
 // Tags that should be applied to all resources.
 var tags = {
@@ -571,7 +583,7 @@ module staticWebApp 'br/public:avm/res/web/static-site:0.7.0' = {
   ]
   params: {
     name: staticWebAppName
-    location: location
+    location: effectiveStaticWebAppLocation
     tags: union(tags, {
       'azd-service-name': 'frontend'
     })
