@@ -9,27 +9,51 @@ param(
 Describe 'Backend API' {
     BeforeAll {
         # Wait for Container App cold start with retry on /health endpoint
-        $maxRetries = 10
+        # ACA cold-start from zero replicas + GHCR image pull can take 2+ minutes
+        $maxRetries = 15
         $retryDelay = 10
         $healthy = $false
 
         for ($i = 1; $i -le $maxRetries; $i++) {
+            $timestamp = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
             try {
                 $response = Invoke-WebRequest -Uri "$ApiBaseUrl/health" -UseBasicParsing -TimeoutSec 10
                 if ($response.StatusCode -eq 200) {
                     $healthy = $true
-                    Write-Host "Backend /health is ready (attempt $i/$maxRetries)"
+                    Write-Host "[$timestamp] Backend /health is ready (attempt $i/$maxRetries)"
                     break
+                }
+                else {
+                    Write-Host "[$timestamp] Attempt $i/${maxRetries}: /health returned HTTP $($response.StatusCode), retrying in ${retryDelay}s..."
+                    Write-Host "  Response body: $($response.Content.Substring(0, [Math]::Min(500, $response.Content.Length)))"
                 }
             }
             catch {
-                Write-Host "Attempt $i/${maxRetries}: /health not ready, retrying in ${retryDelay}s..."
+                $errorDetail = $_.Exception.Message
+                # Try to extract HTTP status code and body from the exception
+                if ($_.Exception.Response) {
+                    $statusCode = [int]$_.Exception.Response.StatusCode
+                    try {
+                        $reader = [System.IO.StreamReader]::new($_.Exception.Response.GetResponseStream())
+                        $body = $reader.ReadToEnd()
+                        $reader.Close()
+                        $bodySnippet = $body.Substring(0, [Math]::Min(500, $body.Length))
+                        Write-Host "[$timestamp] Attempt $i/${maxRetries}: /health returned HTTP $statusCode - $errorDetail"
+                        Write-Host "  Response body: $bodySnippet"
+                    }
+                    catch {
+                        Write-Host "[$timestamp] Attempt $i/${maxRetries}: /health returned HTTP $statusCode - $errorDetail"
+                    }
+                }
+                else {
+                    Write-Host "[$timestamp] Attempt $i/${maxRetries}: /health not ready - $errorDetail"
+                }
                 Start-Sleep -Seconds $retryDelay
             }
         }
 
         if (-not $healthy) {
-            throw "Backend /health did not become healthy after $maxRetries attempts"
+            throw "Backend /health did not become healthy after $maxRetries attempts ($(($maxRetries * $retryDelay))s). URL: $ApiBaseUrl/health"
         }
     }
 

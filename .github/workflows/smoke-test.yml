@@ -11,6 +11,25 @@ on:
         description: "The default hostname of the deployed Azure Static Web App"
         required: true
         type: string
+      AZURE_RESOURCE_GROUP:
+        description: "The Azure resource group containing the Container App"
+        required: true
+        type: string
+      AZURE_CONTAINER_APP_NAME:
+        description: "The name of the Azure Container App"
+        required: true
+        type: string
+
+    secrets:
+      AZURE_TENANT_ID:
+        description: "The Azure tenant ID for CLI authentication"
+        required: true
+      AZURE_SUBSCRIPTION_ID:
+        description: "The Azure subscription ID for CLI authentication"
+        required: true
+      AZURE_CLIENT_ID:
+        description: "The Azure client ID for CLI authentication"
+        required: true
 
 jobs:
   smoke-test:
@@ -19,14 +38,50 @@ jobs:
     permissions:
       checks: write
       contents: read
+      id-token: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Authenticate Azure CLI (Federated Credentials)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
       - name: Install Pester
         shell: pwsh
         run: Install-Module -Name Pester -MinimumVersion 5.5.0 -Force -Scope CurrentUser
+
+      - name: Validate Container App Readiness
+        shell: bash
+        env:
+          CONTAINER_APP_NAME: ${{ inputs.AZURE_CONTAINER_APP_NAME }}
+          RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP }}
+        run: |
+          echo "=== Container App Overview ==="
+          az containerapp show \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "{provisioningState:properties.provisioningState, latestRevisionName:properties.latestRevisionName, latestRevisionFqdn:properties.latestRevisionFqdn}" \
+            --output table
+
+          echo ""
+          echo "=== Active Revisions ==="
+          az containerapp revision list \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --query "[].{name:name, active:properties.active, healthState:properties.healthState, provisioningState:properties.provisioningState, runningState:properties.runningState, replicas:properties.replicas, trafficWeight:properties.trafficWeight}" \
+            --output table
+
+          echo ""
+          echo "=== Replica Status ==="
+          az containerapp replica list \
+            --name "$CONTAINER_APP_NAME" \
+            --resource-group "$RESOURCE_GROUP" \
+            --output table || echo "No replicas found (app may be scaled to zero)"
 
       - name: Run Smoke Tests
         shell: pwsh
@@ -50,6 +105,62 @@ jobs:
             exit 1
           }
 
+      - name: Collect ACA Diagnostics
+        if: failure()
+        shell: bash
+        env:
+          CONTAINER_APP_NAME: ${{ inputs.AZURE_CONTAINER_APP_NAME }}
+          RESOURCE_GROUP: ${{ inputs.AZURE_RESOURCE_GROUP }}
+        run: |
+          DIAG_DIR="TestResults/diagnostics"
+          mkdir -p "$DIAG_DIR"
+          DIAG_FILE="$DIAG_DIR/aca-diagnostics.log"
+
+          {
+            echo "=========================================="
+            echo "ACA Diagnostics - $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+            echo "Container App: $CONTAINER_APP_NAME"
+            echo "Resource Group: $RESOURCE_GROUP"
+            echo "=========================================="
+
+            echo ""
+            echo "=== Container App Details ==="
+            az containerapp show \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --output json 2>&1 || echo "Failed to get container app details"
+
+            echo ""
+            echo "=== Revision List ==="
+            az containerapp revision list \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --output json 2>&1 || echo "Failed to list revisions"
+
+            echo ""
+            echo "=== Replica List ==="
+            az containerapp replica list \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --output json 2>&1 || echo "Failed to list replicas"
+
+            echo ""
+            echo "=== System Logs (last 50 entries) ==="
+            az containerapp logs show \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --type system \
+              --tail 50 2>&1 || echo "Failed to retrieve system logs"
+
+            echo ""
+            echo "=== Console Logs (last 100 entries) ==="
+            az containerapp logs show \
+              --name "$CONTAINER_APP_NAME" \
+              --resource-group "$RESOURCE_GROUP" \
+              --type console \
+              --tail 100 2>&1 || echo "Failed to retrieve console logs"
+          } 2>&1 | tee "$DIAG_FILE"
+
       - name: Publish Smoke Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
@@ -66,3 +177,11 @@ jobs:
           name: smoke-test-results
           path: TestResults/smoke-tests.xml
           retention-days: 7
+
+      - name: Upload ACA Diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: aca-diagnostics
+          path: TestResults/diagnostics/
+          retention-days: 14
