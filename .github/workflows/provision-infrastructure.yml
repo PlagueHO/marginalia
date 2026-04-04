@@ -164,6 +164,11 @@ jobs:
           azd env set AZURE_RESOURCE_GROUP "rg-${AZURE_ENV_NAME}"
           OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           azd env set AZURE_CONTAINER_APP_IMAGE "ghcr.io/${OWNER_LC}/marginalia-service:latest"
+          # Set Static Web App location override (required when primary region doesn't support Microsoft.Web/staticSites).
+          STATIC_WEB_APP_LOCATION="${{ vars.AZURE_STATIC_WEB_APP_LOCATION }}"
+          if [ -n "$STATIC_WEB_APP_LOCATION" ]; then
+            azd env set AZURE_STATIC_WEB_APP_LOCATION "$STATIC_WEB_APP_LOCATION"
+          fi
           # Enable Entra ID app registrations via preprovision hook when configured.
           # Requires Application.ReadWrite.All Graph permission on the deploying identity.
           ENTRA_AUTH="${{ vars.ENABLE_ENTRA_AUTH }}"
