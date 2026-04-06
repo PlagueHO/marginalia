@@ -57,8 +57,8 @@ Describe 'Backend API' {
             throw "Backend /health did not become healthy after $maxRetries attempts ($(($maxRetries * $retryDelay))s). URL: $ApiBaseUrl/health"
         }
 
-        # Wait for all dependencies to be ready using the /api/status endpoint.
-        # This checks Cosmos DB connectivity, managed identity, and AI Foundry in one call.
+        # Wait for all dependency health checks to be ready using the /health endpoint.
+        # The detailed health response includes per-check status for Cosmos DB, managed identity, and AI Foundry.
         $statusReady = $false
         $maxStatusRetries = 20
         $statusRetryDelay = 10
@@ -67,32 +67,28 @@ Describe 'Backend API' {
             $timestamp = (Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ')
             try {
                 # Use -SkipHttpErrorCheck so we can read the response body even on 503
-                $statusResponse = Invoke-WebRequest -Uri "$ApiBaseUrl/api/status" -UseBasicParsing -TimeoutSec 30 -SkipHttpErrorCheck
+                $statusResponse = Invoke-WebRequest -Uri "$ApiBaseUrl/health" -UseBasicParsing -TimeoutSec 30 -SkipHttpErrorCheck
                 $statusJson = $statusResponse.Content | ConvertFrom-Json
 
-                Write-Host "[$timestamp] Status check (attempt $i/$maxStatusRetries) - HTTP $($statusResponse.StatusCode):"
-                Write-Host "  Overall:          $($statusJson.overall)"
-                Write-Host "  Managed Identity: $($statusJson.managedIdentity.status) - $($statusJson.managedIdentity.message)"
-                Write-Host "  Cosmos DB:        $($statusJson.cosmosDb.status) - $($statusJson.cosmosDb.message)"
-                Write-Host "  AI Foundry:       $($statusJson.aiFoundry.status) - $($statusJson.aiFoundry.message)"
+                Write-Host "[$timestamp] Health check (attempt $i/$maxStatusRetries) - HTTP $($statusResponse.StatusCode):"
+                Write-Host "  Overall:          $($statusJson.status)"
 
-                if ($statusJson.overall -eq 'Healthy') {
+                # Log individual check statuses when available
+                if ($statusJson.entries) {
+                    $statusJson.entries.PSObject.Properties | ForEach-Object {
+                        Write-Host "  $($_.Name): $($_.Value.status) - $($_.Value.description)"
+                    }
+                }
+
+                if ($statusJson.status -eq 'Healthy') {
                     $statusReady = $true
                     break
-                }
-
-                # Log specific failures for diagnostics
-                if ($statusJson.cosmosDb.error) {
-                    Write-Host "  Cosmos DB error:  $($statusJson.cosmosDb.error)"
-                }
-                if ($statusJson.managedIdentity.error) {
-                    Write-Host "  MI error:         $($statusJson.managedIdentity.error)"
                 }
 
                 Start-Sleep -Seconds $statusRetryDelay
             }
             catch {
-                Write-Host "[$timestamp] Attempt $i/${maxStatusRetries}: /api/status request failed - $($_.Exception.Message)"
+                Write-Host "[$timestamp] Attempt $i/${maxStatusRetries}: /health request failed - $($_.Exception.Message)"
                 Start-Sleep -Seconds $statusRetryDelay
             }
         }
@@ -106,7 +102,9 @@ Describe 'Backend API' {
     It 'Health endpoint returns Healthy' {
         $response = Invoke-WebRequest -Uri "$ApiBaseUrl/health" -UseBasicParsing -TimeoutSec 10
         $response.StatusCode | Should -Be 200
-        $response.Content | Should -BeLike '*Healthy*'
+
+        $status = $response.Content | ConvertFrom-Json
+        $status.status | Should -Be 'Healthy'
     }
 
     It 'Liveness endpoint returns 200' {
@@ -114,14 +112,14 @@ Describe 'Backend API' {
         $response.StatusCode | Should -Be 200
     }
 
-    It 'Status endpoint reports all dependencies healthy' {
-        $response = Invoke-WebRequest -Uri "$ApiBaseUrl/api/status" -UseBasicParsing -TimeoutSec 30
+    It 'Health endpoint returns detailed dependency status' {
+        $response = Invoke-WebRequest -Uri "$ApiBaseUrl/health" -UseBasicParsing -TimeoutSec 30
         $response.StatusCode | Should -Be 200
 
         $status = $response.Content | ConvertFrom-Json
-        $status.overall | Should -Be 'Healthy'
-        $status.cosmosDb.status | Should -Be 'Healthy'
-        $status.managedIdentity.status | Should -Be 'Healthy'
+        $status.status | Should -Be 'Healthy'
+        $status.entries.'cosmosdb'.status | Should -Be 'Healthy'
+        $status.entries.'managed-identity'.status | Should -Be 'Healthy'
     }
 
     It 'Documents API returns 200' {

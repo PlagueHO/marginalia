@@ -1,14 +1,13 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure.Identity;
+using Marginalia.Api.HealthChecks;
 using Marginalia.Domain.Configuration;
 using Marginalia.Domain.Interfaces;
 using Marginalia.Infrastructure.Repositories;
 using Marginalia.Infrastructure.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.AI;
-
-using Marginalia.Api.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -79,8 +78,17 @@ else
     builder.Services.AddSingleton<ISuggestionService, NoOpSuggestionService>();
 }
 
-// Status endpoint dependency checker
-builder.Services.AddSingleton<IDependencyChecker, DependencyChecker>();
+// Health checks for dependency monitoring
+builder.Services.AddHealthChecks()
+    .AddCheck<CosmosDbHealthCheck>("cosmosdb", tags: ["ready"])
+    .AddCheck<AiFoundryHealthCheck>("ai-foundry", tags: ["ready"]);
+
+// Managed identity health check only runs in deployed environments
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHealthChecks()
+        .AddCheck<ManagedIdentityHealthCheck>("managed-identity", tags: ["ready"]);
+}
 
 // Controllers + JSON config
 builder.Services.AddControllers()
