@@ -56,6 +56,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    outputs:
+      CONTAINER_IMAGE: ${{ steps.image_ref.outputs.name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -91,6 +93,12 @@ jobs:
             org.opencontainers.image.source=https://github.com/${{ github.repository }}
             org.opencontainers.image.description=Marginalia API Service
             org.opencontainers.image.version=${{ github.sha }}
+
+      - name: Compute lowercase container image reference
+        id: image_ref
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "name=ghcr.io/${OWNER}/marginalia-service:${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
 
   e2e-test:
     name: E2E Test
@@ -130,7 +138,7 @@ jobs:
     with:
       BUILD_VERSION: ${{ needs.set-build-variables.outputs.BUILD_VERSION }}
       AZURE_LOCATION: ${{ vars.AZURE_LOCATION || 'eastus2' }}
-      CONTAINER_IMAGE: ghcr.io/${{ github.repository_owner }}/marginalia-service:${{ github.ref_name }}
+      CONTAINER_IMAGE: ${{ needs.build-and-push-api-container.outputs.CONTAINER_IMAGE }}
     secrets:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
