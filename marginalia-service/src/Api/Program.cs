@@ -65,11 +65,20 @@ builder.Services.AddSingleton<ISessionRepository>(sp =>
 });
 builder.Services.AddSingleton<IWordDocumentService, WordDocumentService>();
 
-// Aspire Azure AI Inference integration — active when running under Aspire AppHost
+// Aspire Azure AI Inference integration — active when running under Aspire AppHost.
+// In non-development environments (ACA), use ManagedIdentityCredential directly
+// to avoid the same DefaultAzureCredential cold-start caching issue as Cosmos DB.
 var aiConnectionString = builder.Configuration.GetConnectionString("ai-foundry");
 if (!string.IsNullOrWhiteSpace(aiConnectionString))
 {
-    builder.AddAzureChatCompletionsClient("ai-foundry")
+    builder.AddAzureChatCompletionsClient("ai-foundry",
+        configureSettings: settings =>
+        {
+            if (!builder.Environment.IsDevelopment())
+            {
+                settings.TokenCredential = new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);
+            }
+        })
         .AddChatClient("reviewer");
     builder.Services.AddSingleton<ISuggestionService, FoundrySuggestionService>();
 }
