@@ -7,9 +7,11 @@ import {
   apiGetBlob,
   setApiBaseUrl,
   getApiBaseUrl,
+  setAccessCode,
+  getAccessCode,
 } from '@/services/api'
 import { uploadDocument, pasteDocument, analyzeDocument } from '@/services/documentService'
-import { getLlmConfig, checkHealth } from '@/services/configService'
+import { getLlmConfig, checkHealth, getAccessStatus } from '@/services/configService'
 import { updateSuggestionStatus } from '@/services/suggestionService'
 
 // Mock global fetch
@@ -19,6 +21,7 @@ beforeEach(() => {
   mockFetch.mockReset()
   vi.stubGlobal('fetch', mockFetch)
   setApiBaseUrl('http://localhost:5279')
+  setAccessCode(null)
 })
 
 afterEach(() => {
@@ -351,5 +354,147 @@ describe('Suggestion service', () => {
         body: JSON.stringify({ status: 'Accepted' }),
       })
     )
+  })
+})
+
+describe('Access code support', () => {
+  describe('setAccessCode / getAccessCode', () => {
+    it('defaults to null', () => {
+      expect(getAccessCode()).toBeNull()
+    })
+
+    it('stores and retrieves access code', () => {
+      setAccessCode('my-code')
+      expect(getAccessCode()).toBe('my-code')
+    })
+
+    it('clears access code when set to null', () => {
+      setAccessCode('my-code')
+      setAccessCode(null)
+      expect(getAccessCode()).toBeNull()
+    })
+  })
+
+  describe('X-Access-Code header injection', () => {
+    it('does not include X-Access-Code when access code is null', async () => {
+      setAccessCode(null)
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+      })
+
+      await apiGet('/api/test')
+
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit]
+      const headers = options.headers as Record<string, string>
+      expect(headers).not.toHaveProperty('X-Access-Code')
+    })
+
+    it('includes X-Access-Code when access code is set', async () => {
+      setAccessCode('secret123')
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+      })
+
+      await apiGet('/api/test')
+
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit]
+      const headers = options.headers as Record<string, string>
+      expect(headers['X-Access-Code']).toBe('secret123')
+    })
+
+    it('includes X-Access-Code in POST requests', async () => {
+      setAccessCode('post-code')
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+      })
+
+      await apiPost('/api/test', { data: 'value' })
+
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit]
+      const headers = options.headers as Record<string, string>
+      expect(headers['X-Access-Code']).toBe('post-code')
+    })
+
+    it('includes X-Access-Code in PUT requests', async () => {
+      setAccessCode('put-code')
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+      })
+
+      await apiPut('/api/test', { data: 'value' })
+
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit]
+      const headers = options.headers as Record<string, string>
+      expect(headers['X-Access-Code']).toBe('put-code')
+    })
+
+    it('includes X-Access-Code in file upload requests', async () => {
+      setAccessCode('file-code')
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({}),
+      })
+
+      const file = new File(['content'], 'test.docx')
+      await apiPostFile('/api/upload', file)
+
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit]
+      const headers = options.headers as Record<string, string>
+      expect(headers['X-Access-Code']).toBe('file-code')
+    })
+
+    it('includes X-Access-Code in blob download requests', async () => {
+      setAccessCode('blob-code')
+      const mockBlob = new Blob(['content'])
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        blob: () => Promise.resolve(mockBlob),
+      })
+
+      await apiGetBlob('/api/download')
+
+      const [, options] = mockFetch.mock.calls[0] as [string, RequestInit]
+      const headers = options.headers as Record<string, string>
+      expect(headers['X-Access-Code']).toBe('blob-code')
+    })
+  })
+})
+
+describe('Config service - access status', () => {
+  it('getAccessStatus fetches from access-status endpoint', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ accessCodeRequired: true }),
+    })
+
+    const result = await getAccessStatus()
+
+    expect(mockFetch).toHaveBeenCalledWith(
+      'http://localhost:5279/api/config/access-status',
+      expect.objectContaining({ method: 'GET' })
+    )
+    expect(result.accessCodeRequired).toBe(true)
+  })
+
+  it('getAccessStatus returns false when no access code configured', async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ accessCodeRequired: false }),
+    })
+
+    const result = await getAccessStatus()
+    expect(result.accessCodeRequired).toBe(false)
   })
 })

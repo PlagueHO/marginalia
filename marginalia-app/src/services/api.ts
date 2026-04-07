@@ -10,6 +10,7 @@ const DEFAULT_USER_ID = "_anonymous";
 
 let baseUrl = DEFAULT_BASE_URL;
 let currentUserId: string = DEFAULT_USER_ID;
+let currentAccessCode: string | null = null;
 
 export function setApiBaseUrl(url: string): void {
   baseUrl = url.replace(/\/+$/, "");
@@ -25,6 +26,27 @@ export function setUserId(userId: string): void {
 
 export function getUserId(): string {
   return currentUserId;
+}
+
+export function setAccessCode(code: string | null): void {
+  currentAccessCode = code;
+}
+
+export function getAccessCode(): string | null {
+  return currentAccessCode;
+}
+
+function buildHeaders(contentType?: string): Record<string, string> {
+  const headers: Record<string, string> = {
+    "X-User-Id": currentUserId,
+  };
+  if (contentType) {
+    headers["Content-Type"] = contentType;
+  }
+  if (currentAccessCode) {
+    headers["X-Access-Code"] = currentAccessCode;
+  }
+  return headers;
 }
 
 async function handleResponse<T>(response: Response): Promise<T> {
@@ -56,10 +78,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 export async function apiGet<T>(path: string): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-User-Id": currentUserId,
-    },
+    headers: buildHeaders("application/json"),
   });
   return handleResponse<T>(response);
 }
@@ -67,10 +86,7 @@ export async function apiGet<T>(path: string): Promise<T> {
 export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-User-Id": currentUserId,
-    },
+    headers: buildHeaders("application/json"),
     body: body ? JSON.stringify(body) : undefined,
   });
   return handleResponse<T>(response);
@@ -79,10 +95,7 @@ export async function apiPost<T>(path: string, body?: unknown): Promise<T> {
 export async function apiPut<T>(path: string, body: unknown): Promise<T> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "X-User-Id": currentUserId,
-    },
+    headers: buildHeaders("application/json"),
     body: JSON.stringify(body),
   });
   return handleResponse<T>(response);
@@ -103,9 +116,7 @@ export async function apiPostFile<T>(
 
   const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",
-    headers: {
-      "X-User-Id": currentUserId,
-    },
+    headers: buildHeaders(),
     body: formData,
   });
   return handleResponse<T>(response);
@@ -114,9 +125,7 @@ export async function apiPostFile<T>(
 export async function apiGetBlob(path: string): Promise<Blob> {
   const response = await fetch(`${baseUrl}${path}`, {
     method: "GET",
-    headers: {
-      "X-User-Id": currentUserId,
-    },
+    headers: buildHeaders(),
   });
 
   if (!response.ok) {

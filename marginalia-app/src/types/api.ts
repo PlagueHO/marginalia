@@ -55,6 +55,10 @@ export interface ApiError {
   statusCode: number;
 }
 
+export interface AccessControlStatus {
+  accessCodeRequired: boolean;
+}
+
 export type {
   Document,
   Suggestion,

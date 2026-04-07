@@ -26,6 +26,7 @@ Marginalia guides you through a collaborative editorial workflow with AI-powered
 - **Built for Writers** — Clean, distraction-free UI with accessibility as a first-class concern. Supports up to 10-page documents per session.
 - **Modern Tech Stack** — React 19 + Vite + shadcn/ui frontend, .NET 10 backend, orchestrated with .NET Aspire, powered by Microsoft Foundry AI.
 - **Bring Your Own Model** — Configure your own Foundry endpoint and API key (or use Entra ID authentication), or connect your own compatible LLM.
+- **Access Code Protection** — Optionally protect the application with an access code when running in single-user mode. See [Local Development](docs/QUICKSTART-LOCAL.md).
 
 ## Quick Start
 

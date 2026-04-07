@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Azure.Identity;
 using Marginalia.Api.HealthChecks;
+using Marginalia.Api.Middleware;
 using Marginalia.Domain.Configuration;
 using Marginalia.Domain.Interfaces;
 using Marginalia.Infrastructure.Repositories;
@@ -27,6 +28,15 @@ if (Environment.GetEnvironmentVariable("FOUNDRY_MODEL_NAME") is { Length: > 0 } 
 
 builder.Services.Configure<LlmEndpointOptions>(
     builder.Configuration.GetSection(LlmEndpointOptions.SectionName));
+
+// Access control — optional access code for single-user mode
+if (Environment.GetEnvironmentVariable("ACCESS_CODE") is { Length: > 0 } accessCode)
+{
+    builder.Configuration[$"{AccessControlOptions.SectionName}:AccessCode"] = accessCode;
+}
+
+builder.Services.Configure<AccessControlOptions>(
+    builder.Configuration.GetSection(AccessControlOptions.SectionName));
 
 // Cosmos DB client — use ManagedIdentityCredential directly in deployed environments.
 // DefaultAzureCredential permanently caches credential unavailability per the Azure Identity
@@ -156,6 +166,8 @@ startupLogger.LogInformation("CORS mode: {CorsMode}",
     string.IsNullOrEmpty(corsAllowedOrigins) ? "local dev (any localhost origin)" : "configured origins");
 startupLogger.LogInformation("OTEL exporter endpoint: {Status}",
     string.IsNullOrEmpty(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")) ? "(not set)" : "(set)");
+startupLogger.LogInformation("Access control: {Status}",
+    string.IsNullOrEmpty(builder.Configuration[$"{AccessControlOptions.SectionName}:AccessCode"]) ? "disabled (no access code)" : "enabled (access code set)");
 
 var app = builder.Build();
 
@@ -168,6 +180,7 @@ if (app.Environment.IsDevelopment())
 // path the CORS middleware runs and adds Access-Control-Allow-Origin on error responses.
 app.UseExceptionHandler("/api/error");
 app.UseCors();
+app.UseMiddleware<AccessCodeMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

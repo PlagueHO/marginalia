@@ -144,6 +144,63 @@ export MicrosoftFoundry__modelName="gpt-5.3-chat"
 export MicrosoftFoundry__modelVersion="2026-03-03"
 ```
 
+## Access code protection
+
+When running in single-user mode (without Entra ID authentication), you can optionally protect the application with an access code. When configured, the frontend displays an access code dialog on first load and the backend API rejects requests without a valid `X-Access-Code` header.
+
+When the access code is not set or empty, the application is fully open with no access gate — this is the default behavior.
+
+### Configure via appsettings
+
+In `marginalia-service/src/Api/appsettings.json` (or `appsettings.Development.json`):
+
+```json
+{
+  "AccessControl": {
+    "AccessCode": "your-access-code-here"
+  }
+}
+```
+
+### Configure via environment variable
+
+```bash
+export ACCESS_CODE="your-access-code-here"
+```
+
+Or on Windows:
+
+```powershell
+$env:ACCESS_CODE = "your-access-code-here"
+```
+
+### Configure via user secrets
+
+```bash
+cd marginalia-service/src/Api
+dotnet user-secrets set AccessControl:AccessCode "your-access-code-here"
+```
+
+### Configure for production deployment
+
+When deploying to Azure via GitHub Actions, add an `ACCESS_CODE` secret to your GitHub repository (or the `prod` environment). If the secret is set, the CD pipeline passes it through to the Azure Container App as an environment variable. If the secret is not set, the application runs without access code protection.
+
+1. Go to your GitHub repository **Settings** > **Secrets and variables** > **Actions**.
+1. Click **New repository secret** (or add to the `prod` environment).
+1. Set **Name** to `ACCESS_CODE` and **Value** to your desired access code.
+
+The secret flows through the workflow chain: `continuous-delivery.yml` → `deploy-production.yml` → `provision-infrastructure.yml` → Bicep `accessCode` parameter → Container App `ACCESS_CODE` environment variable.
+
+### How it works
+
+1. The frontend checks `GET /api/config/access-status` on startup to determine if an access code is required.
+1. If required, a modal dialog prompts for the access code before allowing access.
+1. The access code is stored in the browser's session storage (cleared when the tab closes).
+1. All API requests include the access code in the `X-Access-Code` header.
+1. Health endpoints (`/health`, `/alive`) and the access status endpoint are not protected.
+
+> **Note:** This is a lightweight access gate for single-user deployments, not a high-security authentication mechanism. For production multi-user deployments, use Entra ID authentication.
+
 ## Run tests
 
 ### Backend

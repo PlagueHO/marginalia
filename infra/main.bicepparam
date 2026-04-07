@@ -21,3 +21,6 @@ param staticWebAppLocation = toLower(readEnvironmentVariable('AZURE_STATIC_WEB_A
 
 // Backend container image to deploy to Azure Container Apps
 param containerImage = readEnvironmentVariable('AZURE_CONTAINER_APP_IMAGE', 'ghcr.io/marymacgregorreid/marginalia-service:latest')
+
+// Optional access code for single-user mode protection
+param accessCode = readEnvironmentVariable('ACCESS_CODE', '')

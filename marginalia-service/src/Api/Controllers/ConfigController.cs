@@ -10,18 +10,38 @@ namespace Marginalia.Api.Controllers;
 [Route("api/[controller]")]
 public sealed class ConfigController : ControllerBase
 {
-    private readonly IOptionsMonitor<LlmEndpointOptions> _options;
+    private readonly IOptionsMonitor<LlmEndpointOptions> _llmOptions;
+    private readonly IOptionsMonitor<AccessControlOptions> _accessControlOptions;
     private readonly IChatClient? _chatClient;
     private readonly ILogger<ConfigController> _logger;
 
     public ConfigController(
-        IOptionsMonitor<LlmEndpointOptions> options,
+        IOptionsMonitor<LlmEndpointOptions> llmOptions,
+        IOptionsMonitor<AccessControlOptions> accessControlOptions,
         ILogger<ConfigController> logger,
         IChatClient? chatClient = null)
     {
-        _options = options;
+        _llmOptions = llmOptions;
+        _accessControlOptions = accessControlOptions;
         _chatClient = chatClient;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Check whether the application requires an access code.
+    /// This endpoint is not protected by the access code middleware.
+    /// </summary>
+    [HttpGet("access-status")]
+    public ActionResult<AccessControlStatusResponse> GetAccessStatus()
+    {
+        var accessCodeRequired = !string.IsNullOrEmpty(_accessControlOptions.CurrentValue.AccessCode);
+
+        _logger.LogInformation("Access status requested — AccessCodeRequired: {AccessCodeRequired}", accessCodeRequired);
+
+        return Ok(new AccessControlStatusResponse
+        {
+            AccessCodeRequired = accessCodeRequired
+        });
     }
 
     /// <summary>
@@ -31,7 +51,7 @@ public sealed class ConfigController : ControllerBase
     [HttpGet("llm")]
     public ActionResult<LlmConfigResponse> GetLlmConfig()
     {
-        var current = _options.CurrentValue;
+        var current = _llmOptions.CurrentValue;
         var isConfigured = _chatClient is not null;
 
         var metadata = _chatClient?.GetService<ChatClientMetadata>();

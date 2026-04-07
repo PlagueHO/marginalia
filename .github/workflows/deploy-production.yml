@@ -26,6 +26,9 @@ on:
       AZURE_CLIENT_ID:
         description: "The Azure client ID to use for authentication to Azure for deployment"
         required: true
+      ACCESS_CODE:
+        description: "Optional access code to protect the application in single-user mode"
+        required: false
 
 jobs:
   validate-prod-infrastructure:
@@ -57,6 +60,7 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
 
   deploy-prod-frontend:
     name: Deploy Prod Frontend

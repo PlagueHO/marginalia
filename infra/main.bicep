@@ -55,6 +55,10 @@ param staticWebAppLocation string = ''
 @sys.description('Container image to deploy for the backend API Container App.')
 param containerImage string = 'ghcr.io/marymacgregorreid/marginalia-service:latest'
 
+@sys.description('Optional access code to protect the application in single-user mode. Leave empty to disable.')
+@secure()
+param accessCode string = ''
+
 var abbrs = loadJsonContent('./abbreviations.json')
 var modelDeployments = loadJsonContent('./model-deployments.json')
 var effectiveStaticWebAppLocation = !empty(staticWebAppLocation) ? staticWebAppLocation : location
@@ -508,7 +512,7 @@ module containerApp 'br/public:avm/res/app/container-app:0.12.0' = {
           }
           {
             name: 'ConnectionStrings__ai-foundry'
-            value: 'Endpoint=${foundryService.outputs.endpoint}'
+            value: 'Endpoint=https://${foundryCustomSubDomainName}.services.ai.azure.com/api/projects/${defaultProjectName}'
           }
           {
             name: 'ConnectionStrings__cosmos'
@@ -526,6 +530,12 @@ module containerApp 'br/public:avm/res/app/container-app:0.12.0' = {
             {
               name: 'AzureAd__Instance'
               value: environment().authentication.loginEndpoint
+            }
+          ] : [])
+          ...(!empty(accessCode) ? [
+            {
+              name: 'ACCESS_CODE'
+              value: accessCode
             }
           ] : [])
           {

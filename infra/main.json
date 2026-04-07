@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "2452785181605497481"
+      "templateHash": "11461482790120419661"
     }
   },
   "parameters": {
@@ -31450,7 +31450,7 @@
                   "cpu": "0.5",
                   "memory": "1Gi"
                 },
-                "env": "[flatten(createArray(createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').outputs.connectionString.value), createObject('name', 'AZURE_AI_FOUNDRY_ENDPOINT', 'value', reference('foundryService').outputs.endpoint.value), createObject('name', 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT', 'value', format('https://{0}.services.ai.azure.com/api/projects/{1}', variables('foundryCustomSubDomainName'), variables('defaultProjectName'))), createObject('name', 'ConnectionStrings__ai-foundry', 'value', format('Endpoint={0}', reference('foundryService').outputs.endpoint.value)), createObject('name', 'ConnectionStrings__cosmos', 'value', format('AccountEndpoint={0}', reference('cosmosDbAccount').outputs.endpoint.value))), if(not(empty(parameters('apiClientId'))), createArray(createObject('name', 'AzureAd__ClientId', 'value', parameters('apiClientId')), createObject('name', 'AzureAd__TenantId', 'value', tenant().tenantId), createObject('name', 'AzureAd__Instance', 'value', environment().authentication.loginEndpoint)), createArray()), createArray(createObject('name', 'CORS__AllowedOrigins', 'value', format('https://{0}', reference('staticWebApp').outputs.defaultHostname.value)))))]"
+                "env": "[flatten(createArray(createArray(createObject('name', 'APPLICATIONINSIGHTS_CONNECTION_STRING', 'value', reference('applicationInsights').outputs.connectionString.value), createObject('name', 'AZURE_AI_FOUNDRY_ENDPOINT', 'value', reference('foundryService').outputs.endpoint.value), createObject('name', 'AZURE_AI_FOUNDRY_PROJECT_ENDPOINT', 'value', format('https://{0}.services.ai.azure.com/api/projects/{1}', variables('foundryCustomSubDomainName'), variables('defaultProjectName'))), createObject('name', 'ConnectionStrings__ai-foundry', 'value', format('Endpoint=https://{0}.services.ai.azure.com/api/projects/{1}', variables('foundryCustomSubDomainName'), variables('defaultProjectName'))), createObject('name', 'ConnectionStrings__cosmos', 'value', format('AccountEndpoint={0}', reference('cosmosDbAccount').outputs.endpoint.value))), if(not(empty(parameters('apiClientId'))), createArray(createObject('name', 'AzureAd__ClientId', 'value', parameters('apiClientId')), createObject('name', 'AzureAd__TenantId', 'value', tenant().tenantId), createObject('name', 'AzureAd__Instance', 'value', environment().authentication.loginEndpoint)), createArray()), createArray(createObject('name', 'CORS__AllowedOrigins', 'value', format('https://{0}', reference('staticWebApp').outputs.defaultHostname.value)))))]"
               }
             ]
           },
