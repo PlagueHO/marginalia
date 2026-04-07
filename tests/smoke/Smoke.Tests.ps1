@@ -133,6 +133,16 @@ Describe 'Backend API' {
         $response = Invoke-WebRequest -Uri "$ApiBaseUrl/api/documents" -Headers $headers -UseBasicParsing -TimeoutSec 15
         $response.StatusCode | Should -Be 200
     }
+
+    It 'Documents API returns 401 without access code when ACCESS_CODE is configured' {
+        if ([string]::IsNullOrWhiteSpace($AccessCode)) {
+            Set-ItResult -Skipped -Because 'ACCESS_CODE is not configured for this environment'
+            return
+        }
+
+        $response = Invoke-WebRequest -Uri "$ApiBaseUrl/api/documents" -UseBasicParsing -TimeoutSec 15 -SkipHttpErrorCheck
+        $response.StatusCode | Should -Be 401
+    }
 }
 
 Describe 'Frontend SPA' {
