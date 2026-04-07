@@ -1,6 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Azure.Core;
 using Azure.Identity;
+using Marginalia.Api.Authentication;
 using Marginalia.Api.HealthChecks;
 using Marginalia.Api.Middleware;
 using Marginalia.Domain.Configuration;
@@ -84,10 +86,11 @@ if (!string.IsNullOrWhiteSpace(aiConnectionString))
     builder.AddAzureChatCompletionsClient("ai-foundry",
         configureSettings: settings =>
         {
-            if (!builder.Environment.IsDevelopment())
-            {
-                settings.TokenCredential = new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);
-            }
+            TokenCredential baseCredential = builder.Environment.IsDevelopment()
+                ? new DefaultAzureCredential()
+                : new ManagedIdentityCredential(ManagedIdentityId.SystemAssigned);
+
+            settings.TokenCredential = new AiFoundryTokenCredential(baseCredential);
         })
         .AddChatClient("reviewer");
     builder.Services.AddSingleton<ISuggestionService, FoundrySuggestionService>();
