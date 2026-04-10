@@ -638,6 +638,7 @@ output LOG_ANALYTICS_WORKSPACE_ID string = logAnalyticsWorkspace.outputs.logAnal
 output APPLICATION_INSIGHTS_NAME string = applicationInsights.outputs.name
 output APPLICATION_INSIGHTS_RESOURCE_ID string = applicationInsights.outputs.resourceId
 output APPLICATION_INSIGHTS_INSTRUMENTATION_KEY string = applicationInsights.outputs.instrumentationKey
+output APPLICATIONINSIGHTS_CONNECTION_STRING string = applicationInsights.outputs.connectionString
 
 // Microsoft Foundry
 output AZURE_AI_FOUNDRY_NAME string = foundryService.outputs.name

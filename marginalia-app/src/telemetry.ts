@@ -4,6 +4,9 @@
  * Sends traces and metrics to the Aspire dashboard via HTTP OTLP.
  * Gracefully no-ops when the OTLP endpoint is not configured (e.g. standalone dev).
  *
+ * When APPLICATIONINSIGHTS_CONNECTION_STRING is set, also initializes the
+ * Application Insights browser SDK to send telemetry to Azure Monitor.
+ *
  * @see https://aspire.dev/dashboard/enable-browser-telemetry/
  */
 
@@ -23,11 +26,13 @@ import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { DocumentLoadInstrumentation } from '@opentelemetry/instrumentation-document-load';
 import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { UserInteractionInstrumentation } from '@opentelemetry/instrumentation-user-interaction';
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
 
 declare const __OTEL_EXPORTER_OTLP_ENDPOINT__: string;
 declare const __OTEL_EXPORTER_OTLP_HEADERS__: string;
 declare const __OTEL_RESOURCE_ATTRIBUTES__: string;
 declare const __OTEL_SERVICE_NAME__: string;
+declare const __APPLICATIONINSIGHTS_CONNECTION_STRING__: string;
 
 const SERVICE_NAME = 'marginalia-app';
 
@@ -71,16 +76,34 @@ function getServiceName(): string {
   return name || SERVICE_NAME;
 }
 
+function getAppInsightsConnectionString(): string {
+  return typeof __APPLICATIONINSIGHTS_CONNECTION_STRING__ !== 'undefined'
+    ? __APPLICATIONINSIGHTS_CONNECTION_STRING__
+    : '';
+}
+
 let initialized = false;
 
 /**
- * Initialize the OpenTelemetry SDK. Call once before React renders.
- * No-ops if the OTLP endpoint is not configured.
+ * Initialize telemetry. Call once before React renders.
+ *
+ * Starts the OpenTelemetry SDK (Aspire OTLP) when the OTLP endpoint is set,
+ * and the Application Insights browser SDK when the connection string is set.
+ * Either or both may be active simultaneously.
  */
 export function initTelemetry(): void {
   if (initialized) return;
   initialized = true;
 
+  initOpenTelemetry();
+  initApplicationInsights();
+}
+
+/**
+ * Initialize the OpenTelemetry SDK for the Aspire dashboard.
+ * No-ops if the OTLP endpoint is not configured.
+ */
+function initOpenTelemetry(): void {
   const endpoint = getEndpoint();
   if (!endpoint) {
     console.debug('[Telemetry] OTEL_EXPORTER_OTLP_ENDPOINT not set — telemetry disabled');
@@ -136,6 +159,32 @@ export function initTelemetry(): void {
   });
 
   console.debug('[Telemetry] OpenTelemetry initialized — exporting to', endpoint);
+}
+
+/**
+ * Initialize the Application Insights browser SDK.
+ * No-ops if the connection string is not configured.
+ */
+function initApplicationInsights(): void {
+  const connectionString = getAppInsightsConnectionString();
+  if (!connectionString) {
+    console.debug('[Telemetry] APPLICATIONINSIGHTS_CONNECTION_STRING not set — App Insights disabled');
+    return;
+  }
+
+  const appInsights = new ApplicationInsights({
+    config: {
+      connectionString,
+      enableAutoRouteTracking: true,
+      disableFetchTracking: false,
+      enableCorsCorrelation: true,
+      enableRequestHeaderTracking: true,
+      enableResponseHeaderTracking: true,
+    },
+  });
+  appInsights.loadAppInsights();
+
+  console.debug('[Telemetry] Application Insights initialized');
 }
 
 // --- Shared tracer & meter for custom instrumentation ---

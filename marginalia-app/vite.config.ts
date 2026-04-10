@@ -16,6 +16,10 @@ const otelExporterHeaders = process.env.OTEL_EXPORTER_OTLP_HEADERS ?? ''
 const otelResourceAttributes = process.env.OTEL_RESOURCE_ATTRIBUTES ?? ''
 const otelServiceName = process.env.OTEL_SERVICE_NAME ?? ''
 
+// Application Insights — injected in production via container env vars.
+const appInsightsConnectionString =
+  process.env.APPLICATIONINSIGHTS_CONNECTION_STRING ?? ''
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -30,6 +34,9 @@ export default defineConfig({
     __OTEL_EXPORTER_OTLP_HEADERS__: JSON.stringify(otelExporterHeaders),
     __OTEL_RESOURCE_ATTRIBUTES__: JSON.stringify(otelResourceAttributes),
     __OTEL_SERVICE_NAME__: JSON.stringify(otelServiceName),
+    __APPLICATIONINSIGHTS_CONNECTION_STRING__: JSON.stringify(
+      appInsightsConnectionString,
+    ),
   },
   build: {
     rolldownOptions: {
@@ -46,6 +53,9 @@ export default defineConfig({
         manualChunks: (id) => {
           if (id.includes('node_modules/@opentelemetry') || id.includes('node_modules/@protobufjs')) {
             return 'vendor-otel'
+          }
+          if (id.includes('node_modules/@microsoft/applicationinsights')) {
+            return 'vendor-appinsights'
           }
           if (
             id.includes('node_modules/react/') ||
