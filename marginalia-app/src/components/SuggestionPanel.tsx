@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
 import { SuggestionCard } from "./SuggestionCard";
 import { SuggestionBatchActions } from "./SuggestionBatchActions";
+import { cn, mutedText } from "@/lib/utils";
 import type { Suggestion, SuggestionStatus } from "@/types";
 
 interface SuggestionPanelProps {
@@ -96,7 +97,7 @@ export function SuggestionPanel({
           <ScrollArea className="h-full max-h-[calc(100vh-16rem)]">
             <div className="flex flex-col gap-3 p-4">
               {filteredSuggestions.length === 0 ? (
-                <p className="text-sm text-muted-foreground text-center py-8">
+                <p className={cn(mutedText, "text-center py-8")}>
                   No {filter === "All" ? "" : filter.toLowerCase()} suggestions
                 </p>
               ) : (

@@ -2,6 +2,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { gradientText, mutedText } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Sparkles, ChevronDown, Loader2 } from "lucide-react";
+import { Sparkles, ChevronDown } from "lucide-react";
 
 interface AnalysisDialogProps {
   open: boolean;
@@ -75,7 +77,9 @@ export function AnalysisDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-400" aria-hidden="true" />
-            Analyze Manuscript
+            <span className={gradientText}>
+              Analyze Manuscript
+            </span>
           </DialogTitle>
           <DialogDescription id="analysis-dialog-description">
             Configure analysis options and run AI-powered suggestions on your
@@ -132,8 +136,8 @@ export function AnalysisDialog({
 
           {isAnalyzing && progress && (
             <div className="flex items-center gap-3 rounded-md border bg-muted/50 px-4 py-3">
-              <Loader2 className="h-4 w-4 animate-spin text-violet-400 shrink-0" aria-hidden="true" />
-              <p className="text-sm text-muted-foreground">{progress}</p>
+              <Spinner className="text-violet-400 shrink-0" />
+              <p className={mutedText}>{progress}</p>
             </div>
           )}
         </div>
@@ -152,7 +156,7 @@ export function AnalysisDialog({
             className="gap-2"
           >
             {isAnalyzing ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              <Spinner />
             ) : (
               <Sparkles className="h-4 w-4" aria-hidden="true" />
             )}

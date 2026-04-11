@@ -9,7 +9,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
+import { CheckCircle2, XCircle, ShieldCheck } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import { mutedText } from "@/lib/utils";
 import type { LlmConfig, LlmHealthResult } from "@/types";
 
 interface LlmConfigDialogProps {
@@ -77,7 +79,7 @@ export function LlmConfigDialog({
             <Label>Connection Status</Label>
             {isCheckingHealth ? (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <Spinner />
                 Checking connection...
               </div>
             ) : healthResult ? (
@@ -99,7 +101,7 @@ export function LlmConfigDialog({
                 </span>
               </div>
             ) : (
-              <p className="text-sm text-muted-foreground">Not checked</p>
+              <p className={mutedText}>Not checked</p>
             )}
           </div>
         </div>
@@ -111,7 +113,7 @@ export function LlmConfigDialog({
             className="gap-2"
           >
             {isCheckingHealth && (
-              <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+              <Spinner />
             )}
             Check Connection
           </Button>

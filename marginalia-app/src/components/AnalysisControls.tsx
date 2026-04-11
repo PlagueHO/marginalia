@@ -9,7 +9,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, ChevronDown, Loader2 } from "lucide-react";
+import { Sparkles, ChevronDown } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 interface AnalysisControlsProps {
   documentId: string;
@@ -100,7 +101,7 @@ export function AnalysisControls({
                 className="gap-2"
               >
                 {isAnalyzing ? (
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  <Spinner />
                 ) : (
                   <Sparkles className="h-4 w-4" aria-hidden="true" />
                 )}

@@ -14,6 +14,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import type { Suggestion, SuggestionStatus } from "@/types";
+import { cn, mutedText } from "@/lib/utils";
 
 interface SuggestionCardProps {
   suggestion: Suggestion;
@@ -143,7 +144,7 @@ export function SuggestionCard({
             )}
           </Button>
         </div>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className={cn(mutedText, "mt-1")}>
           {suggestion.rationale}
         </p>
       </CardHeader>

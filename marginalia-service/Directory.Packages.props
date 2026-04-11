@@ -1,8 +1,8 @@
 <Project>
   <ItemGroup>
     <!-- Web -->
-    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.2.1" />
-    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.2.1" />
+    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.2.2" />
+    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.2.2" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.58.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
@@ -14,8 +14,8 @@
     <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.3" />
     <!-- Aspire -->
     <PackageVersion Include="Aspire.AppHost.Sdk" Version="13.2.1" />
-    <PackageVersion Include="Aspire.Hosting.Foundry" Version="13.2.1-preview.1.26180.6" />
-    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.2.1" />
+    <PackageVersion Include="Aspire.Hosting.Foundry" Version="13.2.2-preview.1.26207.2" />
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.2.2" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.4.0" />
@@ -25,7 +25,7 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.0" />
     <!-- Azure / AI (Aspire client integrations) -->
-    <PackageVersion Include="Aspire.Azure.AI.Inference" Version="13.2.1-preview.1.26180.6" />
+    <PackageVersion Include="Aspire.Azure.AI.Inference" Version="13.2.2-preview.1.26207.2" />
     <PackageVersion Include="Azure.Identity" Version="1.19.0" />
     <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.2.0" />
     <!-- Testing -->

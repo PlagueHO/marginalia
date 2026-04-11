@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 import * as documentService from "@/services/documentService";
 
 interface ExportControlsProps {
@@ -41,7 +42,7 @@ export function ExportControls({
       disabled={isExporting}
     >
       {isExporting ? (
-        <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+        <Spinner />
       ) : (
         <Download className="h-4 w-4" aria-hidden="true" />
       )}

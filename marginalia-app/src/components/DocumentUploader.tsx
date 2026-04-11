@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, FileText, ClipboardPaste } from "lucide-react";
+import { cn, mutedText } from "@/lib/utils";
 
 interface DocumentUploaderProps {
   onFileUpload: (file: File, title?: string) => Promise<void>;
@@ -115,7 +116,7 @@ export function DocumentUploader({
             <p className="text-lg font-medium">
               Drop your manuscript here
             </p>
-            <p className="text-sm text-muted-foreground mt-1">
+            <p className={cn(mutedText, "mt-1")}>
               or click to browse — supports Word documents (.docx)
             </p>
           </div>
@@ -129,7 +130,7 @@ export function DocumentUploader({
             disabled={isLoading}
           />
           {isLoading && (
-            <p className="text-sm text-muted-foreground animate-pulse">
+            <p className={cn(mutedText, "animate-pulse")}>
               Processing document…
             </p>
           )}
@@ -138,7 +139,7 @@ export function DocumentUploader({
 
       <div className="flex items-center gap-4 w-full">
         <div className="flex-1 h-px bg-border" />
-        <span className="text-sm text-muted-foreground">or</span>
+        <span className={mutedText}>or</span>
         <div className="flex-1 h-px bg-border" />
       </div>
 

@@ -2,11 +2,13 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useLlmConfig } from "@/hooks/useLlmConfig";
+import { cn, gradientText, mutedText } from "@/lib/utils";
+import { Spinner } from "@/components/ui/spinner";
 import { AppHeader } from "@/components/AppHeader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PlusCircle, FileText, Loader2, AlertCircle } from "lucide-react";
+import { PlusCircle, FileText, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function HomePage() {
@@ -31,7 +33,7 @@ export function HomePage() {
       <div className="flex-1 overflow-auto">
         <div className="flex flex-col items-center gap-8 w-full max-w-4xl mx-auto px-4 py-12">
       <div className="text-center space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight bg-linear-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+        <h2 className={cn(gradientText, "text-3xl")}>
           Your Manuscripts
         </h2>
         <p className="text-muted-foreground">
@@ -57,7 +59,7 @@ export function HomePage() {
 
       {isLoading ? (
         <div className="flex items-center gap-2 text-muted-foreground py-12">
-          <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+          <Spinner size="md" />
           <span>Loading manuscripts…</span>
         </div>
       ) : documents.length === 0 && !error ? (
@@ -66,7 +68,7 @@ export function HomePage() {
             <FileText className="h-12 w-12 text-muted-foreground/50" aria-hidden="true" />
             <div className="text-center space-y-1">
               <p className="text-lg font-medium">No manuscripts yet</p>
-              <p className="text-sm text-muted-foreground">
+              <p className={mutedText}>
                 Create your first one to get started
               </p>
             </div>
@@ -93,7 +95,7 @@ export function HomePage() {
                   <FileText className="h-5 w-5 text-muted-foreground shrink-0" aria-hidden="true" />
                   <div className="min-w-0">
                     <p className="font-medium truncate">{doc.title}</p>
-                    <p className="text-sm text-muted-foreground">
+                    <p className={mutedText}>
                       {new Date(doc.updatedAt).toLocaleDateString(undefined, {
                         year: "numeric",
                         month: "short",
@@ -104,7 +106,7 @@ export function HomePage() {
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   {doc.suggestionCount > 0 && (
-                    <span className="text-sm text-muted-foreground">
+                    <span className={mutedText}>
                       {doc.suggestionCount} suggestion{doc.suggestionCount !== 1 ? "s" : ""}
                     </span>
                   )}

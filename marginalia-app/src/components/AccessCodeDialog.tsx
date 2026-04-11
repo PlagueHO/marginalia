@@ -10,7 +10,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Lock, Loader2 } from "lucide-react";
+import { Lock } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 interface AccessCodeDialogProps {
   open: boolean;
@@ -82,7 +83,7 @@ export function AccessCodeDialog({
               className="gap-2"
             >
               {isLoading && (
-                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                <Spinner />
               )}
               Continue
             </Button>

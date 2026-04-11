@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { cn, gradientText } from "@/lib/utils";
 import {
   BookOpen,
   CircleUser,
@@ -74,7 +75,7 @@ export function AppHeader({
           className="flex items-center gap-2.5 hover:opacity-80 transition-opacity mr-2"
         >
           <BookOpen className="h-5 w-5 text-violet-400" aria-hidden="true" />
-          <h1 className="text-lg font-bold tracking-tight bg-linear-to-r from-violet-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent hidden sm:block">
+          <h1 className={cn(gradientText, "text-lg hidden sm:block")}>
             Marginalia
           </h1>
         </Link>

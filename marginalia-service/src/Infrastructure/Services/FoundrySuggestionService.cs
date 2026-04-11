@@ -27,6 +27,36 @@ public sealed class FoundrySuggestionService : ISuggestionService
 
     private const int ChunkSizeChars = 6000; // ~3 pages of text
 
+    /// <summary>
+    /// JSON Schema used with Structured Outputs to guarantee the model returns
+    /// a valid <c>{"suggestions": [...]}</c> envelope. Every field is required
+    /// and <c>additionalProperties</c> is false, satisfying strict-mode rules.
+    /// See: https://learn.microsoft.com/azure/foundry/openai/how-to/structured-outputs
+    /// </summary>
+    private static readonly BinaryData s_suggestionResponseSchema = BinaryData.FromString("""
+        {
+            "type": "object",
+            "properties": {
+                "suggestions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "start": { "type": "integer" },
+                            "end":   { "type": "integer" },
+                            "rationale":     { "type": "string" },
+                            "proposedChange": { "type": "string" }
+                        },
+                        "required": ["start", "end", "rationale", "proposedChange"],
+                        "additionalProperties": false
+                    }
+                }
+            },
+            "required": ["suggestions"],
+            "additionalProperties": false
+        }
+        """);
+
     public FoundrySuggestionService(
         IChatClient chatClient,
         ILogger<FoundrySuggestionService> logger,
@@ -48,16 +78,16 @@ public sealed class FoundrySuggestionService : ISuggestionService
         CancellationToken cancellationToken = default)
     {
         var chunks = ChunkText(content);
-        var allSuggestions = new List<Suggestion>();
 
-        for (var i = 0; i < chunks.Count; i++)
-        {
-            var (chunkText, offset) = chunks[i];
-            var suggestions = await AnalyzeChunkAsync(documentId, chunkText, offset, userGuidance, cancellationToken);
-            allSuggestions.AddRange(suggestions);
-        }
+        // Process all chunks in parallel to stay within the Container Apps
+        // ingress timeout (default 240 s). Sequential processing of N chunks
+        // at 30-100 s each easily exceeds this limit.
+        var tasks = chunks.Select(chunk =>
+            AnalyzeChunkAsync(documentId, chunk.Text, chunk.Offset, userGuidance, cancellationToken));
 
-        return allSuggestions.AsReadOnly();
+        var results = await Task.WhenAll(tasks);
+
+        return results.SelectMany(static r => r).ToList().AsReadOnly();
     }
 
     private async Task<List<Suggestion>> AnalyzeChunkAsync(
@@ -111,7 +141,17 @@ public sealed class FoundrySuggestionService : ISuggestionService
             {
                 role = message.Role.Value,
                 content = message.Text
-            })
+            }),
+            response_format = new
+            {
+                type = "json_schema",
+                json_schema = new
+                {
+                    name = "suggestion_response",
+                    strict = true,
+                    schema = JsonSerializer.Deserialize<JsonElement>(s_suggestionResponseSchema)
+                }
+            }
         };
 
         request.Content = new StringContent(
@@ -223,13 +263,11 @@ public sealed class FoundrySuggestionService : ISuggestionService
         sb.AppendLine("- Repetitive or awkward sentence structures");
         sb.AppendLine("- Areas where additional narrative detail would be beneficial");
         sb.AppendLine();
-        sb.AppendLine("Return a JSON array of suggestion objects. Each object must have:");
-        sb.AppendLine("- \"start\": character offset where the issue begins (integer)");
-        sb.AppendLine("- \"end\": character offset where the issue ends (integer)");
-        sb.AppendLine("- \"rationale\": clear explanation of why this area needs improvement");
-        sb.AppendLine("- \"proposedChange\": the suggested replacement or improvement text");
-        sb.AppendLine();
-        sb.AppendLine("Return ONLY the JSON array, no markdown fencing or extra text.");
+        sb.AppendLine("For each issue, provide:");
+        sb.AppendLine("- start: character offset where the issue begins");
+        sb.AppendLine("- end: character offset where the issue ends");
+        sb.AppendLine("- rationale: clear explanation of why this area needs improvement");
+        sb.AppendLine("- proposedChange: the suggested replacement or improvement text");
 
         if (!string.IsNullOrWhiteSpace(userGuidance))
         {
@@ -260,7 +298,10 @@ public sealed class FoundrySuggestionService : ISuggestionService
                 }
             }
 
-            var rawSuggestions = JsonSerializer.Deserialize(content, FoundrySerializerContext.Default.ListRawSuggestion);
+            // Structured Outputs guarantees the response matches our JSON Schema,
+            // so we always get {"suggestions": [...]}.
+            var wrapper = JsonSerializer.Deserialize(content, FoundrySerializerContext.Default.SuggestionWrapper);
+            var rawSuggestions = wrapper?.Suggestions;
 
             if (rawSuggestions is null)
             {
@@ -330,7 +371,13 @@ public sealed class FoundrySuggestionService : ISuggestionService
     }
 }
 
-// Internal DTO for parsing AI response content
+// Internal DTOs for parsing AI response content
+
+internal sealed class SuggestionWrapper
+{
+    [JsonPropertyName("suggestions")]
+    public List<RawSuggestion>? Suggestions { get; set; }
+}
 
 internal sealed class RawSuggestion
 {
@@ -350,5 +397,5 @@ internal sealed class RawSuggestion
 /// <summary>
 /// Source generation context for System.Text.Json serialization of AI response types.
 /// </summary>
-[JsonSerializable(typeof(List<RawSuggestion>))]
+[JsonSerializable(typeof(SuggestionWrapper))]
 internal sealed partial class FoundrySerializerContext : JsonSerializerContext;
