@@ -71,16 +71,20 @@ public sealed class WordDocumentService : IWordDocumentService
     private static string ApplySuggestions(DomainDocument document)
     {
         var content = document.Content;
-        var accepted = document.Suggestions
-            .Where(s => s.Status == SuggestionStatus.Accepted)
+        var applicable = document.Suggestions
+            .Where(s => s.Status == SuggestionStatus.Accepted || s.Status == SuggestionStatus.Modified)
             .OrderByDescending(s => s.TextRange.Start)
             .ToList();
 
-        foreach (var suggestion in accepted)
+        foreach (var suggestion in applicable)
         {
+            var replacementText = suggestion.Status == SuggestionStatus.Modified
+                ? (suggestion.UserSteeringInput ?? suggestion.ProposedChange)
+                : suggestion.ProposedChange;
+
             var start = Math.Max(0, Math.Min(suggestion.TextRange.Start, content.Length));
             var end = Math.Max(start, Math.Min(suggestion.TextRange.End, content.Length));
-            content = string.Concat(content.AsSpan(0, start), suggestion.ProposedChange, content.AsSpan(end));
+            content = string.Concat(content.AsSpan(0, start), replacementText, content.AsSpan(end));
         }
 
         return content;

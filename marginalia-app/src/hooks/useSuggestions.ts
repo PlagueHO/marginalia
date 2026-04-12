@@ -65,7 +65,7 @@ export function useSuggestions() {
         const updated = await suggestionService.updateSuggestionStatus(
           documentId,
           suggestionId,
-          { status, modifiedText }
+          { status, userSteeringInput: modifiedText }
         );
         setState((prev) => ({
           ...prev,

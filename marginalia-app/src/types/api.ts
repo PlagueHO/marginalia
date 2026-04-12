@@ -30,7 +30,7 @@ export interface AnalyzeRequest {
 
 export interface SuggestionUpdateRequest {
   status: SuggestionStatus;
-  modifiedText?: string;
+  userSteeringInput?: string;
 }
 
 export interface LlmConfig {
