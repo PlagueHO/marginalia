@@ -26,6 +26,7 @@ interface AnalysisDialogProps {
   isAnalyzing: boolean;
   progress: string;
   onAnalyze: (guidance?: string, tone?: string) => void;
+  paragraphMode?: boolean;
 }
 
 const TONE_OPTIONS = [
@@ -42,6 +43,7 @@ export function AnalysisDialog({
   isAnalyzing,
   progress,
   onAnalyze,
+  paragraphMode = false,
 }: AnalysisDialogProps) {
   const [guidance, setGuidance] = useState("");
   const [tone, setTone] = useState<string>("");
@@ -78,16 +80,46 @@ export function AnalysisDialog({
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-violet-400" aria-hidden="true" />
             <span className={gradientText}>
-              Analyze Manuscript
+              {paragraphMode ? "Analyze Paragraph" : "Analyze Manuscript"}
             </span>
           </DialogTitle>
           <DialogDescription id="analysis-dialog-description">
-            Configure analysis options and run AI-powered suggestions on your
-            manuscript.
+            {paragraphMode
+              ? "Re-analyze this paragraph with updated guidance to generate a new suggestion."
+              : "Configure analysis options and run AI-powered suggestions on your manuscript."}
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4 py-2">
+          <div className="flex flex-col gap-2">
+            <Label className="text-sm font-medium">Tone</Label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="justify-between gap-2 w-full"
+                  disabled={isAnalyzing}
+                >
+                  {selectedToneLabel}
+                  <ChevronDown className="h-4 w-4 opacity-50" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-(--radix-dropdown-menu-trigger-width)">
+                <DropdownMenuItem onClick={() => setTone("")}>
+                  No preference
+                </DropdownMenuItem>
+                {TONE_OPTIONS.map((opt) => (
+                  <DropdownMenuItem
+                    key={opt.value}
+                    onClick={() => setTone(opt.value)}
+                  >
+                    {opt.label}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="analysis-guidance-input" className="text-sm font-medium">
               Guidance (optional)
@@ -103,35 +135,6 @@ export function AnalysisDialog({
               className="resize-none text-sm"
               disabled={isAnalyzing}
             />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium">Tone</Label>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="justify-between gap-2 w-full"
-                  disabled={isAnalyzing}
-                >
-                  {selectedToneLabel}
-                  <ChevronDown className="h-4 w-4 opacity-50" aria-hidden="true" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-[var(--radix-dropdown-menu-trigger-width)]">
-                <DropdownMenuItem onClick={() => setTone("")}>
-                  No preference
-                </DropdownMenuItem>
-                {TONE_OPTIONS.map((opt) => (
-                  <DropdownMenuItem
-                    key={opt.value}
-                    onClick={() => setTone(opt.value)}
-                  >
-                    {opt.label}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
 
           {isAnalyzing && progress && (

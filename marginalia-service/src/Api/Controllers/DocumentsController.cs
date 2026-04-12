@@ -1,5 +1,6 @@
 using Marginalia.Domain.Interfaces;
 using Marginalia.Domain.Models;
+using Marginalia.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Marginalia.Api.Controllers;
@@ -12,6 +13,7 @@ public sealed class DocumentsController : ControllerBase
     private readonly ISessionRepository _sessionRepository;
     private readonly ISuggestionService _suggestionService;
     private readonly IWordDocumentService _wordDocumentService;
+    private readonly SuggestionMergeService _suggestionMergeService;
     private readonly ILogger<DocumentsController> _logger;
 
     public DocumentsController(
@@ -19,12 +21,14 @@ public sealed class DocumentsController : ControllerBase
         ISessionRepository sessionRepository,
         ISuggestionService suggestionService,
         IWordDocumentService wordDocumentService,
+        SuggestionMergeService suggestionMergeService,
         ILogger<DocumentsController> logger)
     {
         _documentRepository = documentRepository;
         _sessionRepository = sessionRepository;
         _suggestionService = suggestionService;
         _wordDocumentService = wordDocumentService;
+        _suggestionMergeService = suggestionMergeService;
         _logger = logger;
     }
 
@@ -58,7 +62,8 @@ public sealed class DocumentsController : ControllerBase
                 Status = d.Suggestions.Count > 0 ? DocumentStatus.Analyzed : d.Status,
                 CreatedAt = d.CreatedAt,
                 UpdatedAt = d.UpdatedAt,
-                SuggestionCount = d.Suggestions.Count
+                SuggestionCount = d.Suggestions.Count,
+                ParagraphCount = d.Paragraphs.Count
             })
             .ToList()
             .AsReadOnly();
@@ -134,13 +139,16 @@ public sealed class DocumentsController : ControllerBase
         var userId = GetUserId(Request);
         var now = DateTimeOffset.UtcNow;
 
+        // Split pasted text into paragraphs on double-newline boundaries
+        var paragraphs = SplitIntoParagraphs(request.Content);
+
         var document = new Document
         {
             Id = Guid.NewGuid().ToString("N"),
             UserId = userId,
             Filename = request.Filename ?? "pasted-text.txt",
             Source = DocumentSource.Local,
-            Content = request.Content,
+            Paragraphs = paragraphs,
             Title = request.Title ?? $"{now:yyyy-MM-dd HH:mm} - {request.Filename ?? "Untitled"}",
             Status = DocumentStatus.Draft,
             CreatedAt = now,
@@ -200,6 +208,9 @@ public sealed class DocumentsController : ControllerBase
 
     /// <summary>
     /// Trigger AI analysis on a document, returns generated suggestions.
+    /// If the document has been previously analyzed and the user confirms via the frontend,
+    /// accepted suggestions are merged into the paragraphs and all non-accepted suggestions are deleted
+    /// before running the fresh analysis.
     /// </summary>
     [HttpPost("{id}/analyze")]
     public async Task<ActionResult<IReadOnlyList<Suggestion>>> Analyze(
@@ -208,6 +219,7 @@ public sealed class DocumentsController : ControllerBase
         CancellationToken cancellationToken)
     {
         var userId = GetUserId(Request);
+
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
@@ -215,16 +227,55 @@ public sealed class DocumentsController : ControllerBase
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
-        _logger.LogInformation("Analysis requested for document: {DocumentId}, ContentLength: {ContentLength}, UserId: {UserId}", id, document.Content.Length, userId);
+        var paragraphsForAnalysis = document.Paragraphs;
+        int mergedSuggestionCount = 0;
 
-        var userGuidance = CombineGuidance(request?.UserInstructions, request?.ToneGuidance);
+        // Handle re-analysis: merge accepted suggestions into paragraphs and clear all suggestions
+        if (document.Status == DocumentStatus.Analyzed && document.Suggestions.Count > 0)
+        {
+            var acceptedSuggestions = document.Suggestions
+                .Where(s => s.Status == SuggestionStatus.Accepted || s.Status == SuggestionStatus.Modified)
+                .ToList();
+
+            var nonAcceptedSuggestions = document.Suggestions
+                .Where(s => s.Status != SuggestionStatus.Accepted && s.Status != SuggestionStatus.Modified)
+                .ToList();
+
+            // Apply accepted suggestions to paragraphs
+            if (acceptedSuggestions.Count > 0)
+            {
+                paragraphsForAnalysis = _suggestionMergeService.ApplyAcceptedSuggestionsToParagraphs(
+                    document.Paragraphs,
+                    acceptedSuggestions.AsReadOnly());
+                mergedSuggestionCount = acceptedSuggestions.Count;
+            }
+
+            _logger.LogInformation(
+                "Re-analysis requested for document: {DocumentId}, Merged: {MergedCount}, Cleared: {ClearedCount}, UserId: {UserId}",
+                id,
+                mergedSuggestionCount,
+                nonAcceptedSuggestions.Count,
+                userId);
+
+            document = document with
+            {
+                Paragraphs = paragraphsForAnalysis,
+                Suggestions = []
+            };
+        }
+        else
+        {
+            _logger.LogInformation("Analysis requested for document: {DocumentId}, ParagraphCount: {ParagraphCount}, UserId: {UserId}", id, document.Paragraphs.Count, userId);
+        }
+
+        var userGuidance = CombineGuidance(request?.EffectiveUserInstructions, request?.EffectiveToneGuidance);
 
         IReadOnlyList<Suggestion> suggestions;
         try
         {
             suggestions = await _suggestionService.AnalyzeAsync(
                 document.Id,
-                document.Content,
+                paragraphsForAnalysis,
                 userGuidance,
                 cancellationToken);
         }
@@ -234,23 +285,99 @@ public sealed class DocumentsController : ControllerBase
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Analysis failed. Please try again." });
         }
 
-        // Merge new suggestions with existing ones
-        var updatedSuggestions = document.Suggestions.Concat(suggestions).ToList().AsReadOnly();
         var updatedDocument = document with
         {
-            Suggestions = updatedSuggestions,
+            Suggestions = suggestions,
             Status = DocumentStatus.Analyzed,
             UpdatedAt = DateTimeOffset.UtcNow
         };
         await _documentRepository.SaveAsync(updatedDocument, cancellationToken);
 
-        _logger.LogInformation("Analysis complete for document: {DocumentId}, SuggestionsGenerated: {Count}", id, suggestions.Count);
+        _logger.LogInformation("Analysis complete for document: {DocumentId}, SuggestionsGenerated: {Count}, MergedSuggestions: {MergedCount}", id, suggestions.Count, mergedSuggestionCount);
 
         return Ok(suggestions);
     }
 
     /// <summary>
+    /// Trigger AI analysis on a single paragraph within a document.
+    /// Returns new suggestions for the targeted paragraph (additive — existing suggestions are preserved).
+    /// </summary>
+    [HttpPost("{id}/paragraphs/{paragraphId}/analyze")]
+    public async Task<ActionResult<IReadOnlyList<Suggestion>>> AnalyzeParagraph(
+        string id,
+        string paragraphId,
+        [FromBody] AnalysisRequest? request,
+        CancellationToken cancellationToken)
+    {
+        var userId = GetUserId(Request);
+
+        var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
+        if (document is null)
+        {
+            _logger.LogWarning("Document not found for paragraph analysis: {DocumentId}, UserId: {UserId}", id, userId);
+            return NotFound(new { error = $"Document '{id}' not found." });
+        }
+
+        var targetParagraph = document.Paragraphs.FirstOrDefault(p => p.Id == paragraphId);
+        if (targetParagraph is null)
+        {
+            _logger.LogWarning("Paragraph not found for analysis: {ParagraphId}, DocumentId: {DocumentId}", paragraphId, id);
+            return NotFound(new { error = $"Paragraph '{paragraphId}' not found in document '{id}'." });
+        }
+
+        // Gather context: up to 2 paragraphs before and after the target
+        var targetIndex = document.GetParagraphIndex(paragraphId);
+        var contextStart = Math.Max(0, targetIndex - 2);
+        var contextEnd = Math.Min(document.Paragraphs.Count - 1, targetIndex + 2);
+        var contextParagraphs = new List<Paragraph>();
+        for (var i = contextStart; i <= contextEnd; i++)
+        {
+            if (i != targetIndex)
+            {
+                contextParagraphs.Add(document.Paragraphs[i]);
+            }
+        }
+
+        var userGuidance = CombineGuidance(request?.EffectiveUserInstructions, request?.EffectiveToneGuidance);
+
+        IReadOnlyList<Suggestion> newSuggestions;
+        try
+        {
+            newSuggestions = await _suggestionService.AnalyzeParagraphAsync(
+                document.Id,
+                targetParagraph,
+                contextParagraphs.AsReadOnly(),
+                userGuidance,
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Paragraph analysis failed: {ParagraphId}, DocumentId: {DocumentId}, UserId: {UserId}", paragraphId, id, userId);
+            return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Analysis failed. Please try again." });
+        }
+
+        // Additive: append new suggestions to existing ones
+        var allSuggestions = document.Suggestions.Concat(newSuggestions).ToList().AsReadOnly();
+
+        var updatedDocument = document with
+        {
+            Suggestions = allSuggestions,
+            Status = DocumentStatus.Analyzed,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+        await _documentRepository.SaveAsync(updatedDocument, cancellationToken);
+
+        _logger.LogInformation(
+            "Paragraph analysis complete: {ParagraphId}, DocumentId: {DocumentId}, NewSuggestions: {Count}, UserId: {UserId}",
+            paragraphId, id, newSuggestions.Count, userId);
+
+        return Ok(newSuggestions);
+    }
+
+    /// <summary>
     /// Update a suggestion's status (accept, reject, modify).
+    /// When accepting a suggestion, other pending suggestions targeting the same paragraph
+    /// are automatically rejected (exclusive acceptance).
     /// </summary>
     [HttpPut("{id}/suggestions/{suggestionId}")]
     public async Task<ActionResult<Suggestion>> UpdateSuggestion(
@@ -278,8 +405,24 @@ public sealed class DocumentsController : ControllerBase
             UserSteeringInput = request.UserSteeringInput ?? suggestion.UserSteeringInput
         };
 
+        var isAccepting = request.Status == SuggestionStatus.Accepted || request.Status == SuggestionStatus.Modified;
+
         var updatedSuggestions = document.Suggestions
-            .Select(s => s.Id == suggestionId ? updated : s)
+            .Select(s =>
+            {
+                if (s.Id == suggestionId)
+                {
+                    return updated;
+                }
+
+                // Exclusive acceptance: auto-reject other pending suggestions on the same paragraph
+                if (isAccepting && s.ParagraphId == suggestion.ParagraphId && s.Status == SuggestionStatus.Pending)
+                {
+                    return s with { Status = SuggestionStatus.Rejected };
+                }
+
+                return s;
+            })
             .ToList()
             .AsReadOnly();
 
@@ -385,5 +528,20 @@ public sealed class DocumentsController : ControllerBase
         }
 
         return string.Join(" ", parts);
+    }
+
+    private static IReadOnlyList<Paragraph> SplitIntoParagraphs(string content)
+    {
+        return content
+            .Split(["\n\n"], StringSplitOptions.None)
+            .Select(s => s.Trim())
+            .Where(s => !string.IsNullOrEmpty(s))
+            .Select(text => new Paragraph
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Text = text
+            })
+            .ToList()
+            .AsReadOnly();
     }
 }

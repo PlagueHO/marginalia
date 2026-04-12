@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { axe } from 'jest-axe'
 import { SuggestionPanel } from '@/components/SuggestionPanel'
-import type { Suggestion, SuggestionStatus } from '@/types'
+import type { Paragraph, Suggestion, SuggestionStatus } from '@/types'
 
 function createSuggestion(
   id: string,
@@ -12,12 +12,16 @@ function createSuggestion(
   return {
     id,
     documentId: 'doc-1',
-    textRange: { start: 0, end: 50 },
+    paragraphId: 'p-1',
     rationale: `Rationale for suggestion ${id}`,
     proposedChange: `Proposed change for ${id}`,
     status,
   }
 }
+
+const sampleParagraphs: Paragraph[] = [
+  { id: 'p-1', text: 'Sample document content for testing suggestion display.' },
+]
 
 describe('SuggestionPanel', () => {
   const suggestions = [
@@ -47,6 +51,7 @@ describe('SuggestionPanel', () => {
       ['sug-3', 3],
       ['sug-4', 4],
     ]),
+    paragraphs: sampleParagraphs,
     counts,
     onFilterChange: vi.fn(),
     onStatusChange: vi.fn(),

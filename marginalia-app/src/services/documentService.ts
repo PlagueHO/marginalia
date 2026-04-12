@@ -32,6 +32,17 @@ export async function analyzeDocument(
   return apiPost<Suggestion[]>(`/api/documents/${request.documentId}/analyze`, request);
 }
 
+export async function analyzeParagraph(
+  documentId: string,
+  paragraphId: string,
+  request?: Omit<AnalyzeRequest, "documentId">
+): Promise<Suggestion[]> {
+  return apiPost<Suggestion[]>(
+    `/api/documents/${documentId}/paragraphs/${paragraphId}/analyze`,
+    request ?? {}
+  );
+}
+
 export async function exportDocument(
   documentId: string
 ): Promise<Blob> {

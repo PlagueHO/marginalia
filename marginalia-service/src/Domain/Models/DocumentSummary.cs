@@ -30,4 +30,7 @@ public sealed record DocumentSummary
 
     [JsonPropertyName("suggestionCount")]
     public required int SuggestionCount { get; init; }
+
+    [JsonPropertyName("paragraphCount")]
+    public required int ParagraphCount { get; init; }
 }

@@ -8,11 +8,21 @@ namespace Marginalia.Domain.Interfaces;
 public interface ISuggestionService
 {
     /// <summary>
-    /// Analyzes the given document content and returns AI-generated suggestions.
+    /// Analyzes the given document paragraphs and returns AI-generated suggestions.
     /// </summary>
     Task<IReadOnlyList<Suggestion>> AnalyzeAsync(
         string documentId,
-        string content,
+        IReadOnlyList<Paragraph> paragraphs,
+        string? userGuidance,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Analyzes a single target paragraph with surrounding context paragraphs.
+    /// </summary>
+    Task<IReadOnlyList<Suggestion>> AnalyzeParagraphAsync(
+        string documentId,
+        Paragraph targetParagraph,
+        IReadOnlyList<Paragraph> contextParagraphs,
         string? userGuidance,
         CancellationToken cancellationToken = default);
 }

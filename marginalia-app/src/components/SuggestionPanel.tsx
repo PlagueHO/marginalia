@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SuggestionCard } from "./SuggestionCard";
 import { SuggestionBatchActions } from "./SuggestionBatchActions";
 import { cn, mutedText } from "@/lib/utils";
-import type { Suggestion, SuggestionStatus } from "@/types";
+import type { Suggestion, SuggestionStatus, Paragraph } from "@/types";
 
 interface SuggestionPanelProps {
   suggestions: Suggestion[];
@@ -14,6 +14,7 @@ interface SuggestionPanelProps {
   activeSuggestionId: string | null;
   hoveredSuggestionId: string | null;
   suggestionNumbers: Map<string, number>;
+  paragraphs?: Paragraph[];
   counts: {
     Pending: number;
     Accepted: number;
@@ -31,6 +32,7 @@ interface SuggestionPanelProps {
   onSuggestionHover: (id: string | null) => void;
   onAcceptAll: () => Promise<void>;
   onRejectAll: () => Promise<void>;
+  onReanalyze?: (paragraphId: string) => void;
 }
 
 export function SuggestionPanel({
@@ -39,6 +41,7 @@ export function SuggestionPanel({
   activeSuggestionId,
   hoveredSuggestionId,
   suggestionNumbers,
+  paragraphs,
   counts,
   onFilterChange,
   onStatusChange,
@@ -46,6 +49,7 @@ export function SuggestionPanel({
   onSuggestionHover,
   onAcceptAll,
   onRejectAll,
+  onReanalyze,
 }: SuggestionPanelProps) {
   const handleStatusChange = useCallback(
     (id: string, status: SuggestionStatus, modifiedText?: string) => {
@@ -108,9 +112,11 @@ export function SuggestionPanel({
                     number={suggestionNumbers.get(suggestion.id)}
                     isActive={suggestion.id === activeSuggestionId}
                     isHovered={suggestion.id === hoveredSuggestionId}
+                    paragraphs={paragraphs}
                     onStatusChange={handleStatusChange}
                     onClick={onSuggestionClick}
                     onHoverChange={onSuggestionHover}
+                    onReanalyze={onReanalyze}
                   />
                 ))
               )}

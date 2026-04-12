@@ -157,8 +157,9 @@ export function AppHeader({
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
+                    variant="destructive"
                     size="sm"
-                    className="gap-2 w-24 justify-center bg-linear-to-r from-violet-600 to-red-600 hover:from-violet-700 hover:to-red-700 text-white shadow-sm"
+                    className="gap-2 w-24 justify-center"
                     onClick={onDelete}
                     aria-label="Delete manuscript"
                   >

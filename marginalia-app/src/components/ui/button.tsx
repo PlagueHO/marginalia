@@ -11,9 +11,9 @@ const buttonVariants = cva(
       variant: {
         default: "bg-linear-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white shadow-sm",
         accept:
-          "bg-linear-to-r from-emerald-600 to-jade-600 hover:from-emerald-700 hover:to-jade-700 text-white shadow-sm",
+          "bg-linear-to-r from-emerald-600/95 to-teal-600/95 hover:from-emerald-700 hover:to-teal-700 text-white shadow-sm",
         destructive:
-          "bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white shadow-sm focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+          "bg-linear-to-r from-red-600/95 to-rose-600/95 hover:from-red-700 hover:to-rose-700 text-white shadow-sm focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
         outline:
           "border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:

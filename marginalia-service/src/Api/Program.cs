@@ -76,6 +76,7 @@ builder.Services.AddSingleton<ISessionRepository>(sp =>
     return new CosmosSessionRepository(cosmosClient, logger);
 });
 builder.Services.AddSingleton<IWordDocumentService, WordDocumentService>();
+builder.Services.AddSingleton<SuggestionMergeService>();
 builder.Services.AddHttpClient();
 
 // Named HttpClient for LLM fallback — the standard resilience handler's 30s

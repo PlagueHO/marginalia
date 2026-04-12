@@ -11,11 +11,13 @@ import { DocumentHeader } from "@/components/DocumentHeader";
 import { DocumentEditor } from "@/components/DocumentEditor";
 import { SuggestionPanel } from "@/components/SuggestionPanel";
 import { AnalysisDialog } from "@/components/AnalysisDialog";
+import { ReplaceAnalysisConfirmationDialog } from "@/components/ReplaceAnalysisConfirmationDialog";
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import type { SuggestionStatus } from "@/types";
+import type { Document, SuggestionStatus } from "@/types";
 import { toast } from "sonner";
+import * as documentService from "@/services/documentService";
 
 export function EditorPage() {
   const { documentId } = useParams<{ documentId: string }>();
@@ -26,6 +28,12 @@ export function EditorPage() {
   const llmConfig = useLlmConfig();
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [pendingAnalysisParams, setPendingAnalysisParams] = useState<{
+    guidance?: string;
+    tone?: string;
+  } | null>(null);
+  const [reanalyzeParagraphId, setReanalyzeParagraphId] = useState<string | null>(null);
+  const [isParagraphAnalyzing, setIsParagraphAnalyzing] = useState(false);
 
   useEffect(() => {
     if (documentId && !doc.document) {
@@ -33,12 +41,16 @@ export function EditorPage() {
         if (loaded?.suggestions) {
           suggestions.setSuggestions(loaded.suggestions);
         }
+        if (loaded?.paragraphs) {
+          suggestions.setParagraphs(loaded.paragraphs);
+        }
       }).catch(() => {
         toast.error("Failed to load document");
       });
     } else if (!documentId && doc.document) {
       doc.clearDocument();
       suggestions.setSuggestions([]);
+      suggestions.setParagraphs([]);
     }
   }, [documentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -47,6 +59,7 @@ export function EditorPage() {
       try {
         const response = await doc.uploadFile(file, title);
         suggestions.setSuggestions(response.document.suggestions);
+        suggestions.setParagraphs(response.document.paragraphs);
         toast.success("Document loaded successfully");
         navigate(`/editor/${response.document.id}`, { replace: true });
       } catch {
@@ -61,6 +74,7 @@ export function EditorPage() {
       try {
         const response = await doc.pasteContent(content, filename, title);
         suggestions.setSuggestions(response.document.suggestions);
+        suggestions.setParagraphs(response.document.paragraphs);
         toast.success("Text loaded successfully");
         navigate(`/editor/${response.document.id}`, { replace: true });
       } catch {
@@ -70,24 +84,132 @@ export function EditorPage() {
     [doc, suggestions, navigate]
   );
 
-  const handleAnalyze = useCallback(
+  const runAnalysis = useCallback(
     async (guidance?: string, tone?: string) => {
       if (!doc.document) return;
+
+      const userGuidance = [guidance, tone ? `Tone: ${tone}` : ""]
+        .filter(Boolean)
+        .join(". ") || undefined;
+
+      // Single-paragraph reanalysis
+      if (reanalyzeParagraphId) {
+        const paragraphId = reanalyzeParagraphId;
+        setIsParagraphAnalyzing(true);
+        try {
+          const newSuggestions = await documentService.analyzeParagraph(
+            doc.document.id,
+            paragraphId,
+            userGuidance ? { userGuidance } : undefined
+          );
+
+          const updatedSuggestions = [
+            ...suggestions.suggestions.filter((s) => s.paragraphId !== paragraphId),
+            ...newSuggestions,
+          ];
+
+          // Replace existing suggestions for this paragraph with new ones
+          suggestions.setSuggestions(updatedSuggestions);
+
+          // Keep the newly generated suggestion selected so its card remains expanded.
+          suggestions.setActiveSuggestion(newSuggestions[0]?.id ?? null);
+          toast.success(
+            newSuggestions.length > 0
+              ? `Generated ${newSuggestions.length} new suggestion${newSuggestions.length > 1 ? "s" : ""}`
+              : "No suggestions generated for this paragraph"
+          );
+        } catch {
+          toast.error("Paragraph analysis failed — check your model configuration");
+        } finally {
+          setIsParagraphAnalyzing(false);
+          setReanalyzeParagraphId(null);
+        }
+        return;
+      }
+
+      // Full-document analysis
       try {
-        const result = await analysis.analyze({
+        const analysisResult = await analysis.analyze({
           documentId: doc.document.id,
-          content: doc.document.content,
-          userGuidance: [guidance, tone ? `Tone: ${tone}` : ""]
-            .filter(Boolean)
-            .join(". ") || undefined,
+          userGuidance,
         });
-        suggestions.setSuggestions(result);
-        toast.success(`Found ${result.length} suggestions`);
+        suggestions.setSuggestions(analysisResult);
+        doc.updateDocument({
+          ...doc.document,
+          status: "Analyzed",
+          suggestions: analysisResult,
+        });
+        toast.success(`Found ${analysisResult.length} suggestions`);
       } catch {
         toast.error("Analysis failed — check your model configuration");
       }
     },
-    [doc.document, analysis, suggestions]
+    [doc, analysis, suggestions, reanalyzeParagraphId]
+  );
+
+  const handleAnalyze = useCallback(
+    (guidance?: string, tone?: string) => {
+      if (!doc.document) return;
+
+      // Single-paragraph reanalysis skips the confirmation flow
+      if (reanalyzeParagraphId) {
+        void runAnalysis(guidance, tone);
+        return;
+      }
+
+      // Build a current view of the document using live suggestion state,
+      // because doc.document may not reflect suggestions added after first analysis.
+      const currentDocument: Document = {
+        ...doc.document,
+        suggestions: suggestions.suggestions,
+        status: suggestions.suggestions.length > 0 ? "Analyzed" as const : doc.document.status,
+      };
+
+      // Check if confirmation is needed for re-analysis
+      const result = analysis.initiateAnalysis(currentDocument);
+      if (result === "confirm") {
+        // Store the analysis params and close the analysis dialog.
+        // The confirmation dialog will open via analysis.showConfirmReplaceDialog.
+        setPendingAnalysisParams({ guidance, tone });
+        setIsAnalysisOpen(false);
+        return;
+      }
+
+      // No confirmation needed — proceed with analysis directly
+      void runAnalysis(guidance, tone);
+    },
+    [doc, suggestions.suggestions, analysis, runAnalysis, reanalyzeParagraphId]
+  );
+
+  const handleConfirmReplaceAnalysis = useCallback(async () => {
+    if (!doc.document || !pendingAnalysisParams) return;
+
+    // Close the confirmation dialog and reopen the analysis dialog for progress
+    analysis.confirmReplaceAndAnalyze();
+    setIsAnalysisOpen(true);
+
+    const { guidance, tone } = pendingAnalysisParams;
+    setPendingAnalysisParams(null);
+
+    await runAnalysis(guidance, tone);
+  }, [doc, pendingAnalysisParams, analysis, runAnalysis]);
+
+  const handleCancelReplaceAnalysis = useCallback(
+    (open: boolean) => {
+      if (!open) {
+        analysis.cancelReplaceAnalysis();
+        setPendingAnalysisParams(null);
+      }
+    },
+    [analysis]
+  );
+
+  const handleReanalyzeParagraph = useCallback(
+    (paragraphId: string) => {
+      setReanalyzeParagraphId(paragraphId);
+      setIsAnalysisOpen(true);
+    },
+    []
   );
 
   const handleSuggestionStatusChange = useCallback(
@@ -143,6 +265,7 @@ export function EditorPage() {
     try {
       await doc.deleteDocument();
       suggestions.setSuggestions([]);
+      suggestions.setParagraphs([]);
       setIsDeleteOpen(false);
       toast.success("Document deleted");
       navigate("/");
@@ -152,10 +275,20 @@ export function EditorPage() {
   }, [doc, suggestions, navigate]);
 
   const error = doc.error ?? analysis.error;
+  const isAnalyzing = analysis.isAnalyzing || isParagraphAnalyzing;
+  const analysisProgress = analysis.isAnalyzing
+    ? analysis.progress
+    : isParagraphAnalyzing
+      ? "Analyzing paragraph…"
+      : "";
 
   const editorContent = doc.document ? (
     <div className="flex flex-col h-full">
-      <DocumentHeader document={doc.document} onRename={handleRename} />
+      <DocumentHeader
+        document={doc.document}
+        suggestions={suggestions.suggestions}
+        onRename={handleRename}
+      />
       <DocumentEditor
         document={doc.document}
         suggestions={suggestions.filteredSuggestions}
@@ -182,6 +315,7 @@ export function EditorPage() {
       activeSuggestionId={suggestions.activeSuggestionId}
       hoveredSuggestionId={suggestions.hoveredSuggestionId}
       suggestionNumbers={suggestions.suggestionNumbers}
+      paragraphs={doc.document?.paragraphs}
       counts={suggestions.counts}
       onFilterChange={suggestions.setFilter}
       onStatusChange={handleSuggestionStatusChange}
@@ -189,6 +323,7 @@ export function EditorPage() {
       onSuggestionHover={suggestions.setHoveredSuggestion}
       onAcceptAll={handleAcceptAll}
       onRejectAll={handleRejectAll}
+      onReanalyze={handleReanalyzeParagraph}
     />
   ) : null;
 
@@ -222,10 +357,14 @@ export function EditorPage() {
       {doc.document && (
         <AnalysisDialog
           open={isAnalysisOpen}
-          onOpenChange={setIsAnalysisOpen}
-          isAnalyzing={analysis.isAnalyzing}
-          progress={analysis.progress}
+          onOpenChange={(open) => {
+            setIsAnalysisOpen(open);
+            if (!open) setReanalyzeParagraphId(null);
+          }}
+          isAnalyzing={isAnalyzing}
+          progress={analysisProgress}
           onAnalyze={handleAnalyze}
+          paragraphMode={!!reanalyzeParagraphId}
         />
       )}
 
@@ -236,6 +375,16 @@ export function EditorPage() {
           onConfirm={() => void handleDelete()}
           isDeleting={doc.isLoading}
           documentTitle={doc.document.title || doc.document.filename}
+        />
+      )}
+
+      {doc.document && (
+        <ReplaceAnalysisConfirmationDialog
+          open={analysis.showConfirmReplaceDialog}
+          onOpenChange={handleCancelReplaceAnalysis}
+          acceptedSuggestions={analysis.acceptedSuggestions}
+          pendingCount={analysis.pendingCount}
+          onConfirm={() => void handleConfirmReplaceAnalysis()}
         />
       )}
     </div>

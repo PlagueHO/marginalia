@@ -14,7 +14,7 @@ public sealed class SuggestionTests
         {
             Id = "sug-1",
             DocumentId = "doc-1",
-            TextRange = new TextRange { Start = 0, End = 50 },
+            ParagraphId = "para-1",
             Rationale = "Narrative is compressed here",
             ProposedChange = "Consider expanding with sensory detail",
             Status = status,
@@ -128,7 +128,7 @@ public sealed class SuggestionTests
 
         json.Should().Contain("\"id\":");
         json.Should().Contain("\"documentId\":");
-        json.Should().Contain("\"textRange\":");
+        json.Should().Contain("\"paragraphId\":");
         json.Should().Contain("\"rationale\":");
         json.Should().Contain("\"proposedChange\":");
         json.Should().Contain("\"status\":");
@@ -142,7 +142,7 @@ public sealed class SuggestionTests
         {
             "id": "sug-42",
             "documentId": "doc-7",
-            "textRange": { "start": 100, "end": 200 },
+            "paragraphId": "para-42",
             "rationale": "Style inconsistency",
             "proposedChange": "Revised passage",
             "status": "Rejected",
@@ -156,8 +156,7 @@ public sealed class SuggestionTests
         suggestion!.Id.Should().Be("sug-42");
         suggestion.Status.Should().Be(SuggestionStatus.Rejected);
         suggestion.UserSteeringInput.Should().Be("Keep my voice");
-        suggestion.TextRange.Start.Should().Be(100);
-        suggestion.TextRange.End.Should().Be(200);
+        suggestion.ParagraphId.Should().Be("para-42");
     }
 
     [TestMethod]
@@ -167,7 +166,7 @@ public sealed class SuggestionTests
         {
             "id": "sug-1",
             "documentId": "doc-1",
-            "textRange": { "start": 0, "end": 10 },
+            "paragraphId": "para-1",
             "rationale": "Reason",
             "proposedChange": "Change",
             "status": "Pending"

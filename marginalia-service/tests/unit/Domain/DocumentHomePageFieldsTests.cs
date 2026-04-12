@@ -9,15 +9,15 @@ namespace Marginalia.Tests.Unit.Domain;
 /// Title, Status, CreatedAt, UpdatedAt.
 ///
 /// These tests define the contract from Richard's API design (home-page-api-design).
-/// They will NOT compile until Gilfoyle adds Title, Status, CreatedAt, and UpdatedAt
-/// properties to the Document record in Domain/Models/Document.cs.
-///
 /// Also tests title generation defaults and status transitions.
 /// </summary>
 [TestClass]
 [TestCategory("Unit")]
 public sealed class DocumentHomePageFieldsTests
 {
+    private static readonly IReadOnlyList<Paragraph> DefaultParagraphs =
+        [new Paragraph { Id = "p1", Text = "Once upon a time..." }];
+
     // ── Title field ──────────────────────────────────────────────────────
 
     [TestMethod]
@@ -28,7 +28,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "My Chapter Title",
             Status = DocumentStatus.Draft,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -48,7 +48,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "Test",
             Status = DocumentStatus.Draft,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -67,7 +67,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "Test",
             Status = DocumentStatus.Draft,
             CreatedAt = now,
@@ -95,7 +95,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "Test",
             Status = DocumentStatus.Draft,
             CreatedAt = createdAt,
@@ -104,7 +104,7 @@ public sealed class DocumentHomePageFieldsTests
 
         var updated = doc with
         {
-            Content = "Revised content",
+            Paragraphs = [new Paragraph { Id = "p1", Text = "Revised content" }],
             UpdatedAt = createdAt.AddHours(4)
         };
 
@@ -120,7 +120,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "Test",
             Status = DocumentStatus.Draft,
             CreatedAt = now,
@@ -141,7 +141,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "Test",
             Status = DocumentStatus.Draft,
             CreatedAt = createdAt,
@@ -150,7 +150,7 @@ public sealed class DocumentHomePageFieldsTests
 
         var updated = doc with
         {
-            Content = "Revised content with more narrative air.",
+            Paragraphs = [new Paragraph { Id = "p1", Text = "Revised content with more narrative air." }],
             UpdatedAt = updatedAt
         };
 
@@ -166,7 +166,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "chapter1.docx",
             Source = DocumentSource.Local,
-            Content = "Once upon a time...",
+            Paragraphs = DefaultParagraphs,
             Title = "Test",
             Status = DocumentStatus.Draft,
             CreatedAt = createdAt,
@@ -183,7 +183,7 @@ public sealed class DocumentHomePageFieldsTests
                 {
                     Id = "s1",
                     DocumentId = "doc-1",
-                    TextRange = new TextRange { Start = 0, End = 10 },
+                    ParagraphId = "p1",
                     Rationale = "Too compressed",
                     ProposedChange = "Expand this passage",
                     Status = SuggestionStatus.Pending
@@ -206,7 +206,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "test.docx",
             Source = DocumentSource.Local,
-            Content = "content",
+            Paragraphs = [new Paragraph { Id = "p1", Text = "content" }],
             Title = "My Title",
             Status = DocumentStatus.Draft,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -229,7 +229,7 @@ public sealed class DocumentHomePageFieldsTests
             "id": "doc-1",
             "filename": "test.docx",
             "source": "Local",
-            "content": "hello world",
+            "paragraphs": [{ "id": "p1", "text": "hello world" }],
             "title": "Chapter 1 Draft",
             "status": "Analyzed",
             "createdAt": "2026-03-29T10:15:00+00:00",
@@ -257,7 +257,7 @@ public sealed class DocumentHomePageFieldsTests
             Id = "doc-1",
             Filename = "test.docx",
             Source = DocumentSource.Local,
-            Content = "content",
+            Paragraphs = [new Paragraph { Id = "p1", Text = "content" }],
             Title = "Test",
             Status = DocumentStatus.Analyzed,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -268,7 +268,7 @@ public sealed class DocumentHomePageFieldsTests
                 {
                     Id = "s1",
                     DocumentId = "doc-1",
-                    TextRange = new TextRange { Start = 0, End = 10 },
+                    ParagraphId = "p1",
                     Rationale = "Test",
                     ProposedChange = "Change",
                     Status = SuggestionStatus.Pending
@@ -277,7 +277,7 @@ public sealed class DocumentHomePageFieldsTests
                 {
                     Id = "s2",
                     DocumentId = "doc-1",
-                    TextRange = new TextRange { Start = 20, End = 30 },
+                    ParagraphId = "p1",
                     Rationale = "Test 2",
                     ProposedChange = "Change 2",
                     Status = SuggestionStatus.Accepted

@@ -13,8 +13,9 @@ import {
   ChevronDown,
   ChevronUp,
   Undo2,
+  Sparkles,
 } from "lucide-react";
-import type { Suggestion, SuggestionStatus } from "@/types";
+import type { Suggestion, SuggestionStatus, Paragraph } from "@/types";
 import { cn, mutedText } from "@/lib/utils";
 
 interface SuggestionCardProps {
@@ -22,6 +23,7 @@ interface SuggestionCardProps {
   number?: number;
   isActive: boolean;
   isHovered?: boolean;
+  paragraphs?: Paragraph[];
   onStatusChange: (
     id: string,
     status: SuggestionStatus,
@@ -29,17 +31,18 @@ interface SuggestionCardProps {
   ) => void;
   onClick: (id: string) => void;
   onHoverChange?: (id: string | null) => void;
+  onReanalyze?: (paragraphId: string) => void;
 }
 
 const statusBadge = {
-  Pending: { variant: "default" as const, icon: AlertCircle, className: "bg-linear-to-r from-amber-500/90 to-orange-500/90 text-white border-0 shadow-sm" },
+  Pending: { variant: "default" as const, icon: AlertCircle, className: "bg-linear-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-700/95 dark:to-orange-700/95 text-white border-0 shadow-sm" },
   Accepted: { variant: "secondary" as const, icon: Check, className: "bg-linear-to-r from-emerald-500/90 to-teal-500/90 text-white border-0 shadow-sm" },
   Rejected: { variant: "destructive" as const, icon: X, className: "bg-linear-to-r from-rose-500/90 to-pink-500/90 text-white border-0 shadow-sm" },
   Modified: { variant: "outline" as const, icon: Pencil, className: "bg-linear-to-r from-sky-500/90 to-indigo-500/90 text-white border-0 shadow-sm" },
 };
 
 const statusNumberColors = {
-  Pending: "bg-amber-500 text-white",
+  Pending: "bg-amber-500 dark:bg-amber-700 text-white",
   Accepted: "bg-emerald-500 text-white",
   Rejected: "bg-rose-500 text-white",
   Modified: "bg-sky-500 text-white",
@@ -50,9 +53,11 @@ export function SuggestionCard({
   number,
   isActive,
   isHovered,
+  paragraphs,
   onStatusChange,
   onClick,
   onHoverChange,
+  onReanalyze,
 }: SuggestionCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -100,6 +105,10 @@ export function SuggestionCard({
   const handleRevertToPending = useCallback(() => {
     onStatusChange(suggestion.id, "Pending");
   }, [onStatusChange, suggestion.id]);
+
+  const handleReanalyze = useCallback(() => {
+    onReanalyze?.(suggestion.paragraphId);
+  }, [onReanalyze, suggestion.paragraphId]);
 
   const handleClick = useCallback(() => {
     onClick(suggestion.id);
@@ -182,6 +191,16 @@ export function SuggestionCard({
                 aria-hidden="true"
               />
               <div className="flex-1">
+                {paragraphs && (
+                  <>
+                    <span className="text-xs font-medium text-muted-foreground block mb-1">
+                      Original text:
+                    </span>
+                    <p className="text-sm bg-muted/50 rounded-md p-2 mb-3 line-through decoration-rose-400/50">
+                      {paragraphs.find((p) => p.id === suggestion.paragraphId)?.text ?? ""}
+                    </p>
+                  </>
+                )}
                 <span className="text-xs font-medium text-muted-foreground block mb-1">
                   Proposed change:
                 </span>
@@ -243,6 +262,16 @@ export function SuggestionCard({
                   Cancel
                 </Button>
               )}
+              {onReanalyze && (
+                <Button
+                  size="sm"
+                  className="gap-1"
+                  onClick={handleReanalyze}
+                >
+                  <Sparkles className="h-3 w-3" aria-hidden="true" />
+                  Analyze
+                </Button>
+              )}
             </CardFooter>
           )}
 
@@ -257,6 +286,16 @@ export function SuggestionCard({
                 <Undo2 className="h-3 w-3" aria-hidden="true" />
                 Revert to Pending
               </Button>
+              {onReanalyze && (
+                <Button
+                  size="sm"
+                  className="gap-1"
+                  onClick={handleReanalyze}
+                >
+                  <Sparkles className="h-3 w-3" aria-hidden="true" />
+                  Analyze
+                </Button>
+              )}
             </CardFooter>
           )}
         </>

@@ -11,7 +11,17 @@ public sealed class NoOpSuggestionService : ISuggestionService
 {
     public Task<IReadOnlyList<Suggestion>> AnalyzeAsync(
         string documentId,
-        string content,
+        IReadOnlyList<Paragraph> paragraphs,
+        string? userGuidance,
+        CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult<IReadOnlyList<Suggestion>>([]);
+    }
+
+    public Task<IReadOnlyList<Suggestion>> AnalyzeParagraphAsync(
+        string documentId,
+        Paragraph targetParagraph,
+        IReadOnlyList<Paragraph> contextParagraphs,
         string? userGuidance,
         CancellationToken cancellationToken = default)
     {

@@ -39,7 +39,8 @@ public sealed class DocumentListResponseTests
                 Status = DocumentStatus.Draft,
                 CreatedAt = now,
                 UpdatedAt = now,
-                SuggestionCount = 0
+                SuggestionCount = 0,
+                ParagraphCount = 1
             },
             new()
             {
@@ -50,7 +51,8 @@ public sealed class DocumentListResponseTests
                 Status = DocumentStatus.Analyzed,
                 CreatedAt = now.AddHours(-2),
                 UpdatedAt = now,
-                SuggestionCount = 5
+                SuggestionCount = 5,
+                ParagraphCount = 3
             }
         };
 
@@ -77,7 +79,8 @@ public sealed class DocumentListResponseTests
                     Status = DocumentStatus.Draft,
                     CreatedAt = DateTimeOffset.UtcNow,
                     UpdatedAt = DateTimeOffset.UtcNow,
-                    SuggestionCount = 0
+                    SuggestionCount = 0,
+                    ParagraphCount = 0
                 }
             }
         };
@@ -112,7 +115,8 @@ public sealed class DocumentListResponseTests
                     "status": "Draft",
                     "createdAt": "2026-03-29T10:15:00+00:00",
                     "updatedAt": "2026-03-29T10:15:00+00:00",
-                    "suggestionCount": 0
+                    "suggestionCount": 0,
+                    "paragraphCount": 1
                 },
                 {
                     "id": "doc-2",
@@ -122,7 +126,8 @@ public sealed class DocumentListResponseTests
                     "status": "Analyzed",
                     "createdAt": "2026-03-28T09:00:00+00:00",
                     "updatedAt": "2026-03-29T14:30:00+00:00",
-                    "suggestionCount": 8
+                    "suggestionCount": 8,
+                    "paragraphCount": 5
                 }
             ]
         }

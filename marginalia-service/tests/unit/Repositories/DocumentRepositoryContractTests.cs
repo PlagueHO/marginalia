@@ -51,7 +51,7 @@ public sealed class DocumentRepositoryContractTests
         Id = id,
         Filename = $"{id}.docx",
         Source = DocumentSource.Local,
-        Content = "The morning light filtered through the study window."
+        Paragraphs = [new Paragraph { Id = "p1", Text = "The morning light filtered through the study window." }]
     };
 
     private TestDocumentRepository _repository = null!;
@@ -79,7 +79,7 @@ public sealed class DocumentRepositoryContractTests
 
         retrieved.Should().NotBeNull();
         retrieved!.Id.Should().Be("doc-1");
-        retrieved.Content.Should().Be(doc.Content);
+        retrieved.FullText.Should().Be(doc.FullText);
     }
 
     [TestMethod]
@@ -88,11 +88,11 @@ public sealed class DocumentRepositoryContractTests
         var original = CreateDocument();
         await _repository.SaveAsync(original);
 
-        var updated = original with { Content = "Revised content with more narrative air." };
+        var updated = original with { Paragraphs = [new Paragraph { Id = "p1", Text = "Revised content with more narrative air." }] };
         await _repository.SaveAsync(updated);
 
         var retrieved = await _repository.GetByIdAsync("_anonymous", "doc-1");
-        retrieved!.Content.Should().Be("Revised content with more narrative air.");
+        retrieved!.FullText.Should().Be("Revised content with more narrative air.");
     }
 
     [TestMethod]
@@ -156,7 +156,7 @@ public sealed class DocumentRepositoryContractTests
         {
             Id = "sug-1",
             DocumentId = "doc-1",
-            TextRange = new TextRange { Start = 0, End = 20 },
+            ParagraphId = "p1",
             Rationale = "Too compressed",
             ProposedChange = "Expanded version",
             Status = SuggestionStatus.Pending

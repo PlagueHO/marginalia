@@ -19,13 +19,12 @@ export interface DocumentListResponse {
 
 export interface AnalyzeRequest {
   documentId: string;
-  content: string;
+  userInstructions?: string;
+  toneGuidance?: string;
+
+  // Backward-compatible fields accepted by the API.
   userGuidance?: string;
   tone?: string;
-  selectedRange?: {
-    start: number;
-    end: number;
-  };
 }
 
 export interface SuggestionUpdateRequest {

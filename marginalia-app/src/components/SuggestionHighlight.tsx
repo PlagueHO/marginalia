@@ -17,7 +17,7 @@ interface SuggestionMarkerProps {
 }
 
 const statusMarkerColors = {
-  Pending: "bg-amber-500 text-white dark:bg-amber-500",
+  Pending: "bg-amber-500 text-white dark:bg-amber-700",
   Accepted: "bg-emerald-500 text-white dark:bg-emerald-500",
   Rejected: "bg-rose-500 text-white dark:bg-rose-400",
   Modified: "bg-sky-500 text-white dark:bg-sky-500",

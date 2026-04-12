@@ -3,12 +3,18 @@ import userEvent from '@testing-library/user-event'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { axe } from 'jest-axe'
 import { SuggestionCard } from '@/components/SuggestionCard'
-import type { Suggestion } from '@/types'
+import type { Paragraph, Suggestion } from '@/types'
+
+const SAMPLE_PARAGRAPHS: Paragraph[] = [
+  { id: 'p-1', text: 'The quick brown fox jumps over the lazy dog.' },
+  { id: 'p-2', text: 'This is a simple test document with enough text to cover the range.' },
+  { id: 'p-3', text: 'Additional sentences provide context for suggestion extraction.' },
+]
 
 const createSuggestion = (overrides?: Partial<Suggestion>): Suggestion => ({
   id: 'sug-1',
   documentId: 'doc-1',
-  textRange: { start: 0, end: 100 },
+  paragraphId: 'p-1',
   rationale: 'This passage reads as overly compressed factual summary without narrative color.',
   proposedChange: 'Consider expanding with sensory detail and scene-setting to draw the reader in.',
   status: 'Pending',
@@ -232,6 +238,103 @@ describe('SuggestionCard', () => {
         rules: { 'nested-interactive': { enabled: false } },
       })
       expect(results).toHaveNoViolations()
+    })
+  })
+
+  describe('original text display', () => {
+    it('shows original text when paragraphs are provided and card is expanded', async () => {
+      const user = userEvent.setup()
+      render(
+        <SuggestionCard
+          {...defaultProps}
+          paragraphs={SAMPLE_PARAGRAPHS}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+
+      expect(screen.getByText('Original text:')).toBeInTheDocument()
+      expect(
+        screen.getByText('The quick brown fox jumps over the lazy dog.')
+      ).toBeInTheDocument()
+    })
+
+    it('does not show original text when paragraphs are not provided', async () => {
+      const user = userEvent.setup()
+      render(<SuggestionCard {...defaultProps} />)
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+
+      expect(screen.queryByText('Original text:')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('reanalyze button', () => {
+    it('shows Analyze button when onReanalyze is provided and card is expanded (pending)', async () => {
+      const user = userEvent.setup()
+      const onReanalyze = vi.fn()
+      render(
+        <SuggestionCard {...defaultProps} onReanalyze={onReanalyze} />
+      )
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+
+      expect(screen.getByRole('button', { name: /analyze/i })).toBeInTheDocument()
+    })
+
+    it('does not show Analyze button when onReanalyze is not provided', async () => {
+      const user = userEvent.setup()
+      render(<SuggestionCard {...defaultProps} />)
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+
+      expect(screen.queryByRole('button', { name: /^analyze$/i })).not.toBeInTheDocument()
+    })
+
+    it('calls onReanalyze with paragraphId when Analyze is clicked (pending)', async () => {
+      const user = userEvent.setup()
+      const onReanalyze = vi.fn()
+      render(
+        <SuggestionCard {...defaultProps} onReanalyze={onReanalyze} />
+      )
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+      await user.click(screen.getByRole('button', { name: /analyze/i }))
+
+      expect(onReanalyze).toHaveBeenCalledWith('p-1')
+    })
+
+    it('shows Analyze button for accepted suggestions when onReanalyze is provided', async () => {
+      const user = userEvent.setup()
+      const onReanalyze = vi.fn()
+      render(
+        <SuggestionCard
+          {...defaultProps}
+          suggestion={createSuggestion({ status: 'Accepted' })}
+          onReanalyze={onReanalyze}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+
+      expect(screen.getByRole('button', { name: /analyze/i })).toBeInTheDocument()
+    })
+
+    it('calls onReanalyze with paragraphId when Analyze is clicked (accepted)', async () => {
+      const user = userEvent.setup()
+      const onReanalyze = vi.fn()
+      render(
+        <SuggestionCard
+          {...defaultProps}
+          suggestion={createSuggestion({ status: 'Accepted' })}
+          onReanalyze={onReanalyze}
+        />
+      )
+
+      await user.click(screen.getByRole('button', { name: /expand suggestion/i }))
+      await user.click(screen.getByRole('button', { name: /analyze/i }))
+
+      expect(onReanalyze).toHaveBeenCalledWith('p-1')
     })
   })
 })

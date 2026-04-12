@@ -18,7 +18,7 @@ public sealed class UserIdDefaultingTests
             Id = "doc-1",
             Filename = "test.docx",
             Source = DocumentSource.Local,
-            Content = "Test content"
+            Paragraphs = [new Paragraph { Id = "p1", Text = "Test content" }]
         };
 
         document.UserId.Should().Be("_anonymous", "userId should default to _anonymous when not specified");
@@ -33,7 +33,7 @@ public sealed class UserIdDefaultingTests
             UserId = "user-alice",
             Filename = "test.docx",
             Source = DocumentSource.Local,
-            Content = "Test content"
+            Paragraphs = [new Paragraph { Id = "p1", Text = "Test content" }]
         };
 
         document.UserId.Should().Be("user-alice");
@@ -73,7 +73,7 @@ public sealed class UserIdDefaultingTests
         {
             Id = "sug-1",
             DocumentId = "doc-1",
-            TextRange = new TextRange { Start = 0, End = 10 },
+            ParagraphId = "p1",
             Rationale = "Test rationale",
             ProposedChange = "Test change",
             Status = SuggestionStatus.Pending
@@ -90,7 +90,7 @@ public sealed class UserIdDefaultingTests
             Id = "sug-1",
             DocumentId = "doc-1",
             UserId = "user-charlie",
-            TextRange = new TextRange { Start = 0, End = 10 },
+            ParagraphId = "p1",
             Rationale = "Test rationale",
             ProposedChange = "Test change",
             Status = SuggestionStatus.Pending
@@ -108,10 +108,10 @@ public sealed class UserIdDefaultingTests
             UserId = "user-alice",
             Filename = "test.docx",
             Source = DocumentSource.Local,
-            Content = "Original content"
+            Paragraphs = [new Paragraph { Id = "p1", Text = "Original content" }]
         };
 
-        var updated = original with { Content = "Updated content" };
+        var updated = original with { Paragraphs = [new Paragraph { Id = "p1", Text = "Updated content" }] };
 
         updated.UserId.Should().Be("user-alice", "record with syntax should preserve userId");
     }
@@ -140,7 +140,7 @@ public sealed class UserIdDefaultingTests
             Id = "sug-1",
             DocumentId = "doc-1",
             UserId = "user-charlie",
-            TextRange = new TextRange { Start = 0, End = 10 },
+            ParagraphId = "p1",
             Rationale = "Original rationale",
             ProposedChange = "Original change",
             Status = SuggestionStatus.Pending

@@ -5,8 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="DocumentFormat.OpenXml" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NSubstitute" />
   </ItemGroup>
 
   <ItemGroup>

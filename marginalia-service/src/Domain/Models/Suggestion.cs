@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 namespace Marginalia.Domain.Models;
 
 /// <summary>
-/// An AI-generated editorial suggestion for a specific text range within a document.
+/// An AI-generated editorial suggestion targeting a specific paragraph within a document.
 /// </summary>
 public sealed record Suggestion
 {
@@ -16,8 +16,8 @@ public sealed record Suggestion
     [JsonPropertyName("documentId")]
     public required string DocumentId { get; init; }
 
-    [JsonPropertyName("textRange")]
-    public required TextRange TextRange { get; init; }
+    [JsonPropertyName("paragraphId")]
+    public required string ParagraphId { get; init; }
 
     [JsonPropertyName("rationale")]
     public required string Rationale { get; init; }

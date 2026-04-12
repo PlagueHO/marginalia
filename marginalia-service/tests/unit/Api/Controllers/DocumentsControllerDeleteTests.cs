@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
+using Marginalia.Infrastructure.Services;
 
 namespace Marginalia.Tests.Unit.Api.Controllers;
 
@@ -18,6 +19,7 @@ public sealed class DocumentsControllerDeleteTests
     private ISuggestionService _suggestionService = null!;
     private IWordDocumentService _wordDocumentService = null!;
     private ILogger<DocumentsController> _logger = null!;
+    private SuggestionMergeService _suggestionMergeService = null!;
     private DocumentsController _controller = null!;
 
     private static Document CreateDocument(string id = "doc-1", string userId = "user-1") => new()
@@ -26,7 +28,7 @@ public sealed class DocumentsControllerDeleteTests
         UserId = userId,
         Filename = "test.docx",
         Source = DocumentSource.Local,
-        Content = "Test content for deletion."
+        Paragraphs = [new Paragraph { Id = "p1", Text = "Test content for deletion." }]
     };
 
     [TestInitialize]
@@ -37,12 +39,14 @@ public sealed class DocumentsControllerDeleteTests
         _suggestionService = Substitute.For<ISuggestionService>();
         _wordDocumentService = Substitute.For<IWordDocumentService>();
         _logger = Substitute.For<ILogger<DocumentsController>>();
+        _suggestionMergeService = new SuggestionMergeService();
 
         _controller = new DocumentsController(
             _documentRepository,
             _sessionRepository,
             _suggestionService,
             _wordDocumentService,
+            _suggestionMergeService,
             _logger);
 
         var httpContext = new DefaultHttpContext();
@@ -99,3 +103,4 @@ public sealed class DocumentsControllerDeleteTests
             .DeleteAsync("_anonymous", "doc-1", Arg.Any<CancellationToken>());
     }
 }
+

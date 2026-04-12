@@ -1,20 +1,27 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Hash, Calendar, Pencil, Check, X } from "lucide-react";
-import type { Document } from "@/types";
+import { FileText, Hash, Pencil, Check, X } from "lucide-react";
+import { getAcceptedSuggestionsCharacterCount } from "@/lib/suggestionUtils";
+import type { Document, Suggestion } from "@/types";
 
 interface DocumentHeaderProps {
   document: Document;
+  suggestions: Suggestion[];
   onRename?: (title: string) => Promise<void>;
 }
 
-export function DocumentHeader({ document, onRename }: DocumentHeaderProps) {
+export function DocumentHeader({ document, suggestions, onRename }: DocumentHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const displayTitle = document.title || document.filename;
+  const originalCharacterCount = document.paragraphs.map((p) => p.text).join("\n\n").length;
+  const withSuggestionsCharacterCount = getAcceptedSuggestionsCharacterCount(
+    document.paragraphs,
+    suggestions
+  );
 
   const startEditing = useCallback(() => {
     setEditValue(displayTitle);
@@ -58,7 +65,7 @@ export function DocumentHeader({ document, onRename }: DocumentHeaderProps) {
 
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-linear-to-r from-muted/20 via-muted/10 to-transparent">
-      <FileText className="h-4 w-4 text-muted-foreground shrink-0" aria-hidden="true" />
+      <FileText className="h-5 w-5 text-violet-400 shrink-0" aria-hidden="true" />
       {isEditing ? (
         <div className="flex items-center gap-1 flex-1 min-w-0">
           <input
@@ -109,10 +116,18 @@ export function DocumentHeader({ document, onRename }: DocumentHeaderProps) {
         <Hash className="h-3 w-3" aria-hidden="true" />
         {document.source}
       </Badge>
-      <span className="text-xs text-muted-foreground ml-auto flex items-center gap-1 shrink-0">
-        <Calendar className="h-3 w-3" aria-hidden="true" />
-        {document.content.length.toLocaleString()} characters
-      </span>
+      <div className="ml-auto flex items-center gap-2 shrink-0 text-xs">
+        <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2.5 py-1 text-muted-foreground">
+          <Hash className="h-3 w-3" aria-hidden="true" />
+          <span className="font-medium text-foreground">Original</span>
+          <span>{originalCharacterCount.toLocaleString()}</span>
+        </span>
+        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/40 bg-emerald-500/10 px-2.5 py-1 text-emerald-700 dark:text-emerald-300">
+          <Check className="h-3 w-3" aria-hidden="true" />
+          <span className="font-medium">With accepted</span>
+          <span>{withSuggestionsCharacterCount.toLocaleString()}</span>
+        </span>
+      </div>
     </div>
   );
 }

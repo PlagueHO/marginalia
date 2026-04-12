@@ -1,9 +1,10 @@
 import { useState, useCallback, useMemo } from "react";
-import type { Suggestion, SuggestionStatus } from "@/types";
+import type { Suggestion, SuggestionStatus, Paragraph } from "@/types";
 import * as suggestionService from "@/services/suggestionService";
 
 interface UseSuggestionsState {
   suggestions: Suggestion[];
+  paragraphs: Paragraph[];
   isLoading: boolean;
   error: string | null;
   filter: SuggestionStatus | "All";
@@ -14,6 +15,7 @@ interface UseSuggestionsState {
 export function useSuggestions() {
   const [state, setState] = useState<UseSuggestionsState>({
     suggestions: [],
+    paragraphs: [],
     isLoading: false,
     error: null,
     filter: "All",
@@ -23,6 +25,10 @@ export function useSuggestions() {
 
   const setSuggestions = useCallback((suggestions: Suggestion[]) => {
     setState((prev) => ({ ...prev, suggestions }));
+  }, []);
+
+  const setParagraphs = useCallback((paragraphs: Paragraph[]) => {
+    setState((prev) => ({ ...prev, paragraphs }));
   }, []);
 
   const setFilter = useCallback((filter: SuggestionStatus | "All") => {
@@ -38,21 +44,43 @@ export function useSuggestions() {
   }, []);
 
   const suggestionNumbers = useMemo(() => {
+    // Build a paragraph index map for ordering
+    const paragraphOrder = new Map<string, number>();
+    state.paragraphs.forEach((p, i) => paragraphOrder.set(p.id, i));
+
     const sorted = [...state.suggestions].sort((a, b) => {
-      if (a.textRange.start !== b.textRange.start) {
-        return a.textRange.start - b.textRange.start;
-      }
-      return a.textRange.end - b.textRange.end;
+      const aIdx = paragraphOrder.get(a.paragraphId) ?? Infinity;
+      const bIdx = paragraphOrder.get(b.paragraphId) ?? Infinity;
+      return aIdx - bIdx;
     });
     const map = new Map<string, number>();
     sorted.forEach((s, i) => map.set(s.id, i + 1));
     return map;
-  }, [state.suggestions]);
+  }, [state.suggestions, state.paragraphs]);
+
+  const sortedSuggestions = useMemo(() => {
+    const paragraphOrder = new Map<string, number>();
+    state.paragraphs.forEach((p, i) => paragraphOrder.set(p.id, i));
+
+    return [...state.suggestions].sort((a, b) => {
+      const aIdx = paragraphOrder.get(a.paragraphId) ?? Infinity;
+      const bIdx = paragraphOrder.get(b.paragraphId) ?? Infinity;
+
+      if (aIdx !== bIdx) {
+        return aIdx - bIdx;
+      }
+
+      return a.id.localeCompare(b.id);
+    });
+  }, [state.suggestions, state.paragraphs]);
 
   const filteredSuggestions = useMemo(() => {
-    if (state.filter === "All") return state.suggestions;
-    return state.suggestions.filter((s) => s.status === state.filter);
-  }, [state.suggestions, state.filter]);
+    if (state.filter === "All") {
+      return sortedSuggestions;
+    }
+
+    return sortedSuggestions.filter((s) => s.status === state.filter);
+  }, [sortedSuggestions, state.filter]);
 
   const updateStatus = useCallback(
     async (
@@ -112,15 +140,16 @@ export function useSuggestions() {
 
   const counts = useMemo(() => {
     const result = { Pending: 0, Accepted: 0, Rejected: 0, Modified: 0, total: 0 };
-    for (const s of state.suggestions) {
+    for (const s of sortedSuggestions) {
       result[s.status]++;
       result.total++;
     }
     return result;
-  }, [state.suggestions]);
+  }, [sortedSuggestions]);
 
   return {
-    suggestions: state.suggestions,
+    suggestions: sortedSuggestions,
+    paragraphs: state.paragraphs,
     filteredSuggestions,
     isLoading: state.isLoading,
     error: state.error,
@@ -130,6 +159,7 @@ export function useSuggestions() {
     suggestionNumbers,
     counts,
     setSuggestions,
+    setParagraphs,
     setFilter,
     setActiveSuggestion,
     setHoveredSuggestion,

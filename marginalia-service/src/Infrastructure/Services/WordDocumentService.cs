@@ -4,6 +4,8 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using Marginalia.Domain.Interfaces;
 using Marginalia.Domain.Models;
 using DomainDocument = Marginalia.Domain.Models.Document;
+using DomainParagraph = Marginalia.Domain.Models.Paragraph;
+using OpenXmlParagraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
 
 namespace Marginalia.Infrastructure.Services;
 
@@ -22,17 +24,23 @@ public sealed class WordDocumentService : IWordDocumentService
             throw new InvalidOperationException("The uploaded Word document has no content.");
         }
 
-        var paragraphs = body.Elements<Paragraph>();
-        var content = string.Join("\n\n", paragraphs
+        var paragraphs = body.Elements<OpenXmlParagraph>()
             .Select(p => p.InnerText)
-            .Where(text => !string.IsNullOrWhiteSpace(text)));
+            .Where(text => !string.IsNullOrWhiteSpace(text))
+            .Select(text => new DomainParagraph
+            {
+                Id = Guid.NewGuid().ToString("N"),
+                Text = text.Trim()
+            })
+            .ToList()
+            .AsReadOnly();
 
         var document = new DomainDocument
         {
             Id = Guid.NewGuid().ToString("N"),
             Filename = filename,
             Source = DocumentSource.Local,
-            Content = content
+            Paragraphs = paragraphs
         };
 
         return Task.FromResult(document);
@@ -48,13 +56,11 @@ public sealed class WordDocumentService : IWordDocumentService
             mainPart.Document = new DocumentFormat.OpenXml.Wordprocessing.Document();
             var body = mainPart.Document.AppendChild(new Body());
 
-            // Apply accepted suggestions to produce final content
-            var finalContent = ApplySuggestions(document);
+            var finalParagraphs = ApplySuggestions(document);
 
-            var paragraphs = finalContent.Split(["\n\n"], StringSplitOptions.None);
-            foreach (var paraText in paragraphs)
+            foreach (var paraText in finalParagraphs)
             {
-                var paragraph = new Paragraph();
+                var paragraph = new OpenXmlParagraph();
                 var run = new Run();
                 run.AppendChild(new Text(paraText) { Space = SpaceProcessingModeValues.Preserve });
                 paragraph.AppendChild(run);
@@ -68,25 +74,23 @@ public sealed class WordDocumentService : IWordDocumentService
         return Task.FromResult<Stream>(memoryStream);
     }
 
-    private static string ApplySuggestions(DomainDocument document)
+    private static List<string> ApplySuggestions(DomainDocument document)
     {
-        var content = document.Content;
-        var applicable = document.Suggestions
+        var suggestionsByParagraph = document.Suggestions
             .Where(s => s.Status == SuggestionStatus.Accepted || s.Status == SuggestionStatus.Modified)
-            .OrderByDescending(s => s.TextRange.Start)
-            .ToList();
+            .GroupBy(s => s.ParagraphId)
+            .ToDictionary(g => g.Key, g => g.First());
 
-        foreach (var suggestion in applicable)
+        return document.Paragraphs.Select(p =>
         {
-            var replacementText = suggestion.Status == SuggestionStatus.Modified
-                ? (suggestion.UserSteeringInput ?? suggestion.ProposedChange)
-                : suggestion.ProposedChange;
+            if (suggestionsByParagraph.TryGetValue(p.Id, out var suggestion))
+            {
+                return suggestion.Status == SuggestionStatus.Modified
+                    ? (suggestion.UserSteeringInput ?? suggestion.ProposedChange)
+                    : suggestion.ProposedChange;
+            }
 
-            var start = Math.Max(0, Math.Min(suggestion.TextRange.Start, content.Length));
-            var end = Math.Max(start, Math.Min(suggestion.TextRange.End, content.Length));
-            content = string.Concat(content.AsSpan(0, start), replacementText, content.AsSpan(end));
-        }
-
-        return content;
+            return p.Text;
+        }).ToList();
     }
 }

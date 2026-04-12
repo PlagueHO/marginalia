@@ -36,7 +36,7 @@ export function SuggestionBatchActions({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2 justify-center">
-        <Badge variant="default" className="bg-linear-to-r from-amber-500/90 to-orange-500/90 text-white border-0 shadow-sm pl-1.5">
+        <Badge variant="default" className="bg-linear-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-700/95 dark:to-orange-700/95 text-white border-0 shadow-sm pl-1.5">
           <Clock className="h-3 w-3" aria-hidden="true" />
           {counts.Pending} pending
         </Badge>

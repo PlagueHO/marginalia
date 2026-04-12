@@ -4,9 +4,9 @@ export type DocumentSource = "Local" | "GoogleDocs";
 
 export type DocumentStatus = "Draft" | "Analyzed";
 
-export interface TextRange {
-  start: number;
-  end: number;
+export interface Paragraph {
+  id: string;
+  text: string;
 }
 
 export interface Document {
@@ -14,11 +14,11 @@ export interface Document {
   userId: string;
   filename: string;
   source: DocumentSource;
-  content: string;
   title: string;
   status: DocumentStatus;
   createdAt: string;
   updatedAt: string;
+  paragraphs: Paragraph[];
   suggestions: Suggestion[];
 }
 
@@ -31,4 +31,5 @@ export interface DocumentSummary {
   createdAt: string;
   updatedAt: string;
   suggestionCount: number;
+  paragraphCount: number;
 }

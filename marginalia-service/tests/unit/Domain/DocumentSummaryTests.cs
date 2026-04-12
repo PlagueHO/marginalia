@@ -19,7 +19,8 @@ public sealed class DocumentSummaryTests
         string filename = "test.docx",
         DocumentSource source = DocumentSource.Local,
         DocumentStatus status = DocumentStatus.Draft,
-        int suggestionCount = 0) => new()
+        int suggestionCount = 0,
+        int paragraphCount = 0) => new()
         {
             Id = id,
             Title = title,
@@ -28,7 +29,8 @@ public sealed class DocumentSummaryTests
             Status = status,
             CreatedAt = new DateTimeOffset(2026, 3, 29, 10, 15, 0, TimeSpan.Zero),
             UpdatedAt = new DateTimeOffset(2026, 3, 29, 14, 30, 0, TimeSpan.Zero),
-            SuggestionCount = suggestionCount
+            SuggestionCount = suggestionCount,
+            ParagraphCount = paragraphCount
         };
 
     [TestMethod]
@@ -93,6 +95,7 @@ public sealed class DocumentSummaryTests
         json.Should().Contain("\"createdAt\":");
         json.Should().Contain("\"updatedAt\":");
         json.Should().Contain("\"suggestionCount\":");
+        json.Should().Contain("\"paragraphCount\":");
     }
 
     [TestMethod]
@@ -135,7 +138,8 @@ public sealed class DocumentSummaryTests
             "status": "Analyzed",
             "createdAt": "2026-03-29T10:15:00+00:00",
             "updatedAt": "2026-03-29T14:30:00+00:00",
-            "suggestionCount": 12
+            "suggestionCount": 12,
+            "paragraphCount": 5
         }
         """;
 
@@ -162,7 +166,8 @@ public sealed class DocumentSummaryTests
             "status": "Draft",
             "createdAt": "2026-03-28T09:00:00+00:00",
             "updatedAt": "2026-03-28T09:00:00+00:00",
-            "suggestionCount": 0
+            "suggestionCount": 0,
+            "paragraphCount": 0
         }
         """;
 
