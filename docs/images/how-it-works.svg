@@ -1,60 +1,57 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 645 305" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
-  <!-- Title -->
-  <text x="322" y="30" text-anchor="middle" font-size="21" font-weight="bold" fill="#1e1e1e">How It Works</text>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 285" font-family="'Segoe UI', system-ui, -apple-system, sans-serif">
   <!-- Background zone -->
-  <rect x="15" y="45" width="618" height="250" rx="12" fill="#dbe4ff" fill-opacity="0.25" stroke="#4a9eed" stroke-width="0.75"/>
+  <rect x="10" y="0" width="660" height="278" rx="12" fill="#dbe4ff" fill-opacity="0.25" stroke="#4a9eed" stroke-width="0.75"/>
 
   <!-- Step 1: Upload or Paste -->
-  <rect x="30" y="75" width="112" height="90" rx="9" fill="#a5d8ff" stroke="#4a9eed" stroke-width="1.5"/>
-  <text x="86" y="62" text-anchor="middle" font-size="18">📄</text>
-  <text x="86" y="116" text-anchor="middle" font-size="15" fill="#1e1e1e">Upload</text>
-  <text x="86" y="133" text-anchor="middle" font-size="15" fill="#1e1e1e">or Paste</text>
-  <text x="86" y="186" text-anchor="middle" font-size="11" fill="#555555">Drag a .docx or paste</text>
-  <text x="86" y="200" text-anchor="middle" font-size="11" fill="#555555">text directly</text>
-  <text x="86" y="228" text-anchor="middle" font-size="12" font-weight="600" fill="#4a9eed">Step 1</text>
+  <rect x="40" y="55" width="112" height="90" rx="9" fill="#a5d8ff" stroke="#4a9eed" stroke-width="1.5"/>
+  <text x="96" y="42" text-anchor="middle" font-size="18">📄</text>
+  <text x="96" y="96" text-anchor="middle" font-size="15" fill="#ffffff">Upload</text>
+  <text x="96" y="113" text-anchor="middle" font-size="15" fill="#ffffff">or Paste</text>
+  <text x="96" y="168" text-anchor="middle" font-size="11" fill="#ffffff">Drag a .docx or paste</text>
+  <text x="96" y="182" text-anchor="middle" font-size="11" fill="#ffffff">text directly</text>
+  <text x="96" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#4a9eed">Step 1</text>
 
   <!-- Arrow 1→2 -->
-  <line x1="142" y1="120" x2="183" y2="120" stroke="#4a9eed" stroke-width="2"/>
-  <polygon points="183,114 191,120 183,126" fill="#4a9eed"/>
+  <line x1="152" y1="100" x2="194" y2="100" stroke="#4a9eed" stroke-width="2"/>
+  <polygon points="194,94 202,100 194,106" fill="#4a9eed"/>
 
   <!-- Step 2: Guide & Analyze -->
-  <rect x="191" y="75" width="112" height="90" rx="9" fill="#d0bfff" stroke="#8b5cf6" stroke-width="1.5"/>
-  <text x="247" y="62" text-anchor="middle" font-size="18">🤖</text>
-  <text x="247" y="116" text-anchor="middle" font-size="15" fill="#1e1e1e">Guide &amp;</text>
-  <text x="247" y="133" text-anchor="middle" font-size="15" fill="#1e1e1e">Analyze</text>
-  <text x="247" y="186" text-anchor="middle" font-size="11" fill="#555555">Pick a tone, add</text>
-  <text x="247" y="200" text-anchor="middle" font-size="11" fill="#555555">custom instructions</text>
-  <text x="247" y="228" text-anchor="middle" font-size="12" font-weight="600" fill="#8b5cf6">Step 2</text>
+  <rect x="202" y="55" width="112" height="90" rx="9" fill="#d0bfff" stroke="#8b5cf6" stroke-width="1.5"/>
+  <text x="258" y="42" text-anchor="middle" font-size="18">🤖</text>
+  <text x="258" y="96" text-anchor="middle" font-size="15" fill="#ffffff">Guide &amp;</text>
+  <text x="258" y="113" text-anchor="middle" font-size="15" fill="#ffffff">Analyze</text>
+  <text x="258" y="168" text-anchor="middle" font-size="11" fill="#ffffff">Pick a tone, add</text>
+  <text x="258" y="182" text-anchor="middle" font-size="11" fill="#ffffff">custom instructions</text>
+  <text x="258" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#8b5cf6">Step 2</text>
 
   <!-- Arrow 2→3 -->
-  <line x1="303" y1="120" x2="344" y2="120" stroke="#8b5cf6" stroke-width="2"/>
-  <polygon points="344,114 352,120 344,126" fill="#8b5cf6"/>
+  <line x1="314" y1="100" x2="356" y2="100" stroke="#8b5cf6" stroke-width="2"/>
+  <polygon points="356,94 364,100 356,106" fill="#8b5cf6"/>
 
   <!-- Step 3: Review & Refine -->
-  <rect x="352" y="75" width="112" height="90" rx="9" fill="#fff3bf" stroke="#f59e0b" stroke-width="1.5"/>
-  <text x="408" y="62" text-anchor="middle" font-size="18">✏️</text>
-  <text x="408" y="116" text-anchor="middle" font-size="15" fill="#1e1e1e">Review &amp;</text>
-  <text x="408" y="133" text-anchor="middle" font-size="15" fill="#1e1e1e">Refine</text>
-  <text x="408" y="186" text-anchor="middle" font-size="11" fill="#555555">Accept, reject, or</text>
-  <text x="408" y="200" text-anchor="middle" font-size="11" fill="#555555">modify suggestions</text>
-  <text x="408" y="228" text-anchor="middle" font-size="12" font-weight="600" fill="#f59e0b">Step 3</text>
+  <rect x="364" y="55" width="112" height="90" rx="9" fill="#fff3bf" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="420" y="42" text-anchor="middle" font-size="18">✏️</text>
+  <text x="420" y="96" text-anchor="middle" font-size="15" fill="#ffffff">Review &amp;</text>
+  <text x="420" y="113" text-anchor="middle" font-size="15" fill="#ffffff">Refine</text>
+  <text x="420" y="168" text-anchor="middle" font-size="11" fill="#ffffff">Accept, reject, or</text>
+  <text x="420" y="182" text-anchor="middle" font-size="11" fill="#ffffff">modify suggestions</text>
+  <text x="420" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#f59e0b">Step 3</text>
 
   <!-- Arrow 3→4 -->
-  <line x1="464" y1="120" x2="505" y2="120" stroke="#f59e0b" stroke-width="2"/>
-  <polygon points="505,114 513,120 505,126" fill="#f59e0b"/>
+  <line x1="476" y1="100" x2="518" y2="100" stroke="#f59e0b" stroke-width="2"/>
+  <polygon points="518,94 526,100 518,106" fill="#f59e0b"/>
 
   <!-- Step 4: Export .docx -->
-  <rect x="513" y="75" width="112" height="90" rx="9" fill="#b2f2bb" stroke="#22c55e" stroke-width="1.5"/>
-  <text x="569" y="62" text-anchor="middle" font-size="18">📥</text>
-  <text x="569" y="116" text-anchor="middle" font-size="15" fill="#1e1e1e">Export</text>
-  <text x="569" y="133" text-anchor="middle" font-size="15" fill="#1e1e1e">.docx</text>
-  <text x="569" y="186" text-anchor="middle" font-size="11" fill="#555555">Download polished</text>
-  <text x="569" y="200" text-anchor="middle" font-size="11" fill="#555555">manuscript</text>
-  <text x="569" y="228" text-anchor="middle" font-size="12" font-weight="600" fill="#22c55e">Step 4</text>
+  <rect x="526" y="55" width="112" height="90" rx="9" fill="#b2f2bb" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="582" y="42" text-anchor="middle" font-size="18">📥</text>
+  <text x="582" y="96" text-anchor="middle" font-size="15" fill="#ffffff">Export</text>
+  <text x="582" y="113" text-anchor="middle" font-size="15" fill="#ffffff">.docx</text>
+  <text x="582" y="168" text-anchor="middle" font-size="11" fill="#ffffff">Download polished</text>
+  <text x="582" y="182" text-anchor="middle" font-size="11" fill="#ffffff">manuscript</text>
+  <text x="582" y="212" text-anchor="middle" font-size="12" font-weight="600" fill="#22c55e">Step 4</text>
 
   <!-- Re-analyze loop (dashed) -->
-  <path d="M408,170 L408,270 L247,270 L247,170" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <polygon points="241,177 247,165 253,177" fill="#ec4899"/>
-  <text x="327" y="288" text-anchor="middle" font-size="11" fill="#ec4899" font-style="italic">Re-analyze &amp; iterate</text>
+  <path d="M420,150 L420,252 L258,252 L258,150" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <polygon points="252,157 258,145 264,157" fill="#ec4899"/>
+  <text x="339" y="270" text-anchor="middle" font-size="11" fill="#ec4899" font-style="italic">Re-analyze &amp; iterate</text>
 </svg>
