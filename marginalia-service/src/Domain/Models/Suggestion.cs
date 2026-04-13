@@ -17,7 +17,7 @@ public sealed record Suggestion
     public required string DocumentId { get; init; }
 
     [JsonPropertyName("paragraphId")]
-    public required string ParagraphId { get; init; }
+    public string ParagraphId { get; init; } = string.Empty;
 
     [JsonPropertyName("rationale")]
     public required string Rationale { get; init; }

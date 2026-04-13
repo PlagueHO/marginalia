@@ -53,17 +53,23 @@ public sealed class DocumentsController : ControllerBase
 
         var summaries = documents
             .OrderByDescending(d => d.UpdatedAt)
-            .Select(d => new DocumentSummary
+            .Select(d =>
             {
-                Id = d.Id,
-                Title = string.IsNullOrEmpty(d.Title) ? d.Filename : d.Title,
-                Filename = d.Filename,
-                Source = d.Source,
-                Status = d.Suggestions.Count > 0 ? DocumentStatus.Analyzed : d.Status,
-                CreatedAt = d.CreatedAt,
-                UpdatedAt = d.UpdatedAt,
-                SuggestionCount = d.Suggestions.Count,
-                ParagraphCount = d.Paragraphs.Count
+                var suggestions = d.Suggestions ?? [];
+                var paragraphs = d.Paragraphs ?? [];
+
+                return new DocumentSummary
+                {
+                    Id = d.Id,
+                    Title = string.IsNullOrEmpty(d.Title) ? d.Filename : d.Title,
+                    Filename = d.Filename,
+                    Source = d.Source,
+                    Status = suggestions.Count > 0 ? DocumentStatus.Analyzed : d.Status,
+                    CreatedAt = d.CreatedAt,
+                    UpdatedAt = d.UpdatedAt,
+                    SuggestionCount = suggestions.Count,
+                    ParagraphCount = paragraphs.Count
+                };
             })
             .ToList()
             .AsReadOnly();
