@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
+import { buildSummaryMessage } from "@/lib/replaceAnalysisSummary";
 
 interface ReplaceAnalysisConfirmationDialogProps {
   open: boolean;
@@ -20,45 +21,6 @@ interface ReplaceAnalysisConfirmationDialogProps {
   pendingCount: number;
   rejectedCount: number;
   onConfirm: () => void;
-}
-
-/**
- * Builds the primary summary line shown in the alert.
- * Describes what will be discarded and what will be merged.
- */
-export function buildSummaryMessage(
-  acceptedCount: number,
-  pendingCount: number,
-  rejectedCount: number,
-): string {
-  // Build the "discarded" part from non-accepted counts
-  const discardParts: string[] = [];
-  if (pendingCount > 0) {
-    discardParts.push(`${pendingCount} pending`);
-  }
-  if (rejectedCount > 0) {
-    discardParts.push(`${rejectedCount} rejected`);
-  }
-
-  const discardLabel = discardParts.length > 0
-    ? discardParts.join(" and ")
-    : null;
-
-  const plural = (n: number) => (n !== 1 ? "s" : "");
-
-  if (acceptedCount > 0 && discardLabel) {
-    return `Your ${acceptedCount} accepted suggestion${plural(acceptedCount)} will be merged into the manuscript. The ${discardLabel} suggestion${plural(pendingCount + rejectedCount)} will be discarded.`;
-  }
-
-  if (acceptedCount > 0) {
-    return `Your ${acceptedCount} accepted suggestion${plural(acceptedCount)} will be merged into the manuscript before re-analysis.`;
-  }
-
-  if (discardLabel) {
-    return `All ${discardLabel} suggestion${plural(pendingCount + rejectedCount)} will be discarded and replaced with new analysis results.`;
-  }
-
-  return "All existing suggestions will be replaced with new analysis results.";
 }
 
 export function ReplaceAnalysisConfirmationDialog({
