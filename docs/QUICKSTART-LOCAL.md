@@ -67,8 +67,10 @@ Set user secrets for the AppHost project:
 ```bash
 cd marginalia-service/src/Orchestration/AppHost
 
-dotnet user-secrets set Azure:SubscriptionId "<your-subscription-id>"
-dotnet user-secrets set Azure:TenantId "<your-tenant-id>"
+dotnet user-secrets set "Azure:SubscriptionId" "<your-subscription-id>" \
+  --project src/Orchestration/AppHost
+dotnet user-secrets set "Azure:TenantId" "<your-tenant-id>" \
+  --project src/Orchestration/AppHost
 
 cd ../../../..
 ```
