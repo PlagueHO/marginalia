@@ -29,6 +29,10 @@ export default defineConfig({
         items: [{ text: 'User Guide', link: '/USER-GUIDE' }],
       },
       {
+        text: 'Configuration',
+        items: [{ text: 'Authentication', link: '/AUTHENTICATION' }],
+      },
+      {
         text: 'Design',
         items: [{ text: 'Product Requirements', link: '/design/PRD' }],
       },
