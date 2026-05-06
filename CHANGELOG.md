@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `ContentFilterException` domain exception to represent Azure OpenAI content filter rejections with per-category filter results.
+- Content filter detection in `FoundrySuggestionService` via `TryParseContentFilterResults()` method.
+- HTTP 422 Unprocessable Entity response in `DocumentsController` when content filter is triggered, with structured error payload including triggered categories.
+- Content filter error handling in `EditorPage` with user-friendly toast messaging distinguishing content safety blocks from other failures.
+- Support for `error` field in API error response parsing (`api.ts`).
+- `ContentFilterCategory` interface and unit tests for content filter error handling.
+- GitHub issue templates for bug reports, chores, and feature requests.
+- Unit tests for document summary handling with legacy null collections.
+- Serialization tests for `Suggestion` model deserialization behavior.
+
 ### Changed
 
 - Use `vars.AZURE_LOCATION` with fallback to `inputs.AZURE_LOCATION` in provision and validate workflows.
@@ -15,11 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Handle null collections for suggestions and paragraphs when creating document summaries.
 - Allow empty `ParagraphId` in `Suggestion` model for backward compatibility with legacy data.
-
-### Added
-
-- Unit tests for document summary handling with legacy null collections.
-- Serialization tests for `Suggestion` model deserialization behavior.
 
 ## [1.1.7] - 2026-04-13
 
