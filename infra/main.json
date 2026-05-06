@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.42.1.51946",
-      "templateHash": "10141971764297091700"
+      "templateHash": "10285479852245187173"
     }
   },
   "parameters": {
@@ -93,7 +93,7 @@
     },
     "containerImage": {
       "type": "string",
-      "defaultValue": "ghcr.io/PlagueHO/marginalia-service:latest",
+      "defaultValue": "ghcr.io/plagueho/marginalia-service:latest",
       "metadata": {
         "description": "Container image to deploy for the backend API Container App."
       }
