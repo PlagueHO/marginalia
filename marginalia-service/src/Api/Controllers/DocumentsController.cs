@@ -292,11 +292,16 @@ public sealed class DocumentsController : ControllerBase
                 .Select(f => new { category = f.Category, severity = f.Severity })
                 .ToList();
 
+            var categorySummary = triggeredCategories.Count > 0
+                ? string.Join(", ", triggeredCategories.Select(c =>
+                    c.severity is not null ? $"{c.category}({c.severity})" : c.category))
+                : "(none)";
+
             _logger.LogWarning(
                 "Content filter triggered for document: {DocumentId}, UserId: {UserId}, Categories: {Categories}",
                 id,
                 userId,
-                string.Join(", ", triggeredCategories.Select(c => $"{c.category}({c.severity})")));
+                categorySummary);
 
             return UnprocessableEntity(new
             {
@@ -383,12 +388,17 @@ public sealed class DocumentsController : ControllerBase
                 .Select(f => new { category = f.Category, severity = f.Severity })
                 .ToList();
 
+            var categorySummary = triggeredCategories.Count > 0
+                ? string.Join(", ", triggeredCategories.Select(c =>
+                    c.severity is not null ? $"{c.category}({c.severity})" : c.category))
+                : "(none)";
+
             _logger.LogWarning(
                 "Content filter triggered for paragraph: {ParagraphId}, DocumentId: {DocumentId}, UserId: {UserId}, Categories: {Categories}",
                 paragraphId,
                 id,
                 userId,
-                string.Join(", ", triggeredCategories.Select(c => $"{c.category}({c.severity})")));
+                categorySummary);
 
             return UnprocessableEntity(new
             {
