@@ -233,4 +233,4 @@ pnpm test
 ## Next steps
 
 - **Deploy to Azure** — see [Deploy to Azure with Azure Developer CLI](QUICKSTART-AZURE.md) (coming soon).
-- **Architecture** — read the [PRD](../PRD.md) for product requirements and design context.
+- **Architecture** — read the [PRD](./design/PRD.md) for product requirements and design context.

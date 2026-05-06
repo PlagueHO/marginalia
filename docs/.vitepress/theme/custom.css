@@ -1,0 +1,44 @@
+/* -----------------------------------------------------------------------
+   Marginalia Docs — Brand theme
+   Values sourced from:
+     marginalia-app/src/index.css  (CSS custom properties)
+     marginalia-app/src/lib/utils.ts  (gradientText: violet-400 → indigo-400 → purple-400)
+   ----------------------------------------------------------------------- */
+
+:root {
+  /* Brand colours — violet/indigo/purple gradient mid-points as interactive colour */
+  --vp-c-brand-1: #818cf8; /* indigo-400 */
+  --vp-c-brand-2: #a78bfa; /* violet-400 */
+  --vp-c-brand-3: #c084fc; /* purple-400 */
+  --vp-c-brand-soft: rgba(129, 140, 248, 0.15);
+
+  /* Typography — matches app's font-family declaration */
+  --vp-font-family-base: system-ui, -apple-system, sans-serif;
+
+  /* Hero heading gradient — matches gradientText utility in lib/utils.ts */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(
+    to right,
+    #a78bfa, /* violet-400 */
+    #818cf8, /* indigo-400 */
+    #c084fc  /* purple-400 */
+  );
+
+  /* Light-mode surface colours — from index.css @theme */
+  --vp-c-bg: hsl(0 0% 100%);
+  --vp-c-bg-soft: hsl(0 0% 96.1%);  /* --color-secondary / --color-muted */
+  --vp-c-bg-mute: hsl(0 0% 96.1%);
+  --vp-c-divider: hsl(0 0% 89.8%);  /* --color-border */
+  --vp-c-text-1: hsl(0 0% 3.9%);    /* --color-foreground */
+  --vp-c-text-2: hsl(0 0% 45.1%);   /* --color-muted-foreground */
+}
+
+/* Dark-mode overrides — matches .dark block in index.css */
+.dark {
+  --vp-c-bg: hsl(0 0% 3.9%);
+  --vp-c-bg-soft: hsl(0 0% 14.9%);  /* --color-secondary (dark) */
+  --vp-c-bg-mute: hsl(0 0% 14.9%);
+  --vp-c-divider: hsl(0 0% 14.9%);  /* --color-border (dark) */
+  --vp-c-text-1: hsl(0 0% 98%);     /* --color-foreground (dark) */
+  --vp-c-text-2: hsl(0 0% 63.9%);   /* --color-muted-foreground (dark) */
+}

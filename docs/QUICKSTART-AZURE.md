@@ -169,4 +169,4 @@ azd down --force --purge
 ## Next steps
 
 - **Local development** — see [Local Development with Aspire](QUICKSTART-LOCAL.md) for running locally.
-- **Architecture** — read the [PRD](../PRD.md) for product requirements and design context.
+- **Architecture** — read the [PRD](./design/PRD.md) for product requirements and design context.
