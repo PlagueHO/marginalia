@@ -1,7 +1,5 @@
 # Quickstart: Deploy to Azure
 
-> ⚠️ **Not yet implemented.** Azure Developer CLI deployment is planned but the infrastructure (`azure.yaml`, Bicep/Terraform templates) has not been created yet. This guide documents the intended workflow for when it becomes available. For now, use [Local Development with Aspire](QUICKSTART-LOCAL.md).
-
 Deploy Marginalia to Azure using the Azure Developer CLI (`azd`). This provisions all required infrastructure and deploys the application with a single command.
 
 > **Looking for local development?** See [Local Development with Aspire](QUICKSTART-LOCAL.md).
@@ -120,6 +118,75 @@ azd env set MicrosoftFoundry__modelVersion "2026-03-03"
 azd up
 ```
 
+## Environment configuration
+
+All infrastructure parameters are read from `azd` environment variables and passed to `infra/main.bicepparam` at provisioning time. Use `azd env set <KEY> <VALUE>` to configure any of these before running `azd up` or `azd provision`.
+
+### Required
+
+These values are set automatically by `azd` and do not need to be configured manually.
+
+| Variable | Description |
+| --- | --- |
+| `AZURE_ENV_NAME` | Environment name; used as a prefix for all resource names |
+| `AZURE_LOCATION` | Primary Azure region (default: `EastUS2`) |
+| `AZURE_PRINCIPAL_ID` | Object ID of the user or service principal running the deployment |
+| `AZURE_PRINCIPAL_ID_TYPE` | `User` or `ServicePrincipal` (default: `User`) |
+
+### Optional
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `AZURE_LOCATION` | `EastUS2` | Azure region for all resources |
+| `AZURE_STATIC_WEB_APP_LOCATION` | *(same as primary)* | Override region for the Static Web App. Must be one of: `centralus`, `eastasia`, `eastus2`, `westeurope`, `westus2` |
+| `AZURE_CONTAINER_APP_IMAGE` | `ghcr.io/plagueho/marginalia-service:latest` | Container image to deploy to the backend Container App |
+| `ENABLE_PUBLIC_NETWORK_ACCESS` | `true` | Set to `false` to restrict all resources to private network access only |
+
+### Authentication
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `ACCESS_CODE` | *(empty)* | Optional access code for single-user deployments. Leave empty for Anonymous mode |
+| `ENABLE_ENTRA_AUTH` | `false` | Set to `true` to enable Entra ID multi-user authentication |
+| `AZURE_AD_API_CLIENT_ID` | *(set by preprovision hook)* | API app registration client ID; written automatically when `ENABLE_ENTRA_AUTH=true` |
+| `AZURE_AD_SPA_CLIENT_ID` | *(set by preprovision hook)* | SPA app registration client ID; written automatically when `ENABLE_ENTRA_AUTH=true` |
+
+See [Authentication](./AUTHENTICATION.md) for full details on each authentication mode and how to configure it.
+
+## Authentication
+
+Marginalia supports three authentication modes for Azure deployments. Configure the appropriate variables before running `azd up`:
+
+### Anonymous mode (default)
+
+No additional configuration is needed. All requests are accepted without an access check and attributed to the `_anonymous` user:
+
+```bash
+azd up
+```
+
+### Access Code mode
+
+Protect the deployment with a shared password. All requests must include the correct code:
+
+```bash
+azd env set ACCESS_CODE "your-access-code"
+azd up
+```
+
+### Entra ID mode
+
+Enable multi-user authentication backed by your Entra ID tenant. The pre-provision hook creates the required app registrations automatically:
+
+```bash
+azd env set ENABLE_ENTRA_AUTH true
+azd up
+```
+
+The hook requires the `Application.ReadWrite.All` Microsoft Graph permission on the deploying identity.
+
+For detailed instructions on each mode, see [Authentication](./AUTHENTICATION.md).
+
 ## Update and redeploy
 
 After making code changes, redeploy with:
@@ -169,4 +236,5 @@ azd down --force --purge
 ## Next steps
 
 - **Local development** — see [Local Development with Aspire](QUICKSTART-LOCAL.md) for running locally.
+- **Authentication** — see [Authentication](./AUTHENTICATION.md) for detailed configuration of Anonymous, Access Code, and Entra ID modes.
 - **Architecture** — read the [PRD](./design/PRD.md) for product requirements and design context.
