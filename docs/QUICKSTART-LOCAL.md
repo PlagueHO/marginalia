@@ -54,7 +54,7 @@ You need an active Azure subscription with access to deploy Azure AI Foundry res
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/marymacgregorreid/marginalia.git
+git clone https://github.com/PlagueHO/marginalia.git
 cd marginalia
 ```
 

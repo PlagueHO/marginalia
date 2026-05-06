@@ -1,4 +1,4 @@
-// Entra ID App Registrations for Prompt Babbler
+// Entra ID App Registrations for Marginalia
 // Uses the Microsoft Graph Bicep extension to create API and SPA app registrations.
 
 extension microsoftGraphV1
@@ -10,12 +10,12 @@ param environmentName string
 param spaProductionRedirectUri string = ''
 
 // Deterministic GUID for the access_as_user scope
-var accessAsUserScopeId = guid('prompt-babbler-access-as-user')
+var accessAsUserScopeId = guid('marginalia-access-as-user')
 
 // ---- API App Registration ----
 resource apiApp 'Microsoft.Graph/applications@v1.0' = {
-  uniqueName: 'prompt-babbler-api'
-  displayName: '${environmentName}-prompt-babbler-api'
+  uniqueName: 'marginalia-api'
+  displayName: '${environmentName}-marginalia-api'
   signInAudience: 'AzureADMyOrg'
   api: {
     requestedAccessTokenVersion: 2
@@ -24,10 +24,10 @@ resource apiApp 'Microsoft.Graph/applications@v1.0' = {
         id: accessAsUserScopeId
         value: 'access_as_user'
         type: 'User'
-        adminConsentDisplayName: 'Access Prompt Babbler API'
-        adminConsentDescription: 'Allow the app to access Prompt Babbler API on behalf of the signed-in user.'
-        userConsentDisplayName: 'Access Prompt Babbler API'
-        userConsentDescription: 'Allow the app to access Prompt Babbler API on your behalf.'
+        adminConsentDisplayName: 'Access Marginalia API'
+        adminConsentDescription: 'Allow the app to access Marginalia API on behalf of the signed-in user.'
+        userConsentDisplayName: 'Access Marginalia API'
+        userConsentDescription: 'Allow the app to access Marginalia API on your behalf.'
         isEnabled: true
       }
     ]
@@ -41,7 +41,7 @@ resource apiApp 'Microsoft.Graph/applications@v1.0' = {
     ]
   }
   identifierUris: [
-    'api://prompt-babbler-api'
+    'api://marginalia-api'
   ]
 }
 
@@ -61,8 +61,8 @@ var spaRedirectUris = empty(spaProductionRedirectUri)
     ]
 
 resource spaApp 'Microsoft.Graph/applications@v1.0' = {
-  uniqueName: 'prompt-babbler-spa'
-  displayName: '${environmentName}-prompt-babbler-spa'
+  uniqueName: 'marginalia-spa'
+  displayName: '${environmentName}-marginalia-spa'
   signInAudience: 'AzureADMyOrg'
   spa: {
     redirectUris: spaRedirectUris

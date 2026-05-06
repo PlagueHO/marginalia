@@ -25,7 +25,7 @@ internal sealed partial class FoundrySerializerContext : JsonSerializerContext;
 
 ## Pattern: Aspire Integration
 
-ServiceDefaults + AppHost follow the prompt-babbler pattern. Conditional IChatClient registration:
+ServiceDefaults + AppHost follow the marginalia pattern. Conditional IChatClient registration:
 
 ```csharp
 var aiConnectionString = builder.Configuration.GetConnectionString("ai-foundry");

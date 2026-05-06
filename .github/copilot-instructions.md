@@ -1,70 +1,56 @@
 # Copilot Instructions — Marginalia
 
-This file provides project-specific implementation guidance for the Marginalia repository.
-For broad coding standards, naming conventions, and file organization, see [AGENTS.md](../../AGENTS.md).
+Marginalia is a .NET 10 + React 19 full-stack document analysis application backed by Azure AI Foundry.
+See [AGENTS.md](../AGENTS.md) for layout, commands, and CI pipeline.
 
-## .NET Backend Implementation Details
+## Security Rules
 
-### Controller Patterns
+- **Cosmos DB**: always use parameterized `QueryDefinition` with `@param` syntax — never string interpolation.
+- **Prompt construction**: treat all user-supplied text (guidance, document content) as untrusted; never embed it unescaped in system prompts.
+- **User identity**: extract from `X-User-Id` header; default to `"_anonymous"` — never accept identity from the request body.
+- **File uploads**: validate `.docx` type and 50 MB size limit before processing.
+- **Secrets**: never log or return connection strings, API keys, or access codes.
 
-- Controllers use attribute routing with `[ApiController]` and `[Route("api/[controller]")]`.
-- All controllers are `sealed` classes.
-- Inject dependencies via constructor parameters (`ILogger<T>`, service interfaces).
-- Extract user identity from the `X-User-Id` header, defaulting to `"_anonymous"` when absent.
-- Return `ActionResult<T>` from action methods. Use `Ok()`, `Created()`, `BadRequest()`, `NotFound()` — never throw exceptions for expected conditions.
-- Validate file uploads for type (`.docx` only) and size (50 MB max) before processing.
-- Log all operations at `Information` level for auditing; use `Warning` for recoverable errors.
+## .NET Backend Patterns
 
-### Domain Model Patterns
+### Controllers
 
-- All models are `sealed record` types with init-only properties.
-- Use `[JsonPropertyName("camelCase")]` attributes for JSON serialization.
-- Default collections to empty (e.g., `List<Suggestion> Suggestions { get; init; } = []`).
+- `[ApiController]` + `[Route("api/[controller]")]`; all controllers are `sealed`.
+- Inject `ILogger<T>` and service interfaces via constructor.
+- Return `ActionResult<T>`; use `Ok()`, `Created()`, `BadRequest()`, `NotFound()` — never throw for expected conditions.
+- Log all operations at `Information` level; recoverable errors at `Warning`.
+
+### Domain Models
+
+- `sealed record` with init-only properties and `[JsonPropertyName("camelCase")]` attributes.
+- Default collections: `List<T> Items { get; init; } = []`.
 - Enums: `DocumentSource` (Local, GoogleDocs), `DocumentStatus` (Draft, Analyzed), `SuggestionStatus` (Pending, Accepted, Rejected, Modified).
-- All service and repository contracts are defined as interfaces in `Marginalia.Domain.Interfaces`.
+- All service and repository contracts are interfaces in `Marginalia.Domain.Interfaces`.
 
-### Repository Implementation Patterns
+### Repositories
 
-- Cosmos DB repositories use `/userId` as the partition key.
-- Queries use parameterized `QueryDefinition` with `@parameter` syntax — never string interpolation.
-- Handle `CosmosException` by checking `HttpStatusCode` (return `null` for `NotFound`).
-- All methods accept `CancellationToken` and are fully async (`Task<T>`).
-- Use `UpsertItemAsync` for idempotent saves.
-- Provide matching in-memory implementations for testing (e.g., `InMemoryDocumentRepository`).
+- `/userId` partition key for all Cosmos DB containers.
+- `UpsertItemAsync` for idempotent saves; catch `CosmosException`, check `HttpStatusCode`, return `null` for `NotFound`.
+- Provide matching in-memory implementations (e.g., `InMemoryDocumentRepository`) for unit tests.
+- All methods accept `CancellationToken` and return `Task<T>`.
 
-### AI / LLM Service Patterns
+### AI / LLM Service
 
-- Use `IChatClient` from `Microsoft.Extensions.AI` for LLM interactions.
-- Configure endpoints via the options pattern (`LlmEndpointOptions`) with environment variable overrides (`FOUNDRY_ENDPOINT`, `FOUNDRY_MODEL_NAME`).
-- Chunk text at approximately 6000 characters (~3 pages) for analysis.
-- Construct separate system and user prompts for editorial analysis.
-- Parse JSON responses from the LLM into domain models with proper error handling.
+- Use `IChatClient` from `Microsoft.Extensions.AI`; configure via `LlmEndpointOptions` (env: `FOUNDRY_ENDPOINT`, `FOUNDRY_MODEL_NAME`).
+- Chunk text at ~6000 characters; construct separate system and user prompts; parse JSON responses with error handling.
 
-### Dependency Injection
+### Configuration and DI
 
-- Register services in `Program.cs` using the standard pattern.
-- Use `AddSingleton`, `AddScoped`, or `AddTransient` as appropriate for service lifetimes.
-- Configuration objects are registered via `.Configure<T>(configuration.GetSection("..."))`.
-- API configuration includes CORS with allowed origins from `CORS:AllowedOrigins`, camelCase JSON, and 50 MB request body limit.
+- Options pattern via `.Configure<T>(configuration.GetSection(...))`.
+- CORS allowed origins from `CORS:AllowedOrigins`; JSON serialization camelCase; request body limit 50 MB.
+- `AppHost` registers all services with `WaitFor()` dependencies; frontend is a Vite app with `pnpm`.
 
-### .NET Aspire Orchestration
+## React Frontend Patterns
 
-- The `AppHost` registers all services with resource references and `WaitFor()` dependencies.
-- Cosmos DB containers use `/userId` partition key: `documents`, `sessions`.
-- The frontend is registered as a Vite app with `pnpm` package manager and external HTTP endpoints.
-- Service defaults configure OpenTelemetry (logging, metrics, tracing), health checks (`/health`, `/alive`), service discovery, and HTTP resilience handlers.
+### Components
 
-## React Frontend Implementation Details
-
-### Component Patterns
-
-- All components are functional components using hooks.
-- Props are defined with TypeScript `interface` declarations.
-- Use `useCallback` with explicit dependency arrays for memoized handlers.
-- Use `useEffect` with cleanup functions for side effects.
-- Icons are exclusively from the `lucide-react` package.
-- UI primitives come from shadcn/ui (Radix UI + Tailwind CSS v4) in `components/ui/`.
-- Do not add new UI libraries — use existing shadcn/ui components or generate new ones via the shadcn CLI.
+- Functional components with TypeScript `interface` props; `useCallback` with explicit dependency arrays.
+- Icons: `lucide-react` only. UI primitives: shadcn/ui in `components/ui/`. Never add new UI libraries.
 
 ### Custom Hook Patterns
 
@@ -93,47 +79,49 @@ export function useExample() {
 }
 ```
 
-Return an object containing state properties and action methods — never return arrays.
+Return an object from hooks — never an array.
 
-### API Service Layer Patterns
+### API Service Layer
 
-- All API requests flow through the centralized client in `services/api.ts`.
-- Use the typed helpers: `apiGet<T>()`, `apiPost<T>()`, `apiPut<T>()`, `apiPostFile<T>()`, `apiGetBlob()`.
-- The `X-User-Id` header is injected automatically by the API client.
-- Throw `ApiError` (with `message` and `statusCode`) for non-OK responses.
-- Service modules (`documentService.ts`, `suggestionService.ts`, `configService.ts`) are thin wrappers that call the API client and manage endpoints.
-- Barrel-export all services from `services/index.ts` and all types from `types/index.ts`.
+- All requests via typed helpers in `services/api.ts`: `apiGet<T>()`, `apiPost<T>()`, `apiPut<T>()`, `apiPostFile<T>()`, `apiGetBlob()`.
+- `X-User-Id` header injected automatically. Throw `ApiError` (with `message` and `statusCode`) for non-OK responses.
+- Service modules are thin wrappers; barrel-export from `services/index.ts` and `types/index.ts`.
+- Use `@/` path alias for all internal imports — never traverse above `src/` with `../..`.
+- Tailwind CSS v4 utility classes only; use `cn()` from `lib/utils.ts` for conditional merging.
 
-### Type Definition Patterns
+## Naming Conventions
 
-- Define types in `types/` with one file per domain concept (`document.ts`, `suggestion.ts`, `session.ts`, `api.ts`).
-- Use `type` for unions and simple aliases, `interface` for object shapes.
-- Keep types synchronized with the backend domain models — property names and shapes must match the API JSON contract.
-- Export all types from `types/index.ts`.
+| Element | Convention | Example |
+|---|---|---|
+| C# class / record | `sealed` PascalCase | `DocumentsController` |
+| C# interface | `I` prefix + PascalCase | `IDocumentRepository` |
+| C# async method | PascalCase + `Async` suffix | `GetByIdAsync` |
+| C# private field | `_camelCase` | `_documentRepository` |
+| C# JSON property | `[JsonPropertyName("camelCase")]` | `"userId"`, `"fileName"` |
+| React component | PascalCase `.tsx` | `SuggestionCard.tsx` |
+| React hook | `use` prefix, camelCase `.ts` | `useDocuments.ts` |
+| TypeScript constant | `UPPER_SNAKE_CASE` | `TONE_OPTIONS` |
+| TypeScript test file | `{name}.test.{ts,tsx}` | `SuggestionCard.test.tsx` |
+| Bicep file | `kebab-case` or `snake_case` | `role_foundry.bicep` |
+| Git branch | `kebab-case` | `fix-upload-validation` |
 
-### Path Aliases and Imports
+## Testing
 
-- Use the `@/` path alias for all internal imports (e.g., `import { Document } from "@/types"`).
-- Never use relative paths that traverse above the current directory (`../..`).
+### .NET (MSTest v4 + MTP)
 
-### Styling
+- `[TestClass]`, `[TestMethod]`, `[TestCategory("Unit")]`; runner configured in `global.json`.
+- Assertions: FluentAssertions. Mocking: NSubstitute. Parallelism: `[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]`.
+- Test class naming: `{ClassUnderTest}Tests`, folder mirrors source structure.
 
-- Use Tailwind CSS v4 utility classes exclusively — no custom CSS files beyond `index.css`.
-- shadcn/ui component variants use `class-variance-authority` (CVA).
-- Use `clsx` or `cn()` (from `lib/utils.ts`) for conditional class merging.
+### React (Vitest)
 
-## Infrastructure (Bicep) Implementation Details
+- `describe` / `it` blocks; React Testing Library (`render`, `screen`, `userEvent`); jest-axe for a11y.
+- `vi.fn()` for function mocks; `renderHook()` for custom hook tests.
 
-- Use Azure Verified Modules (AVM) from `br/public:avm/` where available.
-- Load shared configuration from JSON files using `loadJsonContent()`.
-- Generate unique resource names with `uniqueString(subscription().id, environmentName, location)`.
-- Tag all resources with at minimum `azd-env-name` and `project` tags.
-- Resource naming follows `abbreviations.json` patterns: `${abbrs.resourceType}${environmentName}`.
-- Deploy at subscription scope with resource group creation in the template.
-- Support public network access toggle via the `enablePublicNetworkAccess` parameter.
+## Infrastructure and Telemetry
 
-## OpenTelemetry
+- Bicep: use AVM modules (`br/public:avm/`); names via `uniqueString()`; tag with `azd-env-name` + `project`.
+- Deploy at subscription scope; support `enablePublicNetworkAccess` toggle.
+- Backend OTel configured in `ServiceDefaults` (logging, metrics, tracing).
+- Frontend OTel initialized in `telemetry.ts` using Aspire-injected `__OTEL_*__` env vars.
 
-- The backend uses OpenTelemetry for logging, metrics (AspNetCore, HTTP, Runtime), and tracing configured in ServiceDefaults.
-- The frontend initializes OpenTelemetry in `telemetry.ts` with Aspire-injected environment variables (`__OTEL_*__`).
-- When adding new services or significant operations, include appropriate telemetry instrumentation.

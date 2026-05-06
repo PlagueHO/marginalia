@@ -40,7 +40,7 @@ You need an active Azure subscription with quota for `gpt-5.3-chat` (GlobalStand
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/marymacgregorreid/marginalia.git
+git clone https://github.com/PlagueHO/marginalia.git
 cd marginalia
 ```
 

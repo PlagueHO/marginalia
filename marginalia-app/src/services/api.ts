@@ -58,9 +58,11 @@ async function handleResponse<T>(response: Response, method: string, path: strin
     };
 
     try {
-      const body = await response.json() as { message?: string };
+      const body = await response.json() as { message?: string; error?: string };
       if (body.message) {
         error.message = body.message;
+      } else if (body.error) {
+        error.message = body.error;
       }
     } catch {
       // Use default message

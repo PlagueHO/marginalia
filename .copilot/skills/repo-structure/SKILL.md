@@ -1,11 +1,11 @@
 ﻿# Standard Repository Structure
 
 > Confidence: high
-> Source: User directive — standard structure for all Daniel's repos, based on PlagueHO/prompt-babbler
+> Source: User directive — standard structure for all Daniel's repos, based on PlagueHO/marginalia
 
 ## Pattern
 
-All projects follow this folder structure convention, adapted from `PlagueHO/prompt-babbler`.
+All projects follow this folder structure convention, adapted from `PlagueHO/marginalia`.
 
 ### Root Layout
 
