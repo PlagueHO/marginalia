@@ -25,7 +25,7 @@
     }
   },
   "variables": {
-    "accessAsUserScopeId": "[guid('prompt-babbler-access-as-user')]",
+    "accessAsUserScopeId": "[guid('marginalia-access-as-user')]",
     "spaRedirectUris": "[if(empty(parameters('spaProductionRedirectUri')), createArray('http://localhost:5173'), createArray('http://localhost:5173', parameters('spaProductionRedirectUri')))]"
   },
   "imports": {
@@ -39,8 +39,8 @@
       "import": "microsoftGraphV1",
       "type": "Microsoft.Graph/applications@v1.0",
       "properties": {
-        "uniqueName": "prompt-babbler-api",
-        "displayName": "[format('{0}-prompt-babbler-api', parameters('environmentName'))]",
+        "uniqueName": "marginalia-api",
+        "displayName": "[format('{0}-marginalia-api', parameters('environmentName'))]",
         "signInAudience": "AzureADMyOrg",
         "api": {
           "requestedAccessTokenVersion": 2,
@@ -49,10 +49,10 @@
               "id": "[variables('accessAsUserScopeId')]",
               "value": "access_as_user",
               "type": "User",
-              "adminConsentDisplayName": "Access Prompt Babbler API",
-              "adminConsentDescription": "Allow the app to access Prompt Babbler API on behalf of the signed-in user.",
-              "userConsentDisplayName": "Access Prompt Babbler API",
-              "userConsentDescription": "Allow the app to access Prompt Babbler API on your behalf.",
+              "adminConsentDisplayName": "Access Marginalia API",
+              "adminConsentDescription": "Allow the app to access Marginalia API on behalf of the signed-in user.",
+              "userConsentDisplayName": "Access Marginalia API",
+              "userConsentDescription": "Allow the app to access Marginalia API on your behalf.",
               "isEnabled": true
             }
           ]
@@ -66,7 +66,7 @@
           ]
         },
         "identifierUris": [
-          "api://prompt-babbler-api"
+          "api://marginalia-api"
         ]
       }
     },
@@ -84,8 +84,8 @@
       "import": "microsoftGraphV1",
       "type": "Microsoft.Graph/applications@v1.0",
       "properties": {
-        "uniqueName": "prompt-babbler-spa",
-        "displayName": "[format('{0}-prompt-babbler-spa', parameters('environmentName'))]",
+        "uniqueName": "marginalia-spa",
+        "displayName": "[format('{0}-marginalia-spa', parameters('environmentName'))]",
         "signInAudience": "AzureADMyOrg",
         "spa": {
           "redirectUris": "[variables('spaRedirectUris')]"

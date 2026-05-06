@@ -201,6 +201,14 @@ public sealed class FoundrySuggestionService : ISuggestionService
 
         if (!response.IsSuccessStatusCode)
         {
+            var filterResults = TryParseContentFilterResults(content);
+            if (filterResults is not null)
+            {
+                throw new ContentFilterException(
+                    "The request was blocked by Azure OpenAI content filtering policies.",
+                    filterResults);
+            }
+
             throw new InvalidOperationException(
                 $"OpenAI-compatible fallback failed with status {(int)response.StatusCode}: {content}");
         }
@@ -285,6 +293,65 @@ public sealed class FoundrySuggestionService : ISuggestionService
         }
 
         return sb.Length == 0 ? null : sb.ToString();
+    }
+
+    /// <summary>
+    /// Attempts to parse content filter results from an Azure OpenAI error response.
+    /// Returns null if the response is not a content filter error.
+    /// </summary>
+    private static IReadOnlyList<ContentFilterResult>? TryParseContentFilterResults(string responseBody)
+    {
+        try
+        {
+            using var doc = JsonDocument.Parse(responseBody);
+
+            if (!doc.RootElement.TryGetProperty("error", out var error))
+            {
+                return null;
+            }
+
+            // Check for content_filter error code
+            if (!error.TryGetProperty("code", out var code) ||
+                !string.Equals(code.GetString(), "content_filter", StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            // Navigate to innererror.content_filter_result
+            if (!error.TryGetProperty("innererror", out var innerError) ||
+                !innerError.TryGetProperty("content_filter_result", out var filterResult))
+            {
+                // It's a content filter error but without detailed results
+                return Array.Empty<ContentFilterResult>();
+            }
+
+            var results = new List<ContentFilterResult>();
+            foreach (var property in filterResult.EnumerateObject())
+            {
+                // Skip non-category properties like "jailbreak" which has a different shape
+                if (!property.Value.TryGetProperty("filtered", out var filtered))
+                {
+                    continue;
+                }
+
+                var severity = property.Value.TryGetProperty("severity", out var sev)
+                    ? sev.GetString()
+                    : null;
+
+                results.Add(new ContentFilterResult
+                {
+                    Category = property.Name,
+                    Filtered = filtered.GetBoolean(),
+                    Severity = severity
+                });
+            }
+
+            return results.AsReadOnly();
+        }
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
     private static string BuildSystemPrompt(string? userGuidance)

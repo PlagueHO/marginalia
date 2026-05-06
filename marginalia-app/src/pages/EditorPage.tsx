@@ -15,11 +15,15 @@ import { ReplaceAnalysisConfirmationDialog } from "@/components/ReplaceAnalysisC
 import { DeleteConfirmationDialog } from "@/components/DeleteConfirmationDialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import type { Document, SuggestionStatus } from "@/types";
+import type { Document, SuggestionStatus, ApiError } from "@/types";
 import { toast } from "sonner";
 import { mergeAcceptedSuggestionsToParagraphs } from "@/lib/suggestionUtils";
 import * as documentService from "@/services/documentService";
 import * as suggestionService from "@/services/suggestionService";
+
+function isApiError(err: unknown): err is ApiError {
+  return typeof err === "object" && err !== null && "statusCode" in err && "message" in err;
+}
 
 export function EditorPage() {
   const { documentId } = useParams<{ documentId: string }>();
@@ -117,8 +121,12 @@ export function EditorPage() {
               ? `Generated ${newSuggestions.length} new suggestion${newSuggestions.length > 1 ? "s" : ""}`
               : "No suggestions generated for this paragraph"
           );
-        } catch {
-          toast.error("Paragraph analysis failed — check your model configuration");
+        } catch (err) {
+          toast.error(
+            isApiError(err) && err.statusCode === 422
+              ? `Content blocked by safety filter: ${err.message}`
+              : "Paragraph analysis failed — check your model configuration"
+          );
         } finally {
           setIsParagraphAnalyzing(false);
           setReanalyzeParagraphId(null);
@@ -156,8 +164,12 @@ export function EditorPage() {
         suggestions.setParagraphs(mergedParagraphs);
 
         toast.success(`Found ${analysisResult.length} suggestions`);
-      } catch {
-        toast.error("Analysis failed — check your model configuration");
+      } catch (err) {
+        toast.error(
+          isApiError(err) && err.statusCode === 422
+            ? `Content blocked by safety filter: ${err.message}`
+            : "Analysis failed — check your model configuration"
+        );
       }
     },
     [doc, analysis, suggestions, reanalyzeParagraphId]

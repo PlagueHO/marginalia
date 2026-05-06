@@ -285,6 +285,26 @@ public sealed class DocumentsController : ControllerBase
                 userGuidance,
                 cancellationToken);
         }
+        catch (ContentFilterException ex)
+        {
+            var triggeredCategories = ex.FilterResults
+                .Where(f => f.Filtered)
+                .Select(f => new { category = f.Category, severity = f.Severity })
+                .ToList();
+
+            _logger.LogWarning(
+                "Content filter triggered for document: {DocumentId}, UserId: {UserId}, Categories: {Categories}",
+                id,
+                userId,
+                string.Join(", ", triggeredCategories.Select(c => $"{c.category}({c.severity})")));
+
+            return UnprocessableEntity(new
+            {
+                error = "The document content was blocked by the AI content safety filter.",
+                code = "content_filter",
+                categories = triggeredCategories
+            });
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Analysis failed for document: {DocumentId}, UserId: {UserId}", id, userId);
@@ -355,6 +375,27 @@ public sealed class DocumentsController : ControllerBase
                 contextParagraphs.AsReadOnly(),
                 userGuidance,
                 cancellationToken);
+        }
+        catch (ContentFilterException ex)
+        {
+            var triggeredCategories = ex.FilterResults
+                .Where(f => f.Filtered)
+                .Select(f => new { category = f.Category, severity = f.Severity })
+                .ToList();
+
+            _logger.LogWarning(
+                "Content filter triggered for paragraph: {ParagraphId}, DocumentId: {DocumentId}, UserId: {UserId}, Categories: {Categories}",
+                paragraphId,
+                id,
+                userId,
+                string.Join(", ", triggeredCategories.Select(c => $"{c.category}({c.severity})")));
+
+            return UnprocessableEntity(new
+            {
+                error = "The document content was blocked by the AI content safety filter.",
+                code = "content_filter",
+                categories = triggeredCategories
+            });
         }
         catch (Exception ex)
         {

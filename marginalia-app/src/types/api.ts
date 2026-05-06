@@ -54,6 +54,11 @@ export interface ApiError {
   statusCode: number;
 }
 
+export interface ContentFilterCategory {
+  category: string;
+  severity: string | null;
+}
+
 export interface AccessControlStatus {
   accessCodeRequired: boolean;
 }

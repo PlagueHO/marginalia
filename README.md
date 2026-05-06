@@ -41,7 +41,7 @@ For full setup instructions, see [docs/QUICKSTART-LOCAL.md](docs/QUICKSTART-LOCA
 ### Run Locally
 
 ```bash
-git clone https://github.com/marymacgregorreid/marginalia.git
+git clone https://github.com/PlagueHO/marginalia.git
 cd marginalia
 az login
 aspire run
@@ -114,12 +114,12 @@ For troubleshooting, credential configuration, and model overrides, see [Local D
 MIT
 
 <!-- Badge reference links -->
-[ci-shield]: https://img.shields.io/github/actions/workflow/status/marymacgregorreid/marginalia/continuous-integration.yml?branch=main&label=CI
-[ci-url]: https://github.com/marymacgregorreid/marginalia/actions/workflows/continuous-integration.yml
-[cd-shield]: https://img.shields.io/github/actions/workflow/status/marymacgregorreid/marginalia/continuous-delivery.yml?branch=main&label=CD
-[cd-url]: https://github.com/marymacgregorreid/marginalia/actions/workflows/continuous-delivery.yml
+[ci-shield]: https://img.shields.io/github/actions/workflow/status/PlagueHO/marginalia/continuous-integration.yml?branch=main&label=CI
+[ci-url]: https://github.com/PlagueHO/marginalia/actions/workflows/continuous-integration.yml
+[cd-shield]: https://img.shields.io/github/actions/workflow/status/PlagueHO/marginalia/continuous-delivery.yml?branch=main&label=CD
+[cd-url]: https://github.com/PlagueHO/marginalia/actions/workflows/continuous-delivery.yml
 [license-shield]: https://img.shields.io/badge/license-MIT-blue.svg
-[license-url]: https://github.com/marymacgregorreid/marginalia/blob/main/LICENSE
+[license-url]: https://github.com/PlagueHO/marginalia/blob/main/LICENSE
 [dotnet-shield]: https://img.shields.io/badge/.NET-10-512bd4?logo=dotnet
 [dotnet-url]: https://dotnet.microsoft.com/download/dotnet/10.0
 [node-shield]: https://img.shields.io/badge/Node.js-22%2B-5fa04e?logo=nodedotjs
@@ -130,12 +130,12 @@ MIT
 [react-url]: https://react.dev/
 [azure-shield]: https://img.shields.io/badge/Azure-Deployed-0078d4?logo=microsoftazure&logoColor=white
 [azure-url]: https://azure.microsoft.com/
-[issues-shield]: https://img.shields.io/github/issues/marymacgregorreid/marginalia
-[issues-url]: https://github.com/marymacgregorreid/marginalia/issues
+[issues-shield]: https://img.shields.io/github/issues/PlagueHO/marginalia
+[issues-url]: https://github.com/PlagueHO/marginalia/issues
 [prs-shield]: https://img.shields.io/badge/PRs-welcome-brightgreen.svg
-[prs-url]: https://github.com/marymacgregorreid/marginalia/pulls
-[stars-shield]: https://img.shields.io/github/stars/marymacgregorreid/marginalia?style=flat
-[stars-url]: https://github.com/marymacgregorreid/marginalia/stargazers
+[prs-url]: https://github.com/PlagueHO/marginalia/pulls
+[stars-shield]: https://img.shields.io/github/stars/PlagueHO/marginalia?style=flat
+[stars-url]: https://github.com/PlagueHO/marginalia/stargazers
 
 ---
 

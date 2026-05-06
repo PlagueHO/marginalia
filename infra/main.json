@@ -93,7 +93,7 @@
     },
     "containerImage": {
       "type": "string",
-      "defaultValue": "ghcr.io/marymacgregorreid/marginalia-service:latest",
+      "defaultValue": "ghcr.io/PlagueHO/marginalia-service:latest",
       "metadata": {
         "description": "Container image to deploy for the backend API Container App."
       }
