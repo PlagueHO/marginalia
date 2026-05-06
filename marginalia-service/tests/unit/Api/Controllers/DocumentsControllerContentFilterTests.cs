@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
+using System.Text.Json;
 
 namespace Marginalia.Tests.Unit.Api.Controllers;
 
@@ -86,6 +87,16 @@ public sealed class DocumentsControllerContentFilterTests
 
         var unprocessableResult = result.Result.Should().BeOfType<UnprocessableEntityObjectResult>().Subject;
         unprocessableResult.StatusCode.Should().Be(422);
+
+        var json = JsonSerializer.Serialize(unprocessableResult.Value);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        root.GetProperty("error").GetString().Should().NotBeNullOrEmpty();
+        root.GetProperty("code").GetString().Should().Be("content_filter");
+        var categories = root.GetProperty("categories").EnumerateArray().ToList();
+        categories.Should().HaveCount(1, "only filtered=true entries should be included");
+        categories[0].GetProperty("category").GetString().Should().Be("hate");
+        categories[0].GetProperty("severity").GetString().Should().Be("medium");
     }
 
     [TestMethod]
@@ -125,5 +136,15 @@ public sealed class DocumentsControllerContentFilterTests
 
         var unprocessableResult = result.Result.Should().BeOfType<UnprocessableEntityObjectResult>().Subject;
         unprocessableResult.StatusCode.Should().Be(422);
+
+        var json = JsonSerializer.Serialize(unprocessableResult.Value);
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        root.GetProperty("error").GetString().Should().NotBeNullOrEmpty();
+        root.GetProperty("code").GetString().Should().Be("content_filter");
+        var categories = root.GetProperty("categories").EnumerateArray().ToList();
+        categories.Should().HaveCount(1, "only filtered=true entries should be included");
+        categories[0].GetProperty("category").GetString().Should().Be("violence");
+        categories[0].GetProperty("severity").GetString().Should().Be("high");
     }
 }

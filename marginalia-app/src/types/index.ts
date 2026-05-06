@@ -11,5 +11,6 @@ export type {
   LlmHealthResult,
   ExportRequest,
   ApiError,
+  ContentFilterCategory,
   AccessControlStatus,
 } from "./api";
