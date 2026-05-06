@@ -20,7 +20,7 @@ param spaClientId = readEnvironmentVariable('AZURE_AD_SPA_CLIENT_ID', '')
 param staticWebAppLocation = toLower(readEnvironmentVariable('AZURE_STATIC_WEB_APP_LOCATION', ''))
 
 // Backend container image to deploy to Azure Container Apps
-param containerImage = readEnvironmentVariable('AZURE_CONTAINER_APP_IMAGE', 'ghcr.io/PlagueHO/marginalia-service:latest')
+param containerImage = readEnvironmentVariable('AZURE_CONTAINER_APP_IMAGE', 'ghcr.io/plagueho/marginalia-service:latest')
 
 // Optional access code for single-user mode protection
 param accessCode = readEnvironmentVariable('ACCESS_CODE', '')

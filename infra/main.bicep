@@ -53,7 +53,7 @@ param spaClientId string = ''
 param staticWebAppLocation string = ''
 
 @sys.description('Container image to deploy for the backend API Container App.')
-param containerImage string = 'ghcr.io/PlagueHO/marginalia-service:latest'
+param containerImage string = 'ghcr.io/plagueho/marginalia-service:latest'
 
 @sys.description('Optional access code to protect the application in single-user mode. Leave empty to disable.')
 @secure()
