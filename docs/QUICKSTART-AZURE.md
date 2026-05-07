@@ -51,6 +51,8 @@ az login
 azd auth login
 ```
 
+The `azd auth login` command is required to allow the Azure Developer CLI to provision resources in your subscription. The `az login` command is required to allow the pre provision hook to create Entra ID app registrations if you enable Entra ID authentication.
+
 ## 3. Create an environment
 
 Create a new `azd` environment. This stores your deployment configuration (subscription, region, resource group):
@@ -58,6 +60,9 @@ Create a new `azd` environment. This stores your deployment configuration (subsc
 ```bash
 azd env new <env-name>
 ```
+
+> [!NOTE]
+> The `<env-name>` is used as a prefix for all resource names. Use a short, lowercase name (e.g., `dev`, `test`, or `prod`). Use a name that will result in globally unique resource names.
 
 When prompted, select your Azure subscription and target region. The default region is **swedencentral**.
 
@@ -69,6 +74,11 @@ Provision infrastructure and deploy the application:
 azd up
 ```
 
+The command will then prompt you to select an Azure subscription and region if not already set in the environment.
+
+> [!IMPORTANT]
+> The region that is selected must have available quota for the `gpt-5.3-chat` model (GlobalStandard SKU). If you receive a quota error, try a different region (e.g., `eastus2` or `swedencentral`).
+
 This single command will:
 
 1. Provision all Azure resources via Bicep templates
@@ -79,12 +89,26 @@ This single command will:
 
 ### What gets provisioned
 
-| Resource | Type | Purpose |
-| --- | --- | --- |
-| `rg-<env-name>` | Resource Group | Contains all Marginalia resources |
-| Container App | Azure Container Apps | Hosts the Marginalia API |
-| Static Web App | Azure Static Web Apps | Hosts the React frontend |
-| AI Foundry (AIServices) | Azure AI Services | Provides `gpt-5.3-chat` chat model deployment |
+| Resource | Name | Type | Purpose |
+| --- | --- | --- | --- |
+| Resource Group | `rg-<env-name>` | Resource Group | Contains all Marginalia resources |
+| Virtual Network | `vnet-<env-name>` | Azure Virtual Network | Network isolation with dedicated ACA and private endpoint subnets |
+| Private DNS Zone (Cosmos DB) | `privatelink.documents.azure.com` | Azure Private DNS Zone | Resolves private Cosmos DB DNS names |
+| Private DNS Zone (AI Foundry) | `privatelink.cognitiveservices.azure.com` | Azure Private DNS Zone | Resolves private AI Foundry DNS names |
+| Private DNS Zone (OpenAI) | `privatelink.openai.azure.com` | Azure Private DNS Zone | Resolves private OpenAI endpoint DNS names |
+| Log Analytics Workspace | `log-<env-name>` | Azure Monitor | Centralizes logs and metrics from all resources |
+| Application Insights | `appi-<env-name>` | Azure Application Insights | Application performance monitoring for the API |
+| AI Foundry (AIServices) | `aif-<env-name>` | Azure AI Services | Provides `gpt-5.3-chat` chat model deployment |
+| Private Endpoint (AI Foundry) | `pe-<env-name>-foundry` | Azure Private Endpoint | Enables private network access to AI Foundry |
+| Cosmos DB Account | `cdb<resource-token>` | Azure Cosmos DB (Serverless) | Persists documents and user sessions |
+| Private Endpoint (Cosmos DB) | `pe-<env-name>-cosmosdb` | Azure Private Endpoint | Enables private network access to Cosmos DB |
+| Container Apps Environment | `cae-<env-name>` | Azure Container Apps | Shared environment for all container workloads |
+| Aspire Dashboard | `aspire-dashboard` | Azure Container Apps | OpenTelemetry dashboard for observability |
+| Container App (API) | `ca-<env-name>-api` | Azure Container Apps | Hosts the Marginalia API |
+| Static Web App | `stapp-<env-name>` | Azure Static Web Apps | Hosts the React frontend |
+
+> [!NOTE]
+> `<resource-token>` is a deterministic hash of the subscription ID, environment name, and region — guaranteeing a globally unique Cosmos DB account name.
 
 ### Access the deployed app
 
