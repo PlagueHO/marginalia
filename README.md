@@ -16,7 +16,7 @@
 
 Marginalia is an AI-powered editorial assistant for long-form writers. Upload a Word document or paste your draft, describe what you want improved, and let AI analyze your prose paragraph by paragraph — surfacing compressed narrative, inconsistent tone, awkward repetition, and opportunities for expansion. Review every suggestion with full rationale, accept or reject with a click, steer the AI with your own instructions, then export a polished `.docx` — all without losing your voice.
 
-![Marginalia — analyzing a manuscript with suggestions](docs/public/images/17-reanalysis-configured.png)
+![Marginalia — analyzing a manuscript with suggestions](docs/public/images/academic-analysis.png)
 
 ## How It Works
 
