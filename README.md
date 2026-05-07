@@ -11,6 +11,7 @@
 [![GitHub Issues][issues-shield]][issues-url]
 [![PRs Welcome][prs-shield]][prs-url]
 [![GitHub Stars][stars-shield]][stars-url]
+[![Docs][docs-shield]][docs-url]
 
 > *Your manuscript deserves more than a spell-checker.*
 
@@ -136,6 +137,8 @@ MIT
 [prs-url]: https://github.com/PlagueHO/marginalia/pulls
 [stars-shield]: https://img.shields.io/github/stars/PlagueHO/marginalia?style=flat
 [stars-url]: https://github.com/PlagueHO/marginalia/stargazers
+[docs-shield]: https://img.shields.io/badge/docs-online-purple?logo=readthedocs&logoColor=white
+[docs-url]: https://danielscottraynsford.com/marginalia
 
 ---
 
