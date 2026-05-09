@@ -4,6 +4,7 @@ import { useDocument } from "@/hooks/useDocument";
 import { useSuggestions } from "@/hooks/useSuggestions";
 import { useAnalysis } from "@/hooks/useAnalysis";
 import { useLlmConfig } from "@/hooks/useLlmConfig";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { AppHeader } from "@/components/AppHeader";
 import { MainLayout } from "@/components/MainLayout";
 import { DocumentUploader } from "@/components/DocumentUploader";
@@ -40,6 +41,35 @@ export function EditorPage() {
   } | null>(null);
   const [reanalyzeParagraphId, setReanalyzeParagraphId] = useState<string | null>(null);
   const [isParagraphAnalyzing, setIsParagraphAnalyzing] = useState(false);
+
+  const normalizedError = doc.error?.toLowerCase() ?? "";
+  const isManuscriptNotFound =
+    Boolean(documentId) &&
+    Boolean(doc.error) &&
+    (normalizedError.includes("404") || normalizedError.includes("not found"));
+
+  let pageTitle: string;
+  if (isManuscriptNotFound) {
+    pageTitle = "Manuscript not found";
+  } else if (documentId && !doc.document && doc.isLoading) {
+    pageTitle = "Loading Manuscript";
+  } else if (documentId && !doc.document) {
+    pageTitle = "Manuscript";
+  } else if (!documentId && doc.isLoading) {
+    pageTitle = "Loading Manuscript";
+  } else if (!documentId && !doc.document) {
+    pageTitle = "New Manuscript";
+  } else {
+    const documentName =
+      doc.document?.title?.trim() ||
+      doc.document?.filename?.trim() ||
+      "Untitled Manuscript";
+    pageTitle = documentId
+      ? `Manuscript: ${documentName}`
+      : `Editing: ${documentName}`;
+  }
+
+  usePageTitle(pageTitle);
 
   useEffect(() => {
     if (documentId && !doc.document) {

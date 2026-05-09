@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDocuments } from "@/hooks/useDocuments";
 import { useLlmConfig } from "@/hooks/useLlmConfig";
+import { usePageTitle } from "@/hooks/usePageTitle";
 import { cn, gradientText, mutedText } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import { AppHeader } from "@/components/AppHeader";
@@ -15,6 +16,9 @@ export function HomePage() {
   const { documents, isLoading, error, loadDocuments } = useDocuments();
   const navigate = useNavigate();
   const llmConfig = useLlmConfig();
+  const pageTitle = isLoading ? "Loading Manuscripts" : "Home";
+
+  usePageTitle(pageTitle);
 
   useEffect(() => {
     void loadDocuments();
