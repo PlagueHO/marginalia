@@ -29,6 +29,9 @@ on:
       ACCESS_CODE:
         description: "Optional access code to protect the application in single-user mode"
         required: false
+      AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN:
+        description: "Optional custom domain for the Static Web App"
+        required: false
 
 jobs:
   validate-prod-infrastructure:
@@ -61,6 +64,7 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
+      AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN: ${{ secrets.AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN }}
 
   deploy-prod-frontend:
     name: Deploy Prod Frontend

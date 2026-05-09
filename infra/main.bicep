@@ -52,6 +52,9 @@ param spaClientId string = ''
 ])
 param staticWebAppLocation string = ''
 
+@sys.description('Optional custom domain for the Static Web App. If empty, no custom domain is configured. Example: marginalia.danielscottraynsford.com')
+param staticWebAppCustomDomain string = ''
+
 @sys.description('Container image to deploy for the backend API Container App.')
 param containerImage string = 'ghcr.io/plagueho/marginalia-service:latest'
 
@@ -538,7 +541,9 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.0' = {
           ] : [])
           {
             name: 'CORS__AllowedOrigins'
-            value: 'https://${staticWebApp.outputs.defaultHostname}'
+            value: !empty(staticWebAppCustomDomain)
+              ? 'https://${staticWebApp.outputs.defaultHostname},https://${toLower(staticWebAppCustomDomain)}'
+              : 'https://${staticWebApp.outputs.defaultHostname}'
           }
         ]
       }
@@ -615,6 +620,12 @@ module staticWebApp 'br/public:avm/res/web/static-site:0.9.3' = {
   params: {
     name: staticWebAppName
     location: effectiveStaticWebAppLocation
+    customDomains: !empty(staticWebAppCustomDomain) ? [
+      {
+        name: toLower(staticWebAppCustomDomain)
+        validationMethod: 'cname-delegation'
+      }
+    ] : []
     tags: union(tags, {
       'azd-service-name': 'frontend'
     })

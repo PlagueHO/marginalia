@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.42.1.51946",
-      "templateHash": "5970998754236857442"
+      "version": "0.43.1.21952",
+      "templateHash": "13829018353207392702"
     },
     "name": "Cosmos DB SQL Role Assignments",
     "description": "Creates SQL data-plane role assignments on an existing Cosmos DB account without redeploying the account resource."

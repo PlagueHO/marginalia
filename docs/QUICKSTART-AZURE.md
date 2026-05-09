@@ -163,6 +163,7 @@ These values are set automatically by `azd` and do not need to be configured man
 | --- | --- | --- |
 | `AZURE_LOCATION` | `EastUS2` | Azure region for all resources |
 | `AZURE_STATIC_WEB_APP_LOCATION` | *(same as primary)* | Override region for the Static Web App. Must be one of: `centralus`, `eastasia`, `eastus2`, `westeurope`, `westus2` |
+| `AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN` | *(empty)* | Custom domain for the Static Web App (for example, `marginalia.danielscottraynsford.com`). If empty, no custom domain is configured. Requires DNS CNAME delegation to the Static Web App default hostname. |
 | `AZURE_CONTAINER_APP_IMAGE` | `ghcr.io/plagueho/marginalia-service:latest` | Container image to deploy to the backend Container App |
 | `ENABLE_PUBLIC_NETWORK_ACCESS` | `true` | Set to `false` to restrict all resources to private network access only |
 
@@ -176,6 +177,14 @@ These values are set automatically by `azd` and do not need to be configured man
 | `AZURE_AD_SPA_CLIENT_ID` | *(set by preprovision hook)* | SPA app registration client ID; written automatically when `ENABLE_ENTRA_AUTH=true` |
 
 See [Authentication](./AUTHENTICATION.md) for full details on each authentication mode and how to configure it.
+
+## CI/CD custom domain setup
+
+If you want to use a custom domain, such as `marginalia.danielscottraynsford.com`:
+
+1. In your DNS provider, create a CNAME record that points your custom domain to the Static Web App default hostname shown in the Azure portal.
+1. In GitHub, add a repository secret named `AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN` with your custom domain value.
+1. Trigger the deployment workflow. The provision step binds the custom domain to the Static Web App using CNAME delegation.
 
 ## Authentication
 

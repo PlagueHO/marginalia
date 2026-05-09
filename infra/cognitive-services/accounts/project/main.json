@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.42.1.51946",
-      "templateHash": "395518279760521492"
+      "version": "0.43.1.21952",
+      "templateHash": "7574679014623080548"
     },
     "name": "Cognitive Services Project",
     "description": "This module deploys a Project within a Cognitive Services account.\nIt allows for the creation of a Foundry Project with optional managed identities and role assignments.\n"
@@ -1871,8 +1871,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.42.1.51946",
-              "templateHash": "15974844605181325792"
+              "version": "0.43.1.21952",
+              "templateHash": "9100990861153397684"
             },
             "name": "Cognitive Services Project Capability Host",
             "description": "This module creates a capability host in a Cognitive Services project.\nProject-level capability hosts configure per-project storage backends for threads, vectors, and files,\nallowing different projects to use different storage connections.\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/capabilityhosts\n"
@@ -2133,8 +2133,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.42.1.51946",
-              "templateHash": "9942878697140635968"
+              "version": "0.43.1.21952",
+              "templateHash": "14466886527873389146"
             },
             "name": "Cognitive Services Application",
             "description": "This module creates an application within a Cognitive Services project.\nApplications are agentic application instances that can contain agent deployments.\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\n"

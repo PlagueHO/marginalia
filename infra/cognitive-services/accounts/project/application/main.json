@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.42.1.51946",
-      "templateHash": "9942878697140635968"
+      "version": "0.43.1.21952",
+      "templateHash": "14466886527873389146"
     },
     "name": "Cognitive Services Application",
     "description": "This module creates an application within a Cognitive Services project.\nApplications are agentic application instances that can contain agent deployments.\nSee: https://learn.microsoft.com/en-us/azure/templates/microsoft.cognitiveservices/accounts/projects/applications\n"
