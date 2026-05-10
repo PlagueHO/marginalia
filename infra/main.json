@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.43.1.21952",
-      "templateHash": "8227382114777083010"
+      "templateHash": "7039382214361402484"
     }
   },
   "parameters": {
@@ -34991,7 +34991,10 @@
           "location": {
             "value": "[variables('effectiveStaticWebAppLocation')]"
           },
-          "customDomains": "[if(not(empty(parameters('staticWebAppCustomDomain'))), createObject('value', createArray(createObject('name', toLower(parameters('staticWebAppCustomDomain')), 'validationMethod', 'cname-delegation'))), createObject('value', createArray()))]",
+          "customDomains": "[if(not(empty(parameters('staticWebAppCustomDomain'))), createObject('value', createArray(toLower(parameters('staticWebAppCustomDomain')))), createObject('value', createArray()))]",
+          "validationMethod": {
+            "value": "cname-delegation"
+          },
           "tags": {
             "value": "[union(variables('tags'), createObject('azd-service-name', 'frontend'))]"
           },

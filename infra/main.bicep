@@ -621,11 +621,9 @@ module staticWebApp 'br/public:avm/res/web/static-site:0.9.3' = {
     name: staticWebAppName
     location: effectiveStaticWebAppLocation
     customDomains: !empty(staticWebAppCustomDomain) ? [
-      {
-        name: toLower(staticWebAppCustomDomain)
-        validationMethod: 'cname-delegation'
-      }
+      toLower(staticWebAppCustomDomain)
     ] : []
+    validationMethod: 'cname-delegation'
     tags: union(tags, {
       'azd-service-name': 'frontend'
     })
