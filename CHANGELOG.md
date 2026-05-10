@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.9] - 2026-05-10
+
+### Added
+
+- Dynamic page titles that reflect the active page and selected item context.
+- User-facing handling for AI content filter blocks with structured API errors and categorized trigger details.
+
+### Changed
+
+- Added support for custom domains in Azure Static Web App deployment.
+- Refreshed documentation and visuals, including architecture and how-it-works diagrams, deployment guidance, and configuration notes.
+- Updated workflow actions, container image references, and template hashes used by deployment automation.
+
+### Fixed
+
+- Improved content filter log formatting and expanded related test and type export coverage.
+
+### Dependencies
+
+- Aligned Aspire package versions in `marginalia-service` to 13.2.4.
+
+### Removed
+
+- Outdated GitHub workflow files.
+- Accidentally committed `package-lock.json`; added ignore rules to prevent reintroduction.
+
+## [1.1.8] - 2026-04-13
+
 ### Added
 
 - `ContentFilterException` domain exception to represent Azure OpenAI content filter rejections with per-category filter results.
