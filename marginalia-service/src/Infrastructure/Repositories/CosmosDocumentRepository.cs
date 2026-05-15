@@ -59,6 +59,22 @@ public sealed class CosmosDocumentRepository : IDocumentRepository
         return documents.AsReadOnly();
     }
 
+    public async Task<IReadOnlyList<Document>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var query = new QueryDefinition("SELECT * FROM c");
+        var iterator = _container.GetItemQueryIterator<Document>(query);
+
+        var documents = new List<Document>();
+        while (iterator.HasMoreResults)
+        {
+            var response = await iterator.ReadNextAsync(cancellationToken);
+            documents.AddRange(response);
+        }
+
+        _logger.LogInformation("Retrieved {Count} documents from Cosmos across all users", documents.Count);
+        return documents.AsReadOnly();
+    }
+
     public async Task SaveAsync(Document document, CancellationToken cancellationToken = default)
     {
         await _container.UpsertItemAsync(

@@ -28,6 +28,12 @@ public sealed class InMemoryDocumentRepository : IDocumentRepository
         return Task.FromResult<IReadOnlyList<Document>>(userDocs);
     }
 
+    public Task<IReadOnlyList<Document>> GetAllAsync(CancellationToken cancellationToken = default)
+    {
+        var documents = _documents.Values.ToList().AsReadOnly();
+        return Task.FromResult<IReadOnlyList<Document>>(documents);
+    }
+
     public Task SaveAsync(Document document, CancellationToken cancellationToken = default)
     {
         _documents.AddOrUpdate(document.Id, document, (_, _) => document);

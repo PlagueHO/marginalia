@@ -9,6 +9,7 @@ public interface IDocumentRepository
 {
     Task<Document?> GetByIdAsync(string userId, string id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<Document>> GetByUserAsync(string userId, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Document>> GetAllAsync(CancellationToken cancellationToken = default);
     Task SaveAsync(Document document, CancellationToken cancellationToken = default);
     Task DeleteAsync(string userId, string id, CancellationToken cancellationToken = default);
 }
