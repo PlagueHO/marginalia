@@ -33,6 +33,12 @@ public sealed class DocumentRepositoryContractTests
             return Task.FromResult<IReadOnlyList<Document>>(userDocs);
         }
 
+        public Task<IReadOnlyList<Document>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            var allDocs = _documents.Values.ToList();
+            return Task.FromResult<IReadOnlyList<Document>>(allDocs);
+        }
+
         public Task SaveAsync(Document document, CancellationToken cancellationToken = default)
         {
             _documents[document.Id] = document;
@@ -131,6 +137,21 @@ public sealed class DocumentRepositoryContractTests
 
         resultA.Should().ContainSingle().Which.Id.Should().Be("doc-1");
         resultB.Should().ContainSingle().Which.Id.Should().Be("doc-2");
+    }
+
+    [TestMethod]
+    public async Task GetAllAsync_ReturnsDocumentsAcrossUsers()
+    {
+        var doc1 = CreateDocument("doc-1") with { UserId = "user-a" };
+        var doc2 = CreateDocument("doc-2") with { UserId = "user-b" };
+
+        await _repository.SaveAsync(doc1);
+        await _repository.SaveAsync(doc2);
+
+        var result = await _repository.GetAllAsync();
+
+        result.Should().HaveCount(2);
+        result.Select(d => d.Id).Should().Contain(["doc-1", "doc-2"]);
     }
 
     [TestMethod]
