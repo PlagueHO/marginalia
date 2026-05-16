@@ -751,6 +751,9 @@ public sealed class DocumentsController : ControllerBase
         }
         catch (ArgumentOutOfRangeException)
         {
+            // Malformed IFormFile-backed ZIP uploads can surface from ReferenceReadStream
+            // as ArgumentOutOfRangeException while ZipArchive parses the central directory,
+            // and returning null keeps malformed archives on the BadRequest path.
             return null;
         }
         catch (JsonException)

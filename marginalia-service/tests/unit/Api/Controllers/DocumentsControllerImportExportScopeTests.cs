@@ -129,7 +129,7 @@ public sealed class DocumentsControllerImportExportScopeTests
     }
 
     [TestMethod]
-    public async Task Import_InSingleUserMode_AssignsImportedManuscriptsToCurrentUser()
+    public async Task Import_InSingleUserMode_AssignsImportedManuscriptsToAnonymousWhenNoUserIdHeader()
     {
         _controller.ControllerContext.HttpContext.Request.Headers.Remove("X-User-Id");
         var savedDocuments = new List<Document>();
@@ -201,28 +201,28 @@ public sealed class DocumentsControllerImportExportScopeTests
 
     private static async Task<MemoryStream> BuildArchiveStreamAsync(IReadOnlyList<Document> documents)
     {
-        var archiveStream = new MemoryStream();
-
-        using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, leaveOpen: true))
-        {
-            var entry = archive.CreateEntry("manuscripts.json");
-            await using var entryStream = entry.Open();
-            await JsonSerializer.SerializeAsync(entryStream, documents, ArchiveSerializerOptions);
-        }
-
-        archiveStream.Position = 0;
-        return archiveStream;
+        return await BuildArchiveStreamAsync(
+            entryStream => JsonSerializer.SerializeAsync(entryStream, documents, ArchiveSerializerOptions));
     }
 
     private static async Task<MemoryStream> BuildArchiveStreamAsync(string manuscriptsJson)
+    {
+        return await BuildArchiveStreamAsync(async entryStream =>
+        {
+            await using var writer = new StreamWriter(entryStream);
+            await writer.WriteAsync(manuscriptsJson);
+        });
+    }
+
+    private static async Task<MemoryStream> BuildArchiveStreamAsync(Func<Stream, Task> writeArchiveEntryAsync)
     {
         var archiveStream = new MemoryStream();
 
         using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, leaveOpen: true))
         {
             var entry = archive.CreateEntry("manuscripts.json");
-            await using var writer = new StreamWriter(entry.Open());
-            await writer.WriteAsync(manuscriptsJson);
+            await using var entryStream = entry.Open();
+            await writeArchiveEntryAsync(entryStream);
         }
 
         archiveStream.Position = 0;
