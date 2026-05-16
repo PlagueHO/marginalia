@@ -129,7 +129,7 @@ public sealed class DocumentsControllerImportExportScopeTests
     }
 
     [TestMethod]
-    public async Task Import_InSingleUserMode_PreservesImportedOwnership()
+    public async Task Import_InSingleUserMode_AssignsImportedManuscriptsToCurrentUser()
     {
         _controller.ControllerContext.HttpContext.Request.Headers.Remove("X-User-Id");
         var savedDocuments = new List<Document>();
@@ -154,7 +154,32 @@ public sealed class DocumentsControllerImportExportScopeTests
         savedDocuments.Should().HaveCount(2);
         savedDocuments.Select(document => document.UserId)
             .Should()
-            .BeEquivalentTo(new[] { "user-bob", "user-charlie" });
+            .OnlyContain(userId => userId == "_anonymous");
+        savedDocuments.SelectMany(document => document.Suggestions)
+            .Should()
+            .OnlyContain(suggestion => suggestion.UserId == "_anonymous");
+    }
+
+    [TestMethod]
+    public async Task Import_WithMalformedZip_ReturnsBadRequest()
+    {
+        await using var fileStream = new MemoryStream("not a zip file"u8.ToArray());
+        var file = new FormFile(fileStream, 0, fileStream.Length, "file", "manuscripts.zip");
+
+        var result = await _controller.Import(file, CancellationToken.None);
+
+        result.Result.Should().BeOfType<BadRequestObjectResult>();
+    }
+
+    [TestMethod]
+    public async Task Import_WithInvalidJson_ReturnsBadRequest()
+    {
+        await using var fileStream = await BuildArchiveStreamAsync("{ invalid json");
+        var file = new FormFile(fileStream, 0, fileStream.Length, "file", "manuscripts.zip");
+
+        var result = await _controller.Import(file, CancellationToken.None);
+
+        result.Result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     private void CreateController(bool isMultiUserMode)
@@ -183,6 +208,21 @@ public sealed class DocumentsControllerImportExportScopeTests
             var entry = archive.CreateEntry("manuscripts.json");
             await using var entryStream = entry.Open();
             await JsonSerializer.SerializeAsync(entryStream, documents, ArchiveSerializerOptions);
+        }
+
+        archiveStream.Position = 0;
+        return archiveStream;
+    }
+
+    private static async Task<MemoryStream> BuildArchiveStreamAsync(string manuscriptsJson)
+    {
+        var archiveStream = new MemoryStream();
+
+        using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var entry = archive.CreateEntry("manuscripts.json");
+            await using var writer = new StreamWriter(entry.Open());
+            await writer.WriteAsync(manuscriptsJson);
         }
 
         archiveStream.Position = 0;

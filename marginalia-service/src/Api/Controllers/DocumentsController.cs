@@ -621,7 +621,7 @@ public sealed class DocumentsController : ControllerBase
 
     /// <summary>
     /// Import manuscripts from a ZIP archive.
-    /// In single-user mode preserves source ownership; in multi-user mode imports all manuscripts under the current user.
+    /// Imports manuscripts under the current request user, defaulting to _anonymous when no user identity is provided.
     /// </summary>
     [HttpPost("import")]
     [RequestSizeLimit(MaxArchiveSizeBytes)]
@@ -664,7 +664,7 @@ public sealed class DocumentsController : ControllerBase
 
         foreach (var document in documents)
         {
-            var normalizedDocument = NormalizeImportedDocument(document, userId, multiUserMode, importedAt);
+            var normalizedDocument = NormalizeImportedDocument(document, userId, importedAt);
             await _documentRepository.SaveAsync(normalizedDocument, cancellationToken);
             importedCount++;
         }
@@ -721,29 +721,42 @@ public sealed class DocumentsController : ControllerBase
         Stream archiveStream,
         CancellationToken cancellationToken)
     {
-        using var zipArchive = new ZipArchive(archiveStream, ZipArchiveMode.Read, leaveOpen: false);
-        var manuscriptsEntries = zipArchive.Entries
-            .Where(entry => string.Equals(entry.FullName, "manuscripts.json", StringComparison.OrdinalIgnoreCase))
-            .ToList();
+        try
+        {
+            using var zipArchive = new ZipArchive(archiveStream, ZipArchiveMode.Read, leaveOpen: false);
+            var manuscriptsEntries = zipArchive.Entries
+                .Where(entry => string.Equals(entry.FullName, "manuscripts.json", StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-        if (manuscriptsEntries.Count != 1)
+            if (manuscriptsEntries.Count != 1)
+            {
+                return null;
+            }
+
+            var manuscriptsEntry = manuscriptsEntries[0];
+            if (manuscriptsEntry.Length is <= 0 or > MaxArchiveSizeBytes)
+            {
+                return null;
+            }
+
+            await using var entryStream = manuscriptsEntry.Open();
+            return await JsonSerializer.DeserializeAsync<List<Document>>(
+                entryStream,
+                ArchiveSerializerOptions,
+                cancellationToken);
+        }
+        catch (InvalidDataException)
         {
             return null;
         }
-
-        var manuscriptsEntry = manuscriptsEntries[0];
-        if (manuscriptsEntry.Length is <= 0 or > MaxArchiveSizeBytes)
+        catch (ArgumentOutOfRangeException)
         {
             return null;
         }
-
-        await using var entryStream = manuscriptsEntry.Open();
-        var documents = await JsonSerializer.DeserializeAsync<List<Document>>(
-            entryStream,
-            ArchiveSerializerOptions,
-            cancellationToken);
-
-        return documents;
+        catch (JsonException)
+        {
+            return null;
+        }
     }
 
     private static IReadOnlyList<Document> SanitizeMultiUserExport(IReadOnlyList<Document> documents, string userId)
@@ -767,10 +780,9 @@ public sealed class DocumentsController : ControllerBase
     private static Document NormalizeImportedDocument(
         Document sourceDocument,
         string currentUserId,
-        bool multiUserMode,
         DateTimeOffset importedAt)
     {
-        var targetUserId = multiUserMode ? currentUserId : NormalizeUserId(sourceDocument.UserId);
+        var targetUserId = NormalizeUserId(currentUserId);
         var normalizedDocumentId = Guid.NewGuid().ToString("N");
 
         var normalizedParagraphs = (sourceDocument.Paragraphs ?? [])
