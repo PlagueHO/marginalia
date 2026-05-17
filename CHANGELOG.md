@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-18
+
+### Added
+
+- `Marginalia.Tools.Cli` — a new command-line tool for importing and exporting documents
+  via the Marginalia API, with job status polling and unit test coverage.
+- Mode-aware user scoping for bulk import/export: single-user mode exports/imports all
+  manuscripts while multi-user mode is restricted to the current user's data. Includes
+  import normalization to prevent cross-user data leakage.
+- GitHub App scripts for automation support.
+
+### Changed
+
+- Removed custom domain secret from deployment configuration.
+- Normalized markdown documentation filename casing.
+- Updated package versions across project files.
+
 ## [1.1.10] - 2026-05-10
 
 ### Changed
