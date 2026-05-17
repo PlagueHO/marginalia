@@ -2,7 +2,7 @@
 
 Get Marginalia running locally using .NET Aspire. Aspire orchestrates all services (API, frontend, Azure AI Foundry) with a single command — including dependency installation, builds, and service startup.
 
-> **Looking to deploy to Azure?** See [Deploy to Azure with Azure Developer CLI](QUICKSTART-AZURE.md).
+> **Looking to deploy to Azure?** See [Deploy to Azure with Azure Developer CLI](quickstart-azure.md).
 
 ## Prerequisites
 
@@ -232,5 +232,5 @@ pnpm test
 
 ## Next steps
 
-- **Deploy to Azure** — see [Deploy to Azure with Azure Developer CLI](QUICKSTART-AZURE.md) (coming soon).
-- **Architecture** — read the [PRD](./design/PRD.md) for product requirements and design context.
+- **Deploy to Azure** — see [Deploy to Azure with Azure Developer CLI](quickstart-azure.md) (coming soon).
+- **Architecture** — read the [PRD](./design/prd.md) for product requirements and design context.

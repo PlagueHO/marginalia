@@ -10,10 +10,6 @@ export default defineConfig({
   appearance: 'auto',
   ignoreDeadLinks: [/^\.\.\//, /^\.\/\.\.\//],
 
-  head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/marginalia/favicon.svg' }],
-  ],
-
   themeConfig: {
     nav: [
       { text: 'User Guide', link: '/user-guide' },
@@ -30,16 +26,17 @@ export default defineConfig({
         ],
       },
       {
-        text: 'User Guide',
-        items: [{ text: 'Using Marginalia', link: '/user-guide' }],
+        text: 'Using Marginalia',
+        items: [{ text: 'User Guide', link: '/user-guide' }],
       },
       {
-        text: 'Reference',
-        items: [
-          { text: 'Authentication', link: '/authentication' },
-          { text: 'Testing Guide', link: '/testing' }
-        ],
-      }
+        text: 'Configuration',
+        items: [{ text: 'Authentication', link: '/authentication' }],
+      },
+      {
+        text: 'Design',
+        items: [{ text: 'Product Requirements', link: '/design/prd' }],
+      },
     ],
 
     socialLinks: [
