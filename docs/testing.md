@@ -5,13 +5,13 @@ author: Marginalia Team
 ms.date: 2026-05-17
 ms.topic: how-to
 keywords:
-	- testing
-	- unit tests
-	- integration tests
-	- smoke tests
-	- vitest
-	- mstest
-	- aspire
+  - testing
+  - unit tests
+  - integration tests
+  - smoke tests
+  - vitest
+  - mstest
+  - aspire
 estimated_reading_time: 8
 ---
 
