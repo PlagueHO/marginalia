@@ -77,6 +77,13 @@ builder.Services.AddSingleton<ISessionRepository>(sp =>
 });
 builder.Services.AddSingleton<IWordDocumentService, WordDocumentService>();
 builder.Services.AddSingleton<SuggestionMergeService>();
+builder.Services.AddSingleton<IImportExportJobRepository, InMemoryImportExportJobRepository>();
+builder.Services.AddSingleton<IImportExportJobQueue, InMemoryImportExportJobQueue>();
+builder.Services.AddSingleton<IExportService, ExportService>();
+builder.Services.AddSingleton<IImportService, ImportService>();
+builder.Services.AddSingleton<ExportJobProcessor>();
+builder.Services.AddSingleton<ImportJobProcessor>();
+builder.Services.AddHostedService<ImportExportBackgroundWorker>();
 builder.Services.AddHttpClient();
 
 // Named HttpClient for LLM fallback — the standard resilience handler's 30s

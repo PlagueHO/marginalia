@@ -27,7 +27,7 @@
     <!-- Azure / AI (Aspire client integrations) -->
     <PackageVersion Include="Aspire.Azure.AI.Inference" Version="13.3.3-preview.1.26264.13" />
     <PackageVersion Include="Azure.Identity" Version="1.19.0" />
-    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.2.0" />
+    <PackageVersion Include="Microsoft.Extensions.AI.Abstractions" Version="10.5.0" />
     <!-- Testing -->
     <PackageVersion Include="MSTest" Version="4.1.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />

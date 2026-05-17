@@ -3,19 +3,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/sonner";
 import { EditorPage } from "@/pages/EditorPage";
 import { HomePage } from "@/pages/HomePage";
+import { SettingsPage } from "@/pages/SettingsPage";
 import { AccessCodeDialog } from "@/components/AccessCodeDialog";
+import { AppLoadingScreen } from "@/components/AppLoadingScreen";
 import { useAccessCode } from "@/hooks/useAccessCode";
-import { Loader2 } from "lucide-react";
 
 function App() {
   const { accessCodeRequired, isVerified, isLoading, error, submitCode } = useAccessCode();
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" aria-label="Loading" />
-      </div>
-    );
+    return <AppLoadingScreen />;
   }
 
   if (accessCodeRequired && !isVerified) {
@@ -36,6 +33,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/new" element={<EditorPage />} />
           <Route path="/editor/:documentId" element={<EditorPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
         </Routes>
         <Toaster richColors position="bottom-right" />
       </TooltipProvider>

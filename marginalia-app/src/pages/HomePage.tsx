@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDocuments } from "@/hooks/useDocuments";
-import { useLlmConfig } from "@/hooks/useLlmConfig";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { cn, gradientText, mutedText } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
@@ -15,7 +14,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 export function HomePage() {
   const { documents, isLoading, error, loadDocuments } = useDocuments();
   const navigate = useNavigate();
-  const llmConfig = useLlmConfig();
   const pageTitle = isLoading ? "Loading Manuscripts" : "Home";
 
   usePageTitle(pageTitle);
@@ -26,13 +24,7 @@ export function HomePage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <AppHeader
-        llmConfig={llmConfig.config}
-        isConfigLoading={llmConfig.isLoading}
-        isCheckingHealth={llmConfig.isCheckingHealth}
-        healthResult={llmConfig.healthResult}
-        onCheckHealth={llmConfig.checkHealth}
-      />
+      <AppHeader />
 
       <div className="flex-1 overflow-auto">
         <div className="flex flex-col items-center gap-8 w-full max-w-4xl mx-auto px-4 py-12">

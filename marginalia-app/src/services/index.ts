@@ -14,7 +14,13 @@ export {
 } from "./suggestionService";
 export {
   getAccessStatus,
-  getLlmConfig,
   checkHealth,
 } from "./configService";
 export { createSession, getSession } from "./sessionService";
+export {
+  startExport,
+  getExportJob,
+  downloadExport,
+  startImport,
+  getImportJob,
+} from "./exportImportService";

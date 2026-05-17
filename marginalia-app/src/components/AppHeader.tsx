@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn, gradientText } from "@/lib/utils";
@@ -22,32 +21,17 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { LlmConfigDialog } from "./LlmConfigDialog";
-import type { LlmConfig, LlmHealthResult } from "@/types";
 
-interface AppHeaderProps {
-  llmConfig: LlmConfig;
-  isConfigLoading: boolean;
-  isCheckingHealth: boolean;
-  healthResult: LlmHealthResult | null;
-  onCheckHealth: () => Promise<void>;
-}
-
-export function AppHeader({
-  llmConfig,
-  isConfigLoading,
-  isCheckingHealth,
-  healthResult,
-  onCheckHealth,
-}: AppHeaderProps) {
-  const [isConfigOpen, setIsConfigOpen] = useState(false);
+export function AppHeader() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const isHome = location.pathname === "/";
   const isNew = location.pathname === "/new";
@@ -105,55 +89,63 @@ export function AppHeader({
             <Button
               variant="ghost"
               size="icon"
-              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
               onClick={toggleTheme}
             >
-              {theme === "dark" ? (
+              {resolvedTheme === "dark" ? (
                 <Sun className="h-5 w-5" aria-hidden="true" />
               ) : (
                 <Moon className="h-5 w-5" aria-hidden="true" />
               )}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{theme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
+          <TooltipContent>{resolvedTheme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
         </Tooltip>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               aria-label="User menu"
-              className="rounded-full"
+              className="gap-2 opacity-60"
+              title="Entra ID SSO is not enabled. Running in anonymous single-user mode."
             >
-              <CircleUser className="h-5 w-5" />
+              <CircleUser className="size-5" />
+              <span className="text-sm">Anonymous</span>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem
-              onClick={() => setIsConfigOpen(true)}
-              className="gap-2"
-            >
-              <Settings className="h-4 w-4" aria-hidden="true" />
-              Settings
-            </DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">Anonymous Mode</p>
+                <p className="text-xs leading-none text-muted-foreground">
+                  Entra ID SSO is not configured.
+                </p>
+              </div>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem disabled className="gap-2">
-              <LogIn className="h-4 w-4" aria-hidden="true" />
-              Sign In
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => void navigate("/settings")}
+                className="gap-2"
+              >
+                <Settings className="size-4" aria-hidden="true" />
+                Settings
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              disabled
+              className="gap-2"
+              title="Enable Entra ID SSO to sign in. See QUICKSTART-AZURE.md for setup instructions."
+            >
+              <LogIn className="size-4" aria-hidden="true" />
+              Sign in
+              <span className="ml-auto text-xs text-muted-foreground">Disabled</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-
-        <LlmConfigDialog
-          open={isConfigOpen}
-          onOpenChange={setIsConfigOpen}
-          config={llmConfig}
-          isLoading={isConfigLoading}
-          isCheckingHealth={isCheckingHealth}
-          healthResult={healthResult}
-          onCheckHealth={onCheckHealth}
-        />
       </div>
     </header>
   );

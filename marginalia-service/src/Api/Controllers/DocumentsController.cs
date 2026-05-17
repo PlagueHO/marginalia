@@ -1,6 +1,3 @@
-using System.IO.Compression;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Marginalia.Domain.Interfaces;
 using Marginalia.Domain.Models;
 using Marginalia.Infrastructure.Services;
@@ -12,19 +9,12 @@ namespace Marginalia.Api.Controllers;
 [Route("api/[controller]")]
 public sealed class DocumentsController : ControllerBase
 {
-    private const long MaxArchiveSizeBytes = 52_428_800; // 50 MB
-    private static readonly JsonSerializerOptions ArchiveSerializerOptions = new(JsonSerializerDefaults.Web)
-    {
-        Converters = { new JsonStringEnumConverter() }
-    };
-
     private readonly IDocumentRepository _documentRepository;
     private readonly ISessionRepository _sessionRepository;
     private readonly ISuggestionService _suggestionService;
     private readonly IWordDocumentService _wordDocumentService;
     private readonly SuggestionMergeService _suggestionMergeService;
     private readonly ILogger<DocumentsController> _logger;
-    private readonly Func<bool> _isMultiUserModeProvider;
 
     public DocumentsController(
         IDocumentRepository documentRepository,
@@ -32,8 +22,7 @@ public sealed class DocumentsController : ControllerBase
         ISuggestionService suggestionService,
         IWordDocumentService wordDocumentService,
         SuggestionMergeService suggestionMergeService,
-        ILogger<DocumentsController> logger,
-        Func<bool>? isMultiUserModeProvider = null)
+        ILogger<DocumentsController> logger)
     {
         _documentRepository = documentRepository;
         _sessionRepository = sessionRepository;
@@ -41,7 +30,6 @@ public sealed class DocumentsController : ControllerBase
         _wordDocumentService = wordDocumentService;
         _suggestionMergeService = suggestionMergeService;
         _logger = logger;
-        _isMultiUserModeProvider = isMultiUserModeProvider ?? IsMultiUserModeFromEnvironment;
     }
 
     private static string GetUserId(HttpRequest request)
@@ -52,16 +40,6 @@ public sealed class DocumentsController : ControllerBase
             return userIdHeader.ToString();
         }
         return "_anonymous";
-    }
-
-    private static bool IsMultiUserModeFromEnvironment()
-    {
-        if (bool.TryParse(Environment.GetEnvironmentVariable("ENABLE_ENTRA_AUTH"), out var entraAuthEnabled))
-        {
-            return entraAuthEnabled;
-        }
-
-        return !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("AzureAd__ClientId"));
     }
 
     /// <summary>
@@ -581,102 +559,6 @@ public sealed class DocumentsController : ControllerBase
         return NoContent();
     }
 
-    /// <summary>
-    /// Export manuscripts as a ZIP archive.
-    /// In single-user mode exports all manuscripts; in multi-user mode exports only the current user's manuscripts.
-    /// </summary>
-    [HttpGet("export")]
-    public async Task<IActionResult> ExportAll(CancellationToken cancellationToken)
-    {
-        var userId = GetUserId(Request);
-        var multiUserMode = _isMultiUserModeProvider();
-
-        if (multiUserMode && string.Equals(userId, "_anonymous", StringComparison.Ordinal))
-        {
-            _logger.LogWarning("Bulk export rejected in multi-user mode due to missing user identity.");
-            return Unauthorized(new { error = "X-User-Id header is required in multi-user mode." });
-        }
-
-        var documents = multiUserMode
-            ? await _documentRepository.GetByUserAsync(userId, cancellationToken)
-            : await _documentRepository.GetAllAsync(cancellationToken);
-
-        var exportDocuments = multiUserMode
-            ? SanitizeMultiUserExport(documents, userId)
-            : documents;
-
-        var archiveStream = await BuildArchiveAsync(exportDocuments, cancellationToken);
-
-        _logger.LogInformation(
-            "Bulk export requested: {DocumentCount} documents, UserId: {UserId}, MultiUserMode: {MultiUserMode}",
-            exportDocuments.Count,
-            userId,
-            multiUserMode);
-
-        return File(
-            archiveStream,
-            "application/zip",
-            $"manuscripts-{DateTimeOffset.UtcNow:yyyyMMddHHmmss}.zip");
-    }
-
-    /// <summary>
-    /// Import manuscripts from a ZIP archive.
-    /// Imports manuscripts under the current request user, defaulting to _anonymous when no user identity is provided.
-    /// </summary>
-    [HttpPost("import")]
-    [RequestSizeLimit(MaxArchiveSizeBytes)]
-    public async Task<ActionResult<ImportDocumentsResponse>> Import(IFormFile file, CancellationToken cancellationToken)
-    {
-        if (file is null || file.Length == 0)
-        {
-            return BadRequest(new { error = "No file provided." });
-        }
-
-        if (file.Length > MaxArchiveSizeBytes)
-        {
-            return BadRequest(new { error = "Archive exceeds the 50 MB size limit." });
-        }
-
-        if (!file.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
-        {
-            return BadRequest(new { error = "Only .zip files are supported for manuscript import." });
-        }
-
-        var userId = GetUserId(Request);
-        var multiUserMode = _isMultiUserModeProvider();
-
-        if (multiUserMode && string.Equals(userId, "_anonymous", StringComparison.Ordinal))
-        {
-            _logger.LogWarning("Bulk import rejected in multi-user mode due to missing user identity.");
-            return Unauthorized(new { error = "X-User-Id header is required in multi-user mode." });
-        }
-
-        await using var archiveStream = file.OpenReadStream();
-        var documents = await ReadArchiveAsync(archiveStream, cancellationToken);
-        if (documents is null)
-        {
-            _logger.LogWarning("Bulk import rejected: invalid archive format. UserId: {UserId}", userId);
-            return BadRequest(new { error = "Archive must contain exactly one manuscripts.json file with valid document data." });
-        }
-
-        var importedCount = 0;
-        var importedAt = DateTimeOffset.UtcNow;
-
-        foreach (var document in documents)
-        {
-            var normalizedDocument = NormalizeImportedDocument(document, userId, importedAt);
-            await _documentRepository.SaveAsync(normalizedDocument, cancellationToken);
-            importedCount++;
-        }
-
-        _logger.LogInformation(
-            "Bulk import completed: {ImportedCount} documents, UserId: {UserId}, MultiUserMode: {MultiUserMode}",
-            importedCount,
-            userId,
-            multiUserMode);
-
-        return Ok(new ImportDocumentsResponse { ImportedCount = importedCount });
-    }
 
     /// <summary>
     /// Export the document as a .docx file with accepted suggestions applied.
@@ -698,144 +580,6 @@ public sealed class DocumentsController : ControllerBase
         var exportFilename = Path.GetFileNameWithoutExtension(document.Filename) + "-revised.docx";
 
         return File(stream, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", exportFilename);
-    }
-
-    private static async Task<MemoryStream> BuildArchiveAsync(
-        IReadOnlyList<Document> documents,
-        CancellationToken cancellationToken)
-    {
-        var archiveStream = new MemoryStream();
-
-        using (var zipArchive = new ZipArchive(archiveStream, ZipArchiveMode.Create, leaveOpen: true))
-        {
-            var manuscriptsEntry = zipArchive.CreateEntry("manuscripts.json", CompressionLevel.Optimal);
-            await using var entryStream = manuscriptsEntry.Open();
-            await JsonSerializer.SerializeAsync(entryStream, documents, ArchiveSerializerOptions, cancellationToken);
-        }
-
-        archiveStream.Position = 0;
-        return archiveStream;
-    }
-
-    private static async Task<IReadOnlyList<Document>?> ReadArchiveAsync(
-        Stream archiveStream,
-        CancellationToken cancellationToken)
-    {
-        try
-        {
-            using var zipArchive = new ZipArchive(archiveStream, ZipArchiveMode.Read, leaveOpen: false);
-            var manuscriptsEntries = zipArchive.Entries
-                .Where(entry => string.Equals(entry.FullName, "manuscripts.json", StringComparison.OrdinalIgnoreCase))
-                .ToList();
-
-            if (manuscriptsEntries.Count != 1)
-            {
-                return null;
-            }
-
-            var manuscriptsEntry = manuscriptsEntries[0];
-            if (manuscriptsEntry.Length is <= 0 or > MaxArchiveSizeBytes)
-            {
-                return null;
-            }
-
-            await using var entryStream = manuscriptsEntry.Open();
-            return await JsonSerializer.DeserializeAsync<List<Document>>(
-                entryStream,
-                ArchiveSerializerOptions,
-                cancellationToken);
-        }
-        catch (InvalidDataException)
-        {
-            return null;
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            // Malformed IFormFile-backed ZIP uploads can surface from ReferenceReadStream
-            // as ArgumentOutOfRangeException while ZipArchive parses the central directory,
-            // and returning null keeps malformed archives on the BadRequest path.
-            return null;
-        }
-        catch (JsonException)
-        {
-            return null;
-        }
-    }
-
-    private static IReadOnlyList<Document> SanitizeMultiUserExport(IReadOnlyList<Document> documents, string userId)
-    {
-        return documents
-            .Where(document => string.Equals(document.UserId, userId, StringComparison.Ordinal))
-            .Select(document => document with
-            {
-                UserId = userId,
-                Suggestions = (document.Suggestions ?? [])
-                    .Where(suggestion =>
-                        string.Equals(suggestion.UserId, userId, StringComparison.Ordinal) &&
-                        string.Equals(suggestion.DocumentId, document.Id, StringComparison.Ordinal))
-                    .ToList()
-                    .AsReadOnly()
-            })
-            .ToList()
-            .AsReadOnly();
-    }
-
-    private static Document NormalizeImportedDocument(
-        Document sourceDocument,
-        string currentUserId,
-        DateTimeOffset importedAt)
-    {
-        var targetUserId = NormalizeUserId(currentUserId);
-        var normalizedDocumentId = Guid.NewGuid().ToString("N");
-
-        var normalizedParagraphs = (sourceDocument.Paragraphs ?? [])
-            .Select(paragraph => new Paragraph
-            {
-                Id = string.IsNullOrWhiteSpace(paragraph.Id) ? Guid.NewGuid().ToString("N") : paragraph.Id,
-                Text = paragraph.Text ?? string.Empty
-            })
-            .ToList()
-            .AsReadOnly();
-
-        var validParagraphIds = normalizedParagraphs
-            .Select(paragraph => paragraph.Id)
-            .ToHashSet(StringComparer.Ordinal);
-
-        var normalizedSuggestions = (sourceDocument.Suggestions ?? [])
-            .Select(suggestion => new Suggestion
-            {
-                Id = Guid.NewGuid().ToString("N"),
-                UserId = targetUserId,
-                DocumentId = normalizedDocumentId,
-                ParagraphId = validParagraphIds.Contains(suggestion.ParagraphId) ? suggestion.ParagraphId : string.Empty,
-                Rationale = suggestion.Rationale ?? string.Empty,
-                ProposedChange = suggestion.ProposedChange ?? string.Empty,
-                Status = suggestion.Status,
-                UserSteeringInput = suggestion.UserSteeringInput
-            })
-            .ToList()
-            .AsReadOnly();
-
-        return new Document
-        {
-            Id = normalizedDocumentId,
-            UserId = targetUserId,
-            Filename = string.IsNullOrWhiteSpace(sourceDocument.Filename)
-                ? $"{normalizedDocumentId}.docx"
-                : sourceDocument.Filename,
-            Source = sourceDocument.Source,
-            Title = sourceDocument.Title ?? string.Empty,
-            Status = sourceDocument.Status,
-            CreatedAt = importedAt,
-            UpdatedAt = importedAt,
-            Paragraphs = normalizedParagraphs,
-            Suggestions = normalizedSuggestions
-        };
-    }
-
-    private static string NormalizeUserId(string? userId)
-    {
-        return string.IsNullOrWhiteSpace(userId) ? "_anonymous" : userId;
     }
 
     private static string? CombineGuidance(string? instructions, string? tone)

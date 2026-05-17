@@ -18,4 +18,10 @@
     <ProjectReference Include="..\Domain\Marginalia.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="TypeInspectorApp\**" />
+    <EmbeddedResource Remove="TypeInspectorApp\**" />
+    <None Remove="TypeInspectorApp\**" />
+  </ItemGroup>
+
 </Project>

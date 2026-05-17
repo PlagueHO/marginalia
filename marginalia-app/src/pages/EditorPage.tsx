@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useDocument } from "@/hooks/useDocument";
 import { useSuggestions } from "@/hooks/useSuggestions";
 import { useAnalysis } from "@/hooks/useAnalysis";
-import { useLlmConfig } from "@/hooks/useLlmConfig";
 import { usePageTitle } from "@/hooks/usePageTitle";
 import { AppHeader } from "@/components/AppHeader";
 import { MainLayout } from "@/components/MainLayout";
@@ -32,7 +31,6 @@ export function EditorPage() {
   const doc = useDocument();
   const suggestions = useSuggestions();
   const analysis = useAnalysis();
-  const llmConfig = useLlmConfig();
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [pendingAnalysisParams, setPendingAnalysisParams] = useState<{
@@ -155,7 +153,7 @@ export function EditorPage() {
           toast.error(
             isApiError(err) && err.statusCode === 422
               ? `Content blocked by safety filter: ${err.message}`
-              : "Paragraph analysis failed — check your model configuration"
+              : "Paragraph analysis failed — check backend connection"
           );
         } finally {
           setIsParagraphAnalyzing(false);
@@ -198,7 +196,7 @@ export function EditorPage() {
         toast.error(
           isApiError(err) && err.statusCode === 422
             ? `Content blocked by safety filter: ${err.message}`
-            : "Analysis failed — check your model configuration"
+            : "Analysis failed — check backend connection"
         );
       }
     },
@@ -391,13 +389,7 @@ export function EditorPage() {
 
   return (
     <div className="flex flex-col h-screen">
-      <AppHeader
-        llmConfig={llmConfig.config}
-        isConfigLoading={llmConfig.isLoading}
-        isCheckingHealth={llmConfig.isCheckingHealth}
-        healthResult={llmConfig.healthResult}
-        onCheckHealth={llmConfig.checkHealth}
-      />
+      <AppHeader />
 
       {error && (
         <Alert variant="destructive" className="rounded-none">

@@ -17,6 +17,35 @@ export interface DocumentListResponse {
   documents: DocumentSummary[];
 }
 
+export interface ImportDocumentsResponse {
+  importedCount: number;
+}
+
+export type ImportExportJobType = "Export" | "Import";
+export type JobStatus = "Queued" | "Running" | "Completed" | "Failed" | "Cancelled";
+
+export interface ImportExportCounts {
+  documentsImported: number;
+  documentsSkipped: number;
+  failed: number;
+}
+
+export interface ImportExportJob {
+  id: string;
+  jobType: ImportExportJobType;
+  status: JobStatus;
+  createdAt: string;
+  startedAt?: string;
+  completedAt?: string;
+  progressPercentage: number;
+  currentStage?: string;
+  totalItems: number;
+  processedItems: number;
+  errorMessage?: string;
+  overwriteExisting: boolean;
+  counts?: ImportExportCounts;
+}
+
 export interface AnalyzeRequest {
   documentId: string;
   userInstructions?: string;
@@ -30,13 +59,6 @@ export interface AnalyzeRequest {
 export interface SuggestionUpdateRequest {
   status: SuggestionStatus;
   userSteeringInput?: string;
-}
-
-export interface LlmConfig {
-  endpoint?: string;
-  modelName?: string;
-  authMethod?: string;
-  isConfigured?: boolean;
 }
 
 export interface LlmHealthResult {
