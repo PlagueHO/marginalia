@@ -12,7 +12,7 @@ import {
   getAccessCode,
 } from '@/services/api'
 import { uploadDocument, pasteDocument, analyzeDocument, deleteDocument } from '@/services/documentService'
-import { getLlmConfig, checkHealth, getAccessStatus } from '@/services/configService'
+import { checkHealth, getAccessStatus } from '@/services/configService'
 import { updateSuggestionStatus } from '@/services/suggestionService'
 
 // Mock global fetch
@@ -344,26 +344,6 @@ describe('Document service', () => {
 })
 
 describe('Config service', () => {
-  it('getLlmConfig fetches from correct endpoint', async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      status: 200,
-      json: () =>
-        Promise.resolve({
-          endpoint: 'https://foundry.azure.com',
-          modelName: 'gpt-4o',
-        }),
-    })
-
-    const config = await getLlmConfig()
-
-    expect(mockFetch).toHaveBeenCalledWith(
-      'http://localhost:5279/api/config/llm',
-      expect.objectContaining({ method: 'GET' })
-    )
-    expect(config.endpoint).toBe('https://foundry.azure.com')
-  })
-
   it('checkHealth fetches from health endpoint', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
