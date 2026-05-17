@@ -7,11 +7,11 @@ hero:
   actions:
     - theme: brand
       text: User Guide
-      link: /USER-GUIDE
+      link: /user-guide
     - theme: alt
       text: Quickstart (Local)
-      link: /QUICKSTART-LOCAL
+      link: /quickstart-local
     - theme: alt
       text: Quickstart (Azure)
-      link: /QUICKSTART-AZURE
+      link: /quickstart-azure
 ---

@@ -1,14 +1,20 @@
 <Solution DefaultStartup="src/Orchestration/AppHost/Marginalia.AppHost.csproj">
   <Folder Name="/src/">
     <Project Path="src/Api/Marginalia.Api.csproj" />
+    <Project Path="src/Client/Api/Marginalia.Api.Client.csproj" />
     <Project Path="src/Domain/Marginalia.Domain.csproj" />
     <Project Path="src/Infrastructure/Marginalia.Infrastructure.csproj" />
     <Project Path="src/Orchestration/AppHost/Marginalia.AppHost.csproj" />
     <Project Path="src/Orchestration/ServiceDefaults/Marginalia.ServiceDefaults.csproj" />
   </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/integration/Marginalia.Tests.Integration.csproj" />
+  <Folder Name="/tests/unit/">
+    <Project Path="tests/unit/Api.UnitTests/Marginalia.Api.UnitTests.csproj" />
+    <Project Path="tests/unit/Client/Api.UnitTests/Marginalia.Api.Client.UnitTests.csproj" />
+    <Project Path="tests/unit/Domain.UnitTests/Marginalia.Domain.UnitTests.csproj" />
+    <Project Path="tests/unit/Infrastructure.UnitTests/Marginalia.Infrastructure.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/integration/">
+    <Project Path="tests/integration/Api.IntegrationTests/Marginalia.Api.IntegrationTests.csproj" />
     <Project Path="tests/integration/Orchestration.IntegrationTests/Marginalia.Orchestration.IntegrationTests.csproj" />
-    <Project Path="tests/unit/Marginalia.Tests.Unit.csproj" />
   </Folder>
 </Solution>

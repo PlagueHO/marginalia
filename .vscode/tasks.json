@@ -281,8 +281,10 @@
       "command": "dotnet",
       "args": [
         "test",
-        "--project",
-        "tests/unit/Marginalia.Tests.Unit.csproj",
+        "--solution",
+        "Marginalia.slnx",
+        "--filter",
+        "TestCategory=Unit",
         "--configuration",
         "Release",
         "--no-restore",
@@ -310,7 +312,7 @@
       "args": [
         "test",
         "--project",
-        "tests/integration/Marginalia.Tests.Integration.csproj",
+        "tests/integration/Api.IntegrationTests/Marginalia.Api.IntegrationTests.csproj",
         "--configuration",
         "Release",
         "--no-restore",
