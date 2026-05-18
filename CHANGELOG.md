@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-05-18
+
+### Changed
+
+- Removed the `AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN` secret from the production deployment workflow.
+
 ## [1.2.1] - 2026-05-18
 
 ### Fixed
