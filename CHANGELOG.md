@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-05-18
+
+### Fixed
+
+- Restored `AZURE_STATIC_WEB_APP_CUSTOM_DOMAIN` secret to the validate and provision
+  CI/CD jobs, which was inadvertently removed in the previous release.
+
 ## [1.2.0] - 2026-05-18
 
 ### Added
