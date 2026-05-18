@@ -1,0 +1,58 @@
+{
+  "version": "v1",
+  "scenarios": [
+    {
+      "id": "compressed-history",
+      "description": "A compressed historical summary should produce at least one meaningful editorial suggestion.",
+      "userGuidance": "Lean into vivid narrative detail while staying factual and grounded in the original meaning.",
+      "paragraphs": [
+        {
+          "id": "p1",
+          "text": "The factory opened in 1923. It produced steel for decades. The work was dangerous."
+        },
+        {
+          "id": "p2",
+          "text": "Workers came from nearby towns and built a close community around the mill."
+        },
+        {
+          "id": "p3",
+          "text": "By the 1980s, the buildings were mostly silent."
+        }
+      ],
+      "expectedTargetParagraphIds": [
+        "p1"
+      ],
+      "allowedTargetParagraphIds": [
+        "p1",
+        "p2"
+      ],
+      "minimumSuggestionCount": 1,
+      "maximumSuggestionCount": 2,
+      "runInDeployedCanary": true
+    },
+    {
+      "id": "less-academic-guidance",
+      "description": "Academic prose with explicit guidance should return a focused narrative-oriented suggestion.",
+      "userGuidance": "Make the prose more narrative and less academic while preserving the original meaning.",
+      "paragraphs": [
+        {
+          "id": "p1",
+          "text": "The methodology employed a mixed-methods approach and yielded a range of observations regarding daily life in the district."
+        },
+        {
+          "id": "p2",
+          "text": "Residents described the market as the center of conversation, trade, and routine."
+        }
+      ],
+      "expectedTargetParagraphIds": [
+        "p1"
+      ],
+      "allowedTargetParagraphIds": [
+        "p1"
+      ],
+      "minimumSuggestionCount": 1,
+      "maximumSuggestionCount": 1,
+      "runInDeployedCanary": false
+    }
+  ]
+}

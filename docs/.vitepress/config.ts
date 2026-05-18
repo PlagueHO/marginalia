@@ -34,6 +34,13 @@ export default defineConfig({
         items: [{ text: 'Authentication', link: '/authentication' }],
       },
       {
+        text: 'Testing & Quality',
+        items: [
+          { text: 'Testing Guide', link: '/testing' },
+          { text: 'AI Evaluation Suite', link: '/ai-evaluation' },
+        ],
+      },
+      {
         text: 'Design',
         items: [{ text: 'Product Requirements', link: '/design/prd' }],
       },
