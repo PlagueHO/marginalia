@@ -142,9 +142,11 @@ jobs:
         run: dotnet tool restore
 
       - name: Restore AI evaluation test project
-        run: dotnet restore marginalia-service/tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj
+        working-directory: marginalia-service
+        run: dotnet restore tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj
 
       - name: Run AI evaluation tests
+        working-directory: marginalia-service
         env:
           AI_EVAL_FOUNDRY_PROJECT_ENDPOINT: ${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_PROJECT_ENDPOINT }}
           FOUNDRY_MODEL_NAME: ${{ steps.resolve_model.outputs.model_name }}
@@ -154,12 +156,13 @@ jobs:
           AI_EVAL_EXECUTION_NAME: ${{ github.run_id }}-${{ github.run_attempt }}
           AI_EVAL_ENABLE_CACHE: "false"
         run: |
-          dotnet test marginalia-service/tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj \
+          dotnet test tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj \
             --no-restore \
             --configuration Debug \
             --filter TestCategory=AIEval \
-            --results-directory marginalia-service/TestResults/AiEvaluationTests \
-            --logger "trx;LogFileName=ai-evaluation.trx"
+            --results-directory TestResults/AiEvaluationTests \
+            --report-trx \
+            --report-trx-filename ai-evaluation.trx
 
       - name: Generate AI evaluation report
         if: always()
