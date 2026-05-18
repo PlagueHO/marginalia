@@ -30,6 +30,9 @@ on:
       AZURE_CLIENT_ID:
         description: "The Azure client ID to use for authentication to Azure for deployment"
         required: true
+      ACCESS_CODE:
+        description: "Optional access code used by smoke and AI evaluation tests"
+        required: false
 
 jobs:
   validate-infrastructure:
@@ -62,6 +65,7 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
 
   deploy-frontend-app:
     name: Deploy Frontend App
@@ -95,11 +99,13 @@ jobs:
       AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
 
   ai-evaluation:
     name: AI Evaluation
     needs: [provision-infrastructure, smoke-test]
     runs-on: ubuntu-latest
+    environment: ${{ inputs.ENVIRONMENT }}
     permissions:
       checks: write
       contents: read
