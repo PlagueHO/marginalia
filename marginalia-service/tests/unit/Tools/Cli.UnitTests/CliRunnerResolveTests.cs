@@ -5,6 +5,7 @@ namespace Marginalia.Tools.Cli.UnitTests;
 
 [TestClass]
 [TestCategory("Unit")]
+[DoNotParallelize] // Tests modify shared process environment variables; must run serially to avoid race conditions.
 public sealed class CliRunnerResolveTests
 {
     [TestInitialize]

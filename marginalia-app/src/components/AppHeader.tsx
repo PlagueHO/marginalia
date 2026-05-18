@@ -1,23 +1,16 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn, gradientText } from "@/lib/utils";
-import { useTheme } from "@/hooks/useTheme";
 import {
   BookOpen,
   CircleUser,
   Home,
   LogIn,
-  Moon,
   PlusCircle,
   Settings,
-  Sun,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +24,6 @@ import {
 export function AppHeader() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { resolvedTheme, toggleTheme } = useTheme();
 
   const isHome = location.pathname === "/";
   const isNew = location.pathname === "/new";
@@ -84,23 +76,7 @@ export function AppHeader() {
 
       {/* Right: Theme toggle + User Menu */}
       <div className="flex items-center gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={resolvedTheme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
-              onClick={toggleTheme}
-            >
-              {resolvedTheme === "dark" ? (
-                <Sun className="h-5 w-5" aria-hidden="true" />
-              ) : (
-                <Moon className="h-5 w-5" aria-hidden="true" />
-              )}
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>{resolvedTheme === "dark" ? "Light mode" : "Dark mode"}</TooltipContent>
-        </Tooltip>
+        <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
