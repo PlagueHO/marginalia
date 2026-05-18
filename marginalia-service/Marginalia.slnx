@@ -19,4 +19,7 @@
     <Project Path="tests/integration/Api.IntegrationTests/Marginalia.Api.IntegrationTests.csproj" />
     <Project Path="tests/integration/Orchestration.IntegrationTests/Marginalia.Orchestration.IntegrationTests.csproj" />
   </Folder>
+  <Folder Name="/tests/evaluation/">
+    <Project Path="tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj" />
+  </Folder>
 </Solution>

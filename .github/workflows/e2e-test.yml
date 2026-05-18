@@ -96,9 +96,115 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
 
+  ai-evaluation:
+    name: AI Evaluation
+    needs: [provision-infrastructure, smoke-test]
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Authenticate Azure CLI (Federated Credentials)
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Resolve Foundry model deployment name
+        id: resolve_model
+        shell: bash
+        run: |
+          MODEL_NAME=$(python3 - <<'PY'
+          import json
+          with open("infra/model-deployments.json", encoding="utf-8") as handle:
+              print(json.load(handle)[0]["name"])
+          PY
+          )
+          echo "model_name=$MODEL_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Restore .NET tools
+        run: dotnet tool restore
+
+      - name: Restore AI evaluation test project
+        run: dotnet restore marginalia-service/tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj
+
+      - name: Run AI evaluation tests
+        env:
+          AI_EVAL_FOUNDRY_PROJECT_ENDPOINT: ${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_PROJECT_ENDPOINT }}
+          FOUNDRY_MODEL_NAME: ${{ steps.resolve_model.outputs.model_name }}
+          AI_EVAL_API_BASE_URL: https://${{ needs.provision-infrastructure.outputs.AZURE_CONTAINER_APP_FQDN }}
+          AI_EVAL_ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
+          AI_EVAL_STORAGE_ROOT: ${{ github.workspace }}/marginalia-service/TestResults/AiEvaluationStorage
+          AI_EVAL_EXECUTION_NAME: ${{ github.run_id }}-${{ github.run_attempt }}
+          AI_EVAL_ENABLE_CACHE: "false"
+        run: |
+          dotnet test marginalia-service/tests/evaluation/Ai.EvaluationTests/Marginalia.Ai.EvaluationTests.csproj \
+            --no-restore \
+            --configuration Debug \
+            --filter TestCategory=AIEval \
+            --results-directory marginalia-service/TestResults/AiEvaluationTests \
+            --logger "trx;LogFileName=ai-evaluation.trx"
+
+      - name: Generate AI evaluation report
+        if: always()
+        env:
+          AI_EVAL_STORAGE_ROOT: ${{ github.workspace }}/marginalia-service/TestResults/AiEvaluationStorage
+        run: |
+          dotnet aieval report \
+            -p "$AI_EVAL_STORAGE_ROOT" \
+            -o "$AI_EVAL_STORAGE_ROOT/report.html"
+
+      - name: Add AI evaluation summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo "## AI evaluation"
+            echo ""
+            echo "- Dataset version: \`v1\`"
+            echo "- Model deployment: \`${{ steps.resolve_model.outputs.model_name }}\`"
+            echo "- Storage path: \`marginalia-service/TestResults/AiEvaluationStorage\`"
+            echo "- Report artifact: \`ai-evaluation-report-${{ inputs.ENVIRONMENT }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish AI evaluation test results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          check_name: AI Evaluation Results
+          comment_title: AI Evaluation Results
+          files: |
+            marginalia-service/TestResults/AiEvaluationTests/**/*.trx
+
+      - name: Upload AI evaluation test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ai-evaluation-test-results-${{ inputs.ENVIRONMENT }}
+          path: marginalia-service/TestResults/AiEvaluationTests/**/*.trx
+          retention-days: 7
+
+      - name: Upload AI evaluation report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ai-evaluation-report-${{ inputs.ENVIRONMENT }}
+          path: marginalia-service/TestResults/AiEvaluationStorage/
+          retention-days: 7
+
   delete-infrastructure:
     name: Delete Provisioned Infrastructure
-    needs: [provision-infrastructure, smoke-test]
+    needs: [provision-infrastructure, smoke-test, ai-evaluation]
     if: always()
     uses: ./.github/workflows/delete-infrastructure.yml
     with:
