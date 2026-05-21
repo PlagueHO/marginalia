@@ -32,6 +32,18 @@ public sealed class EvaluationMetricLookupTests
 
     [TestMethod]
     [TestCategory("Unit")]
+    public void FindNumericMetricReturnsMetricWhenNameMatchesCaseInsensitive()
+    {
+        var relevanceMetric = new NumericMetric("Relevance", 4, "reason");
+        var result = CreateResult(relevanceMetric);
+
+        var metric = EvaluationMetricLookup.FindNumericMetric(result, "relevance");
+
+        metric.Should().BeSameAs(relevanceMetric);
+    }
+
+    [TestMethod]
+    [TestCategory("Unit")]
     public void FindNumericMetricReturnsNullWhenMetricMissing()
     {
         var result = CreateResult(new NumericMetric("Coherence", 4, "reason"));

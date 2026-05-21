@@ -122,13 +122,10 @@ public sealed class FoundrySuggestionEvaluationTests
 
     private static void AssertPassedQualityMetric(EvaluationResult result, string metricName, string scenarioId)
     {
-        var metric = EvaluationMetricLookup.FindNumericMetric(result, metricName);
-        metric.Should().NotBeNull(
-            $"scenario '{scenarioId}' should produce quality metric '{metricName}'. Available numeric metrics: {EvaluationMetricLookup.FormatAvailableMetricNames(result)}");
+        var metric = EvaluationMetricLookup.FindNumericMetric(result, metricName)
+            ?? throw new AssertFailedException(
+                $"scenario '{scenarioId}' should produce quality metric '{metricName}'. Available numeric metrics: {EvaluationMetricLookup.FormatAvailableMetricNames(result)}");
 
-        if (metric is not null)
-        {
-            AssertPassed(metric, scenarioId);
-        }
+        AssertPassed(metric, scenarioId);
     }
 }
