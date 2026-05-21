@@ -24,10 +24,10 @@
       ],
       "allowedTargetParagraphIds": [
         "p1",
-        "p2"
+        "p2",
+        "p3"
       ],
       "minimumSuggestionCount": 1,
-      "maximumSuggestionCount": 2,
       "runInDeployedCanary": true
     },
     {
