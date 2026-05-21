@@ -109,8 +109,8 @@ public sealed class FoundrySuggestionEvaluationTests
         AssertPassed(result.Get<NumericMetric>(SuggestionFieldsEvaluator.MetricName), scenarioId);
         AssertPassed(result.Get<NumericMetric>(ExpectedCoverageEvaluator.MetricName), scenarioId);
         AssertPassed(result.Get<NumericMetric>(MeaningfulRewriteEvaluator.MetricName), scenarioId);
-        AssertPassed(result.Get<NumericMetric>(RelevanceEvaluator.RelevanceMetricName), scenarioId);
-        AssertPassed(result.Get<NumericMetric>(CoherenceEvaluator.CoherenceMetricName), scenarioId);
+        AssertPassedQualityMetric(result, RelevanceEvaluator.RelevanceMetricName, scenarioId);
+        AssertPassedQualityMetric(result, CoherenceEvaluator.CoherenceMetricName, scenarioId);
     }
 
     private static void AssertPassed(NumericMetric metric, string scenarioId)
@@ -118,5 +118,14 @@ public sealed class FoundrySuggestionEvaluationTests
         metric.Interpretation.Should().NotBeNull($"scenario '{scenarioId}' should return an interpretation for metric '{metric.Name}'.");
         metric.Interpretation!.Failed.Should().BeFalse(
             $"scenario '{scenarioId}' failed metric '{metric.Name}' with reason: {metric.Reason ?? metric.Interpretation.Reason}");
+    }
+
+    private static void AssertPassedQualityMetric(EvaluationResult result, string metricName, string scenarioId)
+    {
+        var metric = EvaluationMetricLookup.FindNumericMetric(result, metricName)
+            ?? throw new AssertFailedException(
+                $"scenario '{scenarioId}' should produce quality metric '{metricName}'. Available numeric metrics: {EvaluationMetricLookup.FormatAvailableMetricNames(result)}");
+
+        AssertPassed(metric, scenarioId);
     }
 }
