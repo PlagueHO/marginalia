@@ -11,5 +11,18 @@
       "capacity": 50
     },
     "raiPolicyName": "MarginaliaContentPolicy"
+  },
+  {
+    "model": {
+      "format": "OpenAI",
+      "name": "gpt-5.3-chat",
+      "version": "2026-03-03"
+    },
+    "name": "judge",
+    "sku": {
+      "name": "GlobalStandard",
+      "capacity": 10
+    },
+    "raiPolicyName": "MarginaliaContentPolicy"
   }
 ]

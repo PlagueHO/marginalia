@@ -64,6 +64,8 @@ param accessCode string = ''
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var modelDeployments = loadJsonContent('./model-deployments.json')
+var runtimeModelDeploymentName = 'reviewer'
+var judgeModelDeploymentName = 'judge'
 var effectiveStaticWebAppLocation = !empty(staticWebAppLocation) ? staticWebAppLocation : location
 
 // Tags that should be applied to all resources.
@@ -513,7 +515,7 @@ module containerApp 'br/public:avm/res/app/container-app:0.22.0' = {
           }
           {
             name: 'FOUNDRY_MODEL_NAME'
-            value: modelDeployments[0].name
+            value: runtimeModelDeploymentName
           }
           {
             name: 'ConnectionStrings__cosmos'
@@ -651,6 +653,8 @@ output AZURE_AI_FOUNDRY_ID string = foundryService.outputs.resourceId
 output AZURE_AI_FOUNDRY_ENDPOINT string = foundryService.outputs.endpoint
 output AZURE_AI_FOUNDRY_RESOURCE_ID string = foundryService.outputs.resourceId
 output AZURE_AI_FOUNDRY_PROJECT_ENDPOINT string = 'https://${foundryCustomSubDomainName}.services.ai.azure.com/api/projects/${defaultProjectName}'
+output AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME string = runtimeModelDeploymentName
+output AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME string = judgeModelDeploymentName
 
 // Container App (marginalia-service)
 output AZURE_CONTAINER_APP_NAME string = containerApp.outputs.name

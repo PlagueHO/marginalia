@@ -41,7 +41,8 @@ public sealed class FoundrySuggestionEvaluationTests
                     [
                         "in-process",
                         s_scenarioSet.Version,
-                        s_environment.ModelName
+                        $"sut:{s_environment.ModelName}",
+                        $"judge:{s_environment.JudgeModelName}"
                     ]);
 
             var suggestions = await service.AnalyzeAsync(
@@ -80,7 +81,8 @@ public sealed class FoundrySuggestionEvaluationTests
                     [
                         "deployed",
                         s_scenarioSet.Version,
-                        s_environment.ModelName
+                        $"sut:{s_environment.ModelName}",
+                        $"judge:{s_environment.JudgeModelName}"
                     ]);
 
             var suggestions = await FoundrySuggestionEvaluationSupport.RunDeployedScenarioAsync(
