@@ -68,6 +68,12 @@ on:
       AZURE_AI_FOUNDRY_PROJECT_ENDPOINT:
         description: "The Microsoft Foundry project endpoint"
         value: ${{ jobs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_PROJECT_ENDPOINT }}
+      AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME:
+        description: "The Microsoft Foundry runtime deployment name"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}
+      AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME:
+        description: "The Microsoft Foundry judge deployment name"
+        value: ${{ jobs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}
       AZURE_CONTAINER_APP_NAME:
         description: "The Azure Container App name"
         value: ${{ jobs.provision-infrastructure.outputs.AZURE_CONTAINER_APP_NAME }}
@@ -129,6 +135,8 @@ jobs:
       AZURE_AI_FOUNDRY_ENDPOINT: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_FOUNDRY_ENDPOINT }}
       AZURE_AI_FOUNDRY_RESOURCE_ID: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_FOUNDRY_RESOURCE_ID }}
       AZURE_AI_FOUNDRY_PROJECT_ENDPOINT: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_FOUNDRY_PROJECT_ENDPOINT }}
+      AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}
+      AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME: ${{ steps.get_infrastructure_outputs.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}
       AZURE_CONTAINER_APP_NAME: ${{ steps.get_infrastructure_outputs.outputs.AZURE_CONTAINER_APP_NAME }}
       AZURE_CONTAINER_APP_FQDN: ${{ steps.get_infrastructure_outputs.outputs.AZURE_CONTAINER_APP_FQDN }}
       AZURE_STATIC_WEB_APP_NAME: ${{ steps.get_infrastructure_outputs.outputs.AZURE_STATIC_WEB_APP_NAME }}
@@ -239,6 +247,8 @@ jobs:
             "AZURE_AI_FOUNDRY_ENDPOINT"
             "AZURE_AI_FOUNDRY_RESOURCE_ID"
             "AZURE_AI_FOUNDRY_PROJECT_ENDPOINT"
+            "AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME"
+            "AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME"
             "AZURE_CONTAINER_APP_NAME"
             "AZURE_CONTAINER_APP_FQDN"
             "AZURE_STATIC_WEB_APP_NAME"

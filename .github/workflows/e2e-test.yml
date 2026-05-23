@@ -126,17 +126,23 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Resolve Foundry model deployment name
-        id: resolve_model
+      - name: Validate Foundry model deployments
         shell: bash
         run: |
-          MODEL_NAME=$(python3 - <<'PY'
-          import json
-          with open("infra/model-deployments.json", encoding="utf-8") as handle:
-              print(json.load(handle)[0]["name"])
-          PY
-          )
-          echo "model_name=$MODEL_NAME" >> "$GITHUB_OUTPUT"
+          test -n "${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}"
+          test -n "${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}"
+
+          az cognitiveservices account deployment show \
+            --resource-group "${{ needs.provision-infrastructure.outputs.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_NAME }}" \
+            --deployment-name "${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}" \
+            --output none
+
+          az cognitiveservices account deployment show \
+            --resource-group "${{ needs.provision-infrastructure.outputs.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_NAME }}" \
+            --deployment-name "${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}" \
+            --output none
 
       - name: Restore .NET tools
         run: dotnet tool restore
@@ -149,7 +155,8 @@ jobs:
         working-directory: marginalia-service
         env:
           AI_EVAL_FOUNDRY_PROJECT_ENDPOINT: ${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_PROJECT_ENDPOINT }}
-          FOUNDRY_MODEL_NAME: ${{ steps.resolve_model.outputs.model_name }}
+          FOUNDRY_MODEL_NAME: ${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}
+          AI_EVAL_JUDGE_MODEL_NAME: ${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}
           AI_EVAL_API_BASE_URL: https://${{ needs.provision-infrastructure.outputs.AZURE_CONTAINER_APP_FQDN }}
           AI_EVAL_ACCESS_CODE: ${{ secrets.ACCESS_CODE }}
           AI_EVAL_STORAGE_ROOT: ${{ github.workspace }}/marginalia-service/TestResults/AiEvaluationStorage
@@ -181,7 +188,8 @@ jobs:
             echo "## AI evaluation"
             echo ""
             echo "- Dataset version: \`v1\`"
-            echo "- Model deployment: \`${{ steps.resolve_model.outputs.model_name }}\`"
+            echo "- Runtime deployment: \`${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}\`"
+            echo "- Judge deployment: \`${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}\`"
             echo "- Storage path: \`marginalia-service/TestResults/AiEvaluationStorage\`"
             echo "- Report artifact: \`ai-evaluation-report-${{ inputs.ENVIRONMENT }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

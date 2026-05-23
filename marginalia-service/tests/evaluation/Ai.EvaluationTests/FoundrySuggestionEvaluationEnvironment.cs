@@ -6,6 +6,8 @@ internal sealed record FoundrySuggestionEvaluationEnvironment
 
     public required string ModelName { get; init; }
 
+    public required string JudgeModelName { get; init; }
+
     public Uri? ApiBaseUrl { get; init; }
 
     public string? AccessCode { get; init; }
@@ -66,6 +68,8 @@ internal sealed record FoundrySuggestionEvaluationEnvironment
         {
             FoundryProjectEndpoint = foundryProjectEndpoint,
             ModelName = modelName,
+            JudgeModelName = FirstNonEmpty(Environment.GetEnvironmentVariable("AI_EVAL_JUDGE_MODEL_NAME"), modelName)
+                             ?? throw new InvalidOperationException("Unable to resolve the AI evaluation judge model name."),
             ApiBaseUrl = string.IsNullOrWhiteSpace(apiBaseUrl) ? null : NormalizeApiBaseUrl(apiBaseUrl),
             AccessCode = FirstNonEmpty(
                 Environment.GetEnvironmentVariable("AI_EVAL_ACCESS_CODE"),

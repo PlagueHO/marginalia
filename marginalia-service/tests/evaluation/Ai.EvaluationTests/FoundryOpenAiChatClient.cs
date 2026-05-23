@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Azure.Core;
 using Marginalia.Domain.Models;
 using Microsoft.Extensions.AI;
@@ -37,16 +38,56 @@ internal sealed class FoundryOpenAiChatClient : IChatClient
         using var request = new HttpRequestMessage(HttpMethod.Post, BuildChatCompletionsEndpoint(_metadata.ProviderUri));
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
-        var payload = new
+        var payload = new Dictionary<string, object?>
         {
-            model = _metadata.DefaultModelId,
-            messages = chatMessages.Select(static message => new
+            ["model"] = ResolveModelId(options),
+            ["messages"] = chatMessages.Select(static message => new Dictionary<string, object?>
             {
-                role = message.Role.Value,
-                content = message.Text
-            }),
-            temperature = options?.Temperature
+                ["role"] = message.Role.Value,
+                ["content"] = message.Text
+            }).ToArray()
         };
+
+        if (options?.Temperature is float temperature)
+        {
+            payload["temperature"] = temperature;
+        }
+
+        if (options?.MaxOutputTokens is int maxOutputTokens)
+        {
+            payload["max_completion_tokens"] = maxOutputTokens;
+        }
+
+        if (options?.TopP is float topP)
+        {
+            payload["top_p"] = topP;
+        }
+
+        if (options?.FrequencyPenalty is float frequencyPenalty)
+        {
+            payload["frequency_penalty"] = frequencyPenalty;
+        }
+
+        if (options?.PresencePenalty is float presencePenalty)
+        {
+            payload["presence_penalty"] = presencePenalty;
+        }
+
+        if (options?.Seed is long seed)
+        {
+            payload["seed"] = seed;
+        }
+
+        if (options?.StopSequences is { Count: > 0 } stopSequences)
+        {
+            payload["stop"] = stopSequences.ToArray();
+        }
+
+        var responseFormat = BuildResponseFormat(options);
+        if (responseFormat is not null)
+        {
+            payload["response_format"] = responseFormat;
+        }
 
         request.Content = new StringContent(
             JsonSerializer.Serialize(payload),
@@ -93,6 +134,63 @@ internal sealed class FoundryOpenAiChatClient : IChatClient
         };
 
         return builder.Uri;
+    }
+
+    private string ResolveModelId(ChatOptions? options)
+    {
+        if (!string.IsNullOrWhiteSpace(options?.ModelId))
+        {
+            return options.ModelId;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_metadata.DefaultModelId))
+        {
+            return _metadata.DefaultModelId;
+        }
+
+        throw new InvalidOperationException("A model deployment name is required for the Foundry evaluation chat client.");
+    }
+
+    private static object? BuildResponseFormat(ChatOptions? options)
+    {
+        var responseFormat = options?.ResponseFormat;
+        if (responseFormat is null || responseFormat is ChatResponseFormatText)
+        {
+            return null;
+        }
+
+        if (responseFormat is not ChatResponseFormatJson jsonResponseFormat)
+        {
+            throw new NotSupportedException(
+                $"Response format '{responseFormat.GetType().FullName}' is not supported by the Foundry evaluation chat client.");
+        }
+
+        if (jsonResponseFormat.Schema is JsonElement schema)
+        {
+            return new Dictionary<string, object?>
+            {
+                ["type"] = "json_schema",
+                ["json_schema"] = new Dictionary<string, object?>
+                {
+                    ["name"] = NormalizeSchemaName(jsonResponseFormat.SchemaName),
+                    ["description"] = jsonResponseFormat.SchemaDescription,
+                    ["strict"] = true,
+                    ["schema"] = schema
+                }
+            };
+        }
+
+        return new Dictionary<string, object?>
+        {
+            ["type"] = "json_object"
+        };
+    }
+
+    private static string NormalizeSchemaName(string? schemaName)
+    {
+        var candidate = string.IsNullOrWhiteSpace(schemaName) ? "response" : schemaName.Trim();
+        var normalized = Regex.Replace(candidate, "[^A-Za-z0-9_-]", "_");
+        return string.IsNullOrWhiteSpace(normalized) ? "response" : normalized;
     }
 
     private static string ExtractAssistantText(string responseBody)

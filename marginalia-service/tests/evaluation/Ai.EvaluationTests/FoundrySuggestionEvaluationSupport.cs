@@ -40,7 +40,7 @@ internal static class FoundrySuggestionEvaluationSupport
             judgeHttpClient,
             new DefaultAzureCredential(),
             environment.FoundryProjectEndpoint,
-            environment.ModelName);
+            environment.JudgeModelName);
 
         return DiskBasedReportingConfiguration.Create(
             storageRootPath: environment.StorageRootPath,
