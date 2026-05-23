@@ -53,6 +53,36 @@ public sealed class EvaluationMetricLookupTests
         metric.Should().BeNull();
     }
 
+    [TestMethod]
+    [TestCategory("Unit")]
+    public void FormatNumericMetricDiagnosticsIncludesInterpretationAndReason()
+    {
+        var metric = new NumericMetric("Relevance", 4, "judge reason")
+        {
+            Interpretation = new EvaluationMetricInterpretation(
+                EvaluationRating.Good,
+                failed: false,
+                reason: "accepted")
+        };
+
+        var diagnostics = EvaluationMetricLookup.FormatNumericMetricDiagnostics(CreateResult(metric));
+
+        diagnostics.Should().Contain("Relevance");
+        diagnostics.Should().Contain("rating=Good");
+        diagnostics.Should().Contain("failed=False");
+        diagnostics.Should().Contain("interpretation=accepted");
+        diagnostics.Should().Contain("reason=judge reason");
+    }
+
+    [TestMethod]
+    [TestCategory("Unit")]
+    public void FormatNumericMetricDiagnosticsReturnsNoneWhenResultHasNoNumericMetrics()
+    {
+        var diagnostics = EvaluationMetricLookup.FormatNumericMetricDiagnostics(new EvaluationResult());
+
+        diagnostics.Should().Be("(none)");
+    }
+
     private static EvaluationResult CreateResult(params NumericMetric[] metrics) =>
         new()
         {

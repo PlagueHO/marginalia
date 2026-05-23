@@ -91,7 +91,7 @@ Aspire will:
 1. Install frontend dependencies (`pnpm install`)
 1. Build the .NET API project
 1. Provision Azure Microsoft Foundry resource with Foundry Project.
-1. Deploy a `gpt-5.3-chat` model to the provisioned Foundry Project.
+1. Deploy the `reviewer` (`gpt-5.3-chat`) model to the provisioned Foundry Project.
 1. Start the API and frontend dev server.
 1. Open the Aspire Dashboard
 
@@ -116,11 +116,13 @@ First run takes several minutes while Azure AI Foundry resources are provisioned
 
 ## Model configuration
 
-Aspire provisions these AI model deployments by default:
+Aspire provisions this AI model deployment by default:
 
 | Deployment | Model | Version | SKU | Capacity |
 | --- | --- | --- | --- | --- |
-| `foundry` | `gpt-5.3-chat` | `2026-03-03` | GlobalStandard | 50 |
+| `reviewer` | `gpt-5.3-chat` | `2026-03-03` | GlobalStandard | 50 |
+
+The dedicated `judge` deployment used by the AI evaluation pipeline is provisioned by the shared Azure infrastructure described in [quickstart-azure.md](quickstart-azure.md), not by the local Aspire AppHost.
 
 ### Override model settings
 

@@ -33,7 +33,7 @@ Install the [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
 
 ### Azure subscription
 
-You need an active Azure subscription with quota for `gpt-5.3-chat` (GlobalStandard SKU) in the target region (default: **swedencentral**).
+You need an active Azure subscription with quota for both `gpt-5.3-chat` and `gpt-5.1-chat` (GlobalStandard SKU) in the target region (default: **swedencentral**).
 
 ## 1. Clone the repository
 
@@ -77,7 +77,7 @@ azd up
 The command will then prompt you to select an Azure subscription and region if not already set in the environment.
 
 > [!IMPORTANT]
-> The region that is selected must have available quota for the `gpt-5.3-chat` model (GlobalStandard SKU). If you receive a quota error, try a different region (e.g., `eastus2` or `swedencentral`).
+> The region that is selected must have available quota for both the `gpt-5.3-chat` reviewer model and the `gpt-5.1-chat` judge model (GlobalStandard SKU). If you receive a quota error, try a different region (e.g., `eastus2` or `swedencentral`).
 
 This single command will:
 
@@ -98,7 +98,7 @@ This single command will:
 | Private DNS Zone (OpenAI) | `privatelink.openai.azure.com` | Azure Private DNS Zone | Resolves private OpenAI endpoint DNS names |
 | Log Analytics Workspace | `log-<env-name>` | Azure Monitor | Centralizes logs and metrics from all resources |
 | Application Insights | `appi-<env-name>` | Azure Application Insights | Application performance monitoring for the API |
-| AI Foundry (AIServices) | `aif-<env-name>` | Azure AI Services | Provides `gpt-5.3-chat` chat model deployment |
+| AI Foundry (AIServices) | `aif-<env-name>` | Azure AI Services | Provides the `reviewer` (`gpt-5.3-chat`) and `judge` (`gpt-5.1-chat`) model deployments |
 | Private Endpoint (AI Foundry) | `pe-<env-name>-foundry` | Azure Private Endpoint | Enables private network access to AI Foundry |
 | Cosmos DB Account | `cdb<resource-token>` | Azure Cosmos DB (Serverless) | Persists documents and user sessions |
 | Private Endpoint (Cosmos DB) | `pe-<env-name>-cosmosdb` | Azure Private Endpoint | Enables private network access to Cosmos DB |
@@ -132,7 +132,8 @@ The deployment provisions these AI model deployments by default:
 
 | Deployment | Model | Version | SKU | Capacity |
 | --- | --- | --- | --- | --- |
-| `foundry` | `gpt-5.3-chat` | `2026-03-03` | GlobalStandard | 50 |
+| `reviewer` | `gpt-5.3-chat` | `2026-03-03` | GlobalStandard | 50 |
+| `judge` | `gpt-5.1-chat` | `2025-11-13` | GlobalStandard | 10 |
 
 To override the model configuration, set environment variables before deploying:
 
@@ -261,7 +262,7 @@ azd down --force --purge
 | Symptom | Fix |
 | --- | --- |
 | `azd` command not found | Install Azure Developer CLI: `winget install Microsoft.Azd` (Windows) or see [install docs](https://learn.microsoft.com/azure/developer/azure-developer-cli/install-azd) |
-| Quota error during provisioning | Ensure your subscription has `gpt-5.3-chat` GlobalStandard quota in the target region. Try `swedencentral` or another region with available capacity. |
+| Quota error during provisioning | Ensure your subscription has both `gpt-5.3-chat` and `gpt-5.1-chat` GlobalStandard quota in the target region. Try `swedencentral` or another region with available capacity. |
 | `azd auth login` fails | Run `az login` first, then retry `azd auth login`. Ensure your account has Contributor access to the target subscription. |
 | Deployment times out | AI Foundry model deployments can take several minutes. Re-run `azd up` — it will resume from where it left off. |
 | Frontend can't reach API | Check that the Container App is running in the Azure Portal. Verify environment variables are set correctly with `azd env get-values`. |
