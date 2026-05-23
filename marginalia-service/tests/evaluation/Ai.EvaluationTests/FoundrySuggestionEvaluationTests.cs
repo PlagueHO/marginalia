@@ -9,6 +9,12 @@ namespace Marginalia.Ai.EvaluationTests;
 [TestClass]
 public sealed class FoundrySuggestionEvaluationTests
 {
+    private static readonly string[] s_requiredQualityMetricNames =
+    [
+        RelevanceEvaluator.RelevanceMetricName,
+        CoherenceEvaluator.CoherenceMetricName
+    ];
+
     private static FoundrySuggestionEvaluationEnvironment s_environment = null!;
     private static FoundrySuggestionScenarioSet s_scenarioSet = null!;
     private static ReportingConfiguration s_reportingConfiguration = null!;
@@ -111,8 +117,7 @@ public sealed class FoundrySuggestionEvaluationTests
         AssertPassed(result.Get<NumericMetric>(SuggestionFieldsEvaluator.MetricName), scenarioId);
         AssertPassed(result.Get<NumericMetric>(ExpectedCoverageEvaluator.MetricName), scenarioId);
         AssertPassed(result.Get<NumericMetric>(MeaningfulRewriteEvaluator.MetricName), scenarioId);
-        AssertPassedQualityMetric(result, RelevanceEvaluator.RelevanceMetricName, scenarioId);
-        AssertPassedQualityMetric(result, CoherenceEvaluator.CoherenceMetricName, scenarioId);
+        AssertPassedQualityMetrics(result, scenarioId);
     }
 
     private static void AssertPassed(NumericMetric metric, string scenarioId)
@@ -122,12 +127,31 @@ public sealed class FoundrySuggestionEvaluationTests
             $"scenario '{scenarioId}' failed metric '{metric.Name}' with reason: {metric.Reason ?? metric.Interpretation.Reason}");
     }
 
-    private static void AssertPassedQualityMetric(EvaluationResult result, string metricName, string scenarioId)
+    private static void AssertPassedQualityMetrics(EvaluationResult result, string scenarioId)
     {
-        var metric = EvaluationMetricLookup.FindNumericMetric(result, metricName)
-            ?? throw new AssertFailedException(
-                $"scenario '{scenarioId}' should produce quality metric '{metricName}'. Available numeric metrics: {EvaluationMetricLookup.FormatAvailableMetricNames(result)}");
+        List<string> missingMetricNames = [];
 
-        AssertPassed(metric, scenarioId);
+        foreach (var metricName in s_requiredQualityMetricNames)
+        {
+            var metric = EvaluationMetricLookup.FindNumericMetric(result, metricName);
+
+            if (metric is null)
+            {
+                missingMetricNames.Add(metricName);
+                continue;
+            }
+
+            AssertPassed(metric, scenarioId);
+        }
+
+        if (missingMetricNames.Count > 0)
+        {
+            throw new AssertFailedException(
+                $"scenario '{scenarioId}' should produce quality metrics [{string.Join(", ", missingMetricNames)}]. " +
+                $"Runtime model: '{s_environment.ModelName}'. Judge model: '{s_environment.JudgeModelName}'. " +
+                $"Available numeric metrics: {EvaluationMetricLookup.FormatAvailableMetricNames(result)}. " +
+                $"Numeric metric diagnostics: {EvaluationMetricLookup.FormatNumericMetricDiagnostics(result)}. " +
+                "This usually means the judge-backed evaluators did not complete or returned an unexpected payload.");
+        }
     }
 }

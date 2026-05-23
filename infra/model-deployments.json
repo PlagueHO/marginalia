@@ -15,8 +15,8 @@
   {
     "model": {
       "format": "OpenAI",
-      "name": "gpt-5.3-chat",
-      "version": "2026-03-03"
+      "name": "gpt-5.1-chat",
+      "version": "2025-11-13"
     },
     "name": "judge",
     "sku": {
