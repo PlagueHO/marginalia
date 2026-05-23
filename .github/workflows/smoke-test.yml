@@ -94,10 +94,19 @@ jobs:
       - name: Run Smoke Tests
         shell: pwsh
         run: |
-          $container = New-PesterContainer -Path 'tests/smoke/Smoke.Tests.ps1' -Data @{
+          $data = @{
             ApiBaseUrl      = 'https://${{ inputs.AZURE_CONTAINER_APP_FQDN }}'
             FrontendBaseUrl = 'https://${{ inputs.AZURE_STATIC_WEB_APP_DEFAULT_HOSTNAME }}'
-            AccessCode      = '${{ secrets.ACCESS_CODE }}'
+          }
+
+          if ('${{ secrets.ACCESS_CODE }}') {
+            $data.AccessCode = '${{ secrets.ACCESS_CODE }}'
+          }
+
+          $container = New-PesterContainer -Path 'tests/smoke/Smoke.Tests.ps1' -Data @{
+            ApiBaseUrl      = $data.ApiBaseUrl
+            FrontendBaseUrl = $data.FrontendBaseUrl
+            AccessCode      = $data.AccessCode
           }
 
           $config = New-PesterConfiguration

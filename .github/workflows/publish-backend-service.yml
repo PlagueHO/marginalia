@@ -1,0 +1,66 @@
+name: Publish Backend Service
+
+on:
+  workflow_call:
+    outputs:
+      api-container-image:
+        description: The published API container image reference
+        value: ${{ jobs.publish-backend-service.outputs.api_container_image }}
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish-backend-service:
+    name: Publish Backend Service
+    runs-on: ubuntu-latest
+    outputs:
+      api_container_image: ${{ steps.image_ref.outputs.api_container_image }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Extract container metadata
+        id: metadata
+        uses: docker/metadata-action@v6
+        with:
+          images: ghcr.io/${{ github.repository_owner }}/marginalia-service
+          tags: |
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=raw,value=sha-${{ github.sha }}
+            type=ref,event=tag
+
+      - name: Build and push API container image
+        uses: docker/build-push-action@v7
+        with:
+          context: ./marginalia-service
+          file: ./marginalia-service/src/Api/Dockerfile
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: |
+            org.opencontainers.image.source=https://github.com/${{ github.repository }}
+            org.opencontainers.image.description=Marginalia API Service
+            org.opencontainers.image.version=${{ github.sha }}
+
+      - name: Compute container image reference
+        id: image_ref
+        shell: bash
+        run: |
+          OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            IMAGE_TAG="${{ github.ref_name }}"
+          else
+            IMAGE_TAG=latest
+          fi
+          echo "api_container_image=ghcr.io/${OWNER}/marginalia-service:${IMAGE_TAG}" >> "$GITHUB_OUTPUT"

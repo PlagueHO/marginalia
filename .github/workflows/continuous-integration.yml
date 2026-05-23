@@ -4,16 +4,15 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - .github/workflows/**
   push:
     branches:
       - main
+    paths:
+      - .github/workflows/**
 
   workflow_dispatch:
-
-permissions:
-  contents: read
-  checks: write
-  pull-requests: write
 
 jobs:
   lint-markdown:
@@ -23,20 +22,18 @@ jobs:
   lint-and-publish-bicep:
     name: Lint and Publish Bicep
     uses: ./.github/workflows/lint-and-publish-bicep.yml
-    permissions:
-      contents: read
 
-  lint-build-test-and-publish-backend-service:
-    name: Lint, Build, Test and Publish Backend Service
-    uses: ./.github/workflows/build-and-publish-backend-service.yml
+  build-backend-service:
+    name: Build Backend Service
+    uses: ./.github/workflows/build-backend-service.yml
     permissions:
       contents: read
       checks: write
       pull-requests: write
 
-  build-and-publish-frontend-app:
-    name: Build and Publish Frontend App
-    uses: ./.github/workflows/build-and-publish-frontend-app.yml
+  build-frontend-app:
+    name: Build Frontend App
+    uses: ./.github/workflows/build-frontend-app.yml
     permissions:
       contents: read
       checks: write
@@ -45,5 +42,3 @@ jobs:
   build-docs:
     name: Build Docs
     uses: ./.github/workflows/build-docs.yml
-    permissions:
-      contents: read
