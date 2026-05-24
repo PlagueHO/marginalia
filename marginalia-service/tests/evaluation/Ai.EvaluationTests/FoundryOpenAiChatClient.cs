@@ -223,19 +223,40 @@ internal sealed class FoundryOpenAiChatClient : IChatClient
         var builder = new StringBuilder();
         foreach (var item in content.EnumerateArray())
         {
-            if (!item.TryGetProperty("type", out var type) ||
-                !string.Equals(type.GetString(), "text", StringComparison.OrdinalIgnoreCase) ||
-                !item.TryGetProperty("text", out var text) ||
-                text.ValueKind != JsonValueKind.String)
+            if (!TryGetTextContent(item, out var text))
             {
                 continue;
             }
 
-            builder.Append(text.GetString());
+            builder.Append(text);
         }
 
         return builder.Length > 0
             ? builder.ToString()
             : throw new InvalidOperationException("The assistant content did not contain any text parts.");
+    }
+
+    private static bool TryGetTextContent(JsonElement contentPart, out string text)
+    {
+        text = string.Empty;
+
+        if (!contentPart.TryGetProperty("text", out var textElement) ||
+            textElement.ValueKind != JsonValueKind.String)
+        {
+            return false;
+        }
+
+        if (contentPart.TryGetProperty("type", out var typeElement))
+        {
+            var type = typeElement.GetString();
+            if (!string.Equals(type, "text", StringComparison.OrdinalIgnoreCase) &&
+                !string.Equals(type, "output_text", StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+        }
+
+        text = textElement.GetString() ?? string.Empty;
+        return text.Length > 0;
     }
 }

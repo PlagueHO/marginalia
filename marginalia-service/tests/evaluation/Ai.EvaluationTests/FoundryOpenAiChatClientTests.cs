@@ -67,6 +67,19 @@ public sealed class FoundryOpenAiChatClientTests
         payload.RootElement.GetProperty("response_format").GetProperty("type").GetString().Should().Be("json_object");
     }
 
+    [TestMethod]
+    [TestCategory("Unit")]
+    public async Task GetResponseAsyncAcceptsOutputTextContentParts()
+    {
+        var handler = new CapturingHandler("""{"choices":[{"message":{"content":[{"type":"output_text","text":"ok"}]}}]}""");
+        var client = CreateClient(handler);
+
+        var response = await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "grade this response")]);
+
+        response.Text.Should().Be("ok");
+    }
+
     private static FoundryOpenAiChatClient CreateClient(CapturingHandler handler) =>
         new(
             new HttpClient(handler),
@@ -78,13 +91,20 @@ public sealed class FoundryOpenAiChatClientTests
     {
         public string? RequestBody { get; private set; }
 
+        private readonly string _responseBody;
+
+        public CapturingHandler(string responseBody = """{"choices":[{"message":{"content":"ok"}}]}""")
+        {
+            _responseBody = responseBody;
+        }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             RequestBody = request.Content is null ? null : await request.Content.ReadAsStringAsync(cancellationToken);
 
             return new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("""{"choices":[{"message":{"content":"ok"}}]}""")
+                Content = new StringContent(_responseBody)
             };
         }
     }
