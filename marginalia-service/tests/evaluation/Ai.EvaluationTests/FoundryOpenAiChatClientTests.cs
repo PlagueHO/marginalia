@@ -69,6 +69,26 @@ public sealed class FoundryOpenAiChatClientTests
 
     [TestMethod]
     [TestCategory("Unit")]
+    public async Task GetResponseAsyncOmitsTemperatureWhenSetToZero()
+    {
+        var handler = new CapturingHandler();
+        var client = CreateClient(handler);
+
+        await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "grade this response")],
+            new ChatOptions
+            {
+                Temperature = 0f
+            });
+
+        handler.RequestBody.Should().NotBeNull();
+
+        using var payload = JsonDocument.Parse(handler.RequestBody!);
+        payload.RootElement.TryGetProperty("temperature", out _).Should().BeFalse();
+    }
+
+    [TestMethod]
+    [TestCategory("Unit")]
     public async Task GetResponseAsyncAcceptsOutputTextContentParts()
     {
         var handler = new CapturingHandler("""{"choices":[{"message":{"content":[{"type":"output_text","text":"ok"}]}}]}""");

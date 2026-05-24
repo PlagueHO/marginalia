@@ -48,7 +48,7 @@ internal sealed class FoundryOpenAiChatClient : IChatClient
             }).ToArray()
         };
 
-        if (options?.Temperature is float temperature)
+        if (options?.Temperature is float temperature && temperature != 0f)
         {
             payload["temperature"] = temperature;
         }
