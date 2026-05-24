@@ -182,13 +182,13 @@ If the command fails, verify the storage root path exists and contains evaluatio
 
 ## Next Steps
 
-- **Expand scenarios**: Add more test cases covering edge cases and tone variations in [marginalia-service/tests/evaluation/Ai.EvaluationTests/Scenarios](../marginalia-service/tests/evaluation/Ai.EvaluationTests/Scenarios)
-- **Tune LLM prompts**: Refine quality evaluator criteria in [SuggestionQualityEvaluators.cs](../marginalia-service/tests/evaluation/Ai.EvaluationTests/SuggestionQualityEvaluators.cs) for better signal
+- **Expand scenarios**: Add more test cases covering edge cases and tone variations in [marginalia-service/tests/evaluation/Ai.EvaluationTests/Scenarios](../../marginalia-service/tests/evaluation/Ai.EvaluationTests/Scenarios)
+- **Tune LLM prompts**: Refine quality evaluator criteria in [SuggestionQualityEvaluators.cs](../../marginalia-service/tests/evaluation/Ai.EvaluationTests/SuggestionQualityEvaluators.cs) for better signal
 - **Define quality gates**: Establish minimum thresholds (e.g., Relevance ≥ 0.8) and implement CI workflow logic to fail on substandard results
 - **Monitor over time**: Track evaluation metrics across model versions and updates to detect regressions
 
 ## References
 
 - [Microsoft.Extensions.AI.Evaluation on GitHub](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.AI.Evaluation)
-- [Testing Guide](testing.md) — Overview of all Marginalia test suites
-- [Local Development](quickstart-local.md) — Setting up local Foundry credentials and model access
+- [Testing Guide](./testing.md) — Overview of all Marginalia test suites
+- [Local Development](../quickstart-local.md) — Setting up local Foundry credentials and model access

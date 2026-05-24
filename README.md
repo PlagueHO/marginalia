@@ -59,8 +59,8 @@ For troubleshooting, credential configuration, and model overrides, see [Local D
 | [User Guide](docs/USER-GUIDE.md) | Step-by-step walkthrough with screenshots |
 | [Local Development](docs/QUICKSTART-LOCAL.md) | Local dev setup, Azure credentials, first-run walkthrough, and troubleshooting |
 | [Deploy to Azure](docs/QUICKSTART-AZURE.md) | Azure Developer CLI deployment and infrastructure provisioning |
-| [Testing Guide](docs/TESTING.md) | Automated testing strategy for unit, integration, smoke, and evaluation tests |
-| [AI Evaluation Suite](docs/AI-EVALUATION.md) | Run AI-powered quality evaluations for suggestions locally or in CI/CD |
+| [Testing Guide](docs/design/testing.md) | Automated testing strategy for unit, integration, smoke, and evaluation tests |
+| [AI Evaluation Suite](docs/design/ai-evaluation.md) | Run AI-powered quality evaluations for suggestions locally or in CI/CD |
 | [Product Requirements](docs/design/PRD.md) | Original product requirements document |
 
 ## Features

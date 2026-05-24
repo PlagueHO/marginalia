@@ -19,11 +19,11 @@ estimated_reading_time: 8
 
 | Layer            | Test type                    | Primary scope                                                          | Runner                                   | Key entry points                                                                                                                         |
 |------------------|------------------------------|------------------------------------------------------------------------|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| Frontend         | Unit and component tests     | React components, hooks, services, and utility functions               | Vitest + Testing Library                 | [marginalia-app/package.json](../marginalia-app/package.json), [marginalia-app/vitest.config.ts](../marginalia-app/vitest.config.ts) |
-| Frontend         | Accessibility-focused tests  | `jest-axe` assertions for selected UI components                       | Vitest + jest-axe                        | [marginalia-app/tests/components](../marginalia-app/tests/components), [marginalia-app/vitest.setup.ts](../marginalia-app/vitest.setup.ts) |
-| Backend          | Unit tests                   | API controllers, domain models, repositories, services, health checks  | MSTest v4 + FluentAssertions + NSubstitute | [marginalia-service/tests/unit](../marginalia-service/tests/unit), [marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj](../marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj) |
-| Backend          | Integration tests            | ASP.NET Core API pipeline behavior and AppHost resource composition    | MSTest v4 + WebApplicationFactory + Aspire testing | [marginalia-service/tests/integration](../marginalia-service/tests/integration), [marginalia-service/tests/integration/Orchestration.IntegrationTests](../marginalia-service/tests/integration/Orchestration.IntegrationTests) |
-| End-to-end smoke | Deployed service checks      | API and frontend readiness and critical endpoint behavior              | Pester (PowerShell)                      | [tests/smoke/Smoke.Tests.ps1](../tests/smoke/Smoke.Tests.ps1)                                                                           |
+| Frontend         | Unit and component tests     | React components, hooks, services, and utility functions               | Vitest + Testing Library                 | [marginalia-app/package.json](../../marginalia-app/package.json), [marginalia-app/vitest.config.ts](../../marginalia-app/vitest.config.ts) |
+| Frontend         | Accessibility-focused tests  | `jest-axe` assertions for selected UI components                       | Vitest + jest-axe                        | [marginalia-app/tests/components](../../marginalia-app/tests/components), [marginalia-app/vitest.setup.ts](../../marginalia-app/vitest.setup.ts) |
+| Backend          | Unit tests                   | API controllers, domain models, repositories, services, health checks  | MSTest v4 + FluentAssertions + NSubstitute | [marginalia-service/tests/unit](../../marginalia-service/tests/unit), [marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj](../../marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj) |
+| Backend          | Integration tests            | ASP.NET Core API pipeline behavior and AppHost resource composition    | MSTest v4 + WebApplicationFactory + Aspire testing | [marginalia-service/tests/integration](../../marginalia-service/tests/integration), [marginalia-service/tests/integration/Orchestration.IntegrationTests](../../marginalia-service/tests/integration/Orchestration.IntegrationTests) |
+| End-to-end smoke | Deployed service checks      | API and frontend readiness and critical endpoint behavior              | Pester (PowerShell)                      | [tests/smoke/Smoke.Tests.ps1](../../tests/smoke/Smoke.Tests.ps1)                                                                         |
 
 ## Frontend Automated Tests
 
@@ -37,14 +37,14 @@ estimated_reading_time: 8
 
 Examples:
 
-* Components: [marginalia-app/tests/components](../marginalia-app/tests/components)
-* Hooks: [marginalia-app/tests/hooks](../marginalia-app/tests/hooks)
-* Services: [marginalia-app/tests/services](../marginalia-app/tests/services)
-* Utilities: [marginalia-app/tests/lib](../marginalia-app/tests/lib)
+* Components: [marginalia-app/tests/components](../../marginalia-app/tests/components)
+* Hooks: [marginalia-app/tests/hooks](../../marginalia-app/tests/hooks)
+* Services: [marginalia-app/tests/services](../../marginalia-app/tests/services)
+* Utilities: [marginalia-app/tests/lib](../../marginalia-app/tests/lib)
 
 ### How to run
 
-From [marginalia-app](../marginalia-app):
+From [marginalia-app](../../marginalia-app):
 
 1. Install dependencies.
 
@@ -70,7 +70,7 @@ pnpm test:watch
 pnpm test -t accessibility
 ```
 
-Equivalent VS Code tasks are defined in [.vscode/tasks.json](../.vscode/tasks.json):
+Equivalent VS Code tasks are defined in [.vscode/tasks.json](../../.vscode/tasks.json):
 
 * app: test
 * app: test (watch)
@@ -78,18 +78,18 @@ Equivalent VS Code tasks are defined in [.vscode/tasks.json](../.vscode/tasks.js
 * app: test (ui)
 
 > [!NOTE]
-> The current [marginalia-app/package.json](../marginalia-app/package.json) does not define a `test:ui` script. The `app: test (ui)` task in [.vscode/tasks.json](../.vscode/tasks.json) will require adding that script before it can run successfully.
+> The current [marginalia-app/package.json](../../marginalia-app/package.json) does not define a `test:ui` script. The `app: test (ui)` task in [.vscode/tasks.json](../../.vscode/tasks.json) will require adding that script before it can run successfully.
 
 ### Mocks and fakes used
 
 * Vitest module mocking with `vi.mock` and `vi.mocked` for hook and service dependencies
 * JSDOM as the test browser environment
-* Shared setup in [marginalia-app/vitest.setup.ts](../marginalia-app/vitest.setup.ts), including `jest-dom`, `jest-axe`, and stubs for `matchMedia` and `ResizeObserver`
+* Shared setup in [marginalia-app/vitest.setup.ts](../../marginalia-app/vitest.setup.ts), including `jest-dom`, `jest-axe`, and stubs for `matchMedia` and `ResizeObserver`
 
 ### Dependencies needed
 
 * Node.js and pnpm
-* Frontend dependencies from [marginalia-app/package.json](../marginalia-app/package.json)
+* Frontend dependencies from [marginalia-app/package.json](../../marginalia-app/package.json)
 * No Docker requirement for frontend unit and component tests
 
 ## Backend Unit Tests
@@ -104,11 +104,11 @@ Equivalent VS Code tasks are defined in [.vscode/tasks.json](../.vscode/tasks.js
 
 Test project:
 
-* [marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj](../marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj)
+* [marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj](../../marginalia-service/tests/unit/Marginalia.Tests.Unit.csproj)
 
 ### How to run
 
-From [marginalia-service](../marginalia-service):
+From [marginalia-service](../../marginalia-service):
 
 1. Restore.
 
@@ -124,7 +124,7 @@ dotnet test --project tests/unit/Marginalia.Tests.Unit.csproj --configuration Re
 
 Recommended task:
 
-* service: test (unit) in [.vscode/tasks.json](../.vscode/tasks.json)
+* service: test (unit) in [.vscode/tasks.json](../../.vscode/tasks.json)
 
 ### Mocks and fakes used
 
@@ -134,8 +134,8 @@ Recommended task:
 ### Dependencies needed
 
 * .NET SDK 10
-* MSTest v4 on Microsoft Testing Platform as configured in [marginalia-service/global.json](../marginalia-service/global.json)
-* NuGet package versions centrally managed in [marginalia-service/Directory.Packages.props](../marginalia-service/Directory.Packages.props)
+* MSTest v4 on Microsoft Testing Platform as configured in [marginalia-service/global.json](../../marginalia-service/global.json)
+* NuGet package versions centrally managed in [marginalia-service/Directory.Packages.props](../../marginalia-service/Directory.Packages.props)
 * No Docker requirement for backend unit tests
 
 ## Backend Integration Tests
@@ -149,12 +149,12 @@ Recommended task:
 
 Test projects:
 
-* [marginalia-service/tests/integration/Marginalia.Tests.Integration.csproj](../marginalia-service/tests/integration/Marginalia.Tests.Integration.csproj)
-* [marginalia-service/tests/integration/Orchestration.IntegrationTests/Marginalia.Orchestration.IntegrationTests.csproj](../marginalia-service/tests/integration/Orchestration.IntegrationTests/Marginalia.Orchestration.IntegrationTests.csproj)
+* [marginalia-service/tests/integration/Marginalia.Tests.Integration.csproj](../../marginalia-service/tests/integration/Marginalia.Tests.Integration.csproj)
+* [marginalia-service/tests/integration/Orchestration.IntegrationTests/Marginalia.Orchestration.IntegrationTests.csproj](../../marginalia-service/tests/integration/Orchestration.IntegrationTests/Marginalia.Orchestration.IntegrationTests.csproj)
 
 ### How to run
 
-From [marginalia-service](../marginalia-service):
+From [marginalia-service](../../marginalia-service):
 
 1. Run the API integration test project.
 
@@ -173,7 +173,7 @@ VS Code tasks:
 * service: test (integration)
 * service: test (integration - Orchestration)
 
-Defined in [.vscode/tasks.json](../.vscode/tasks.json).
+Defined in [.vscode/tasks.json](../../.vscode/tasks.json).
 
 ### Mocks and fakes used
 
@@ -190,8 +190,8 @@ Orchestration integration tests use Aspire testing to inspect the distributed ap
 * .NET SDK 10
 * For API and orchestration integration tests in this repo, Docker is not required by default because tests use in-process hosting and substitutions
 * Integration and orchestration assemblies are currently configured with method-level parallelization:
-  * [marginalia-service/tests/integration/MSTestSettings.cs](../marginalia-service/tests/integration/MSTestSettings.cs)
-  * [marginalia-service/tests/integration/Orchestration.IntegrationTests/AssemblyInfo.cs](../marginalia-service/tests/integration/Orchestration.IntegrationTests/AssemblyInfo.cs)
+  * [marginalia-service/tests/integration/MSTestSettings.cs](../../marginalia-service/tests/integration/MSTestSettings.cs)
+  * [marginalia-service/tests/integration/Orchestration.IntegrationTests/AssemblyInfo.cs](../../marginalia-service/tests/integration/Orchestration.IntegrationTests/AssemblyInfo.cs)
 
 ## Smoke Tests
 
@@ -205,7 +205,7 @@ Smoke tests validate deployed environment readiness and core API and frontend ro
 
 Reference:
 
-* [tests/smoke/Smoke.Tests.ps1](../tests/smoke/Smoke.Tests.ps1)
+* [tests/smoke/Smoke.Tests.ps1](../../tests/smoke/Smoke.Tests.ps1)
 
 ### How to run
 
@@ -233,7 +233,7 @@ Backend coverage workflow:
 1. Run unit tests with Cobertura output using service: test (unit).
 1. Generate reports using service: code coverage (report).
 
-Task definitions are in [.vscode/tasks.json](../.vscode/tasks.json).
+Task definitions are in [.vscode/tasks.json](../../.vscode/tasks.json).
 
 ## Practical Notes
 
