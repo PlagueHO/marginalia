@@ -80,6 +80,19 @@ public sealed class FoundryOpenAiChatClientTests
         response.Text.Should().Be("ok");
     }
 
+    [TestMethod]
+    [TestCategory("Unit")]
+    public async Task GetResponseAsyncAcceptsNestedTextValueContentParts()
+    {
+        var handler = new CapturingHandler("""{"choices":[{"message":{"content":[{"type":"output_text","text":{"value":"ok"}}]}}]}""");
+        var client = CreateClient(handler);
+
+        var response = await client.GetResponseAsync(
+            [new ChatMessage(ChatRole.User, "grade this response")]);
+
+        response.Text.Should().Be("ok");
+    }
+
     private static FoundryOpenAiChatClient CreateClient(CapturingHandler handler) =>
         new(
             new HttpClient(handler),

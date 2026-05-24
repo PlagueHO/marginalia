@@ -240,8 +240,7 @@ internal sealed class FoundryOpenAiChatClient : IChatClient
     {
         text = string.Empty;
 
-        if (!contentPart.TryGetProperty("text", out var textElement) ||
-            textElement.ValueKind != JsonValueKind.String)
+        if (!contentPart.TryGetProperty("text", out var textElement))
         {
             return false;
         }
@@ -256,7 +255,20 @@ internal sealed class FoundryOpenAiChatClient : IChatClient
             }
         }
 
-        text = textElement.GetString() ?? string.Empty;
+        if (textElement.ValueKind == JsonValueKind.String)
+        {
+            text = textElement.GetString() ?? string.Empty;
+            return text.Length > 0;
+        }
+
+        if (textElement.ValueKind != JsonValueKind.Object ||
+            !textElement.TryGetProperty("value", out var valueElement) ||
+            valueElement.ValueKind != JsonValueKind.String)
+        {
+            return false;
+        }
+
+        text = valueElement.GetString() ?? string.Empty;
         return text.Length > 0;
     }
 }
