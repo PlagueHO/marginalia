@@ -31,13 +31,13 @@ export default defineConfig({
       },
       {
         text: 'Configuration',
-        items: [{ text: 'Authentication', link: '/authentication' }],
+        items: [{ text: 'Authentication', link: '/design/authentication' }],
       },
       {
         text: 'Testing & Quality',
         items: [
-          { text: 'Testing Guide', link: '/testing' },
-          { text: 'AI Evaluation Suite', link: '/ai-evaluation' },
+          { text: 'Testing Guide', link: '/design/testing' },
+          { text: 'AI Evaluation Suite', link: '/design/ai-evaluation' },
         ],
       },
       {

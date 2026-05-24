@@ -177,7 +177,7 @@ These values are set automatically by `azd` and do not need to be configured man
 | `AZURE_AD_API_CLIENT_ID` | *(set by preprovision hook)* | API app registration client ID; written automatically when `ENABLE_ENTRA_AUTH=true` |
 | `AZURE_AD_SPA_CLIENT_ID` | *(set by preprovision hook)* | SPA app registration client ID; written automatically when `ENABLE_ENTRA_AUTH=true` |
 
-See [Authentication](./authentication.md) for full details on each authentication mode and how to configure it.
+See [Authentication](./design/authentication.md) for full details on each authentication mode and how to configure it.
 
 ## CI/CD custom domain setup
 
@@ -219,7 +219,7 @@ azd up
 
 The hook requires the `Application.ReadWrite.All` Microsoft Graph permission on the deploying identity.
 
-For detailed instructions on each mode, see [Authentication](./authentication.md).
+For detailed instructions on each mode, see [Authentication](./design/authentication.md).
 
 ## Update and redeploy
 
@@ -270,5 +270,5 @@ azd down --force --purge
 ## Next steps
 
 - **Local development** — see [Local Development with Aspire](quickstart-local.md) for running locally.
-- **Authentication** — see [Authentication](./authentication.md) for detailed configuration of Anonymous, Access Code, and Entra ID modes.
+- **Authentication** — see [Authentication](./design/authentication.md) for detailed configuration of Anonymous, Access Code, and Entra ID modes.
 - **Architecture** — read the [PRD](./design/prd.md) for product requirements and design context.
