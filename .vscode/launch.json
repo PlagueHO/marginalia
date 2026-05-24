@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run Aspire AppHost",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "marginalia-service/src/Orchestration/AppHost/Marginalia.AppHost.csproj"
+      ]
+    }
+  ]
+}

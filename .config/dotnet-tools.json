@@ -2,6 +2,12 @@
   "version": 1,
   "isRoot": true,
   "tools": {
+    "aspire.cli": {
+      "version": "9.3.0",
+      "commands": [
+        "aspire"
+      ]
+    },
     "microsoft.extensions.ai.evaluation.console": {
       "version": "10.6.0",
       "commands": [
