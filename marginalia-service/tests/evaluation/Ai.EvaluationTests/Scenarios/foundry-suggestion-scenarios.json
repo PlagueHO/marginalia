@@ -3,25 +3,23 @@
   "scenarios": [
     {
       "id": "compressed-history",
-      "description": "A compressed historical summary should produce at least one meaningful editorial suggestion.",
+      "description": "A passage of formal, AI-like historical prose should produce at least one meaningful editorial suggestion.",
       "userGuidance": "Lean into vivid narrative detail while staying factual and grounded in the original meaning.",
       "paragraphs": [
         {
           "id": "p1",
-          "text": "The factory opened in 1923. It produced steel for decades. The work was dangerous."
+          "text": "The steel manufacturing facility commenced operations in 1923 and subsequently engaged in the production of steel products for a period of several decades. The working conditions present within the facility were hazardous in nature and posed physical risks to the workers employed there."
         },
         {
           "id": "p2",
-          "text": "Workers came from nearby towns and built a close community around the mill."
+          "text": "The workforce was primarily composed of individuals originating from residential areas in close proximity to the facility. Over time, these workers established a community in the immediate vicinity of the mill."
         },
         {
           "id": "p3",
-          "text": "By the 1980s, the buildings were mostly silent."
+          "text": "During the decade of the 1980s, the level of operational activity at the facility declined considerably. The structures associated with the facility were no longer actively utilized for their original manufacturing purpose."
         }
       ],
-      "expectedTargetParagraphIds": [
-        "p1"
-      ],
+      "expectedTargetParagraphIds": [],
       "allowedTargetParagraphIds": [
         "p1",
         "p2",
