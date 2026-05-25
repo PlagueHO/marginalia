@@ -1,0 +1,9 @@
+name: Marginalia CodeQL Config
+
+queries:
+  - uses: security-extended
+  - uses: ./.github/codeql/queries/logging-safety.ql
+
+paths:
+  - marginalia-service/src/Api
+  - marginalia-service/src/Infrastructure
