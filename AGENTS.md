@@ -57,6 +57,7 @@ After every code change:
 1. Run `pnpm lint:md` if any `.md` files changed
 1. **Never** add package versions to `.csproj` files — all versions in `Directory.Packages.props`
 1. **Never** use the null-forgiving operator (`!`) without a comment explaining why
+1. **Never** log raw user-derived text, titles, file names, file paths, or secret values; use metadata-only logs
 
 ## Conventions
 

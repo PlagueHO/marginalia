@@ -72,7 +72,7 @@ public sealed class ExportsController : ControllerBase
 
         if (!System.IO.File.Exists(job.ResultFilePath))
         {
-            _logger.LogWarning("Export result file not found for completed job: {JobId}, Path: {Path}", jobId, job.ResultFilePath);
+            _logger.LogWarning("Export result file not found for completed job.");
             return NotFound(new { error = "Export file is no longer available." });
         }
 
@@ -91,14 +91,14 @@ public sealed class ExportsController : ControllerBase
                         }
 
                         System.IO.File.Delete(resultFilePath);
-                        _logger.LogInformation("Deleted export result file after download: {JobId}, Path: {Path}", jobId, resultFilePath);
+                        _logger.LogInformation("Deleted export result file after download.");
                         return;
                     }
                     catch (IOException ex)
                     {
                         if (attempt == 5)
                         {
-                            _logger.LogWarning(ex, "Failed to delete export result file after download: {JobId}, Path: {Path}", jobId, resultFilePath);
+                            _logger.LogWarning(ex, "Failed to delete export result file after download.");
                             return;
                         }
 

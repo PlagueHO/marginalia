@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Api\Marginalia.Api.csproj" />
+    <ProjectReference Include="..\..\..\src\Orchestration\ServiceDefaults\Marginalia.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>

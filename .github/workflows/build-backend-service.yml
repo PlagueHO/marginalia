@@ -4,9 +4,9 @@ on:
   workflow_call:
     inputs:
       build_configuration:
-        description: 'Build configuration (Debug/Release)'
+        description: "Build configuration (Debug/Release)"
         type: string
-        default: 'Debug'
+        default: "Debug"
   pull_request:
     branches:
       - main
@@ -27,7 +27,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: "10.0.x"
 
       - name: Cache NuGet packages
         uses: actions/cache@v5
@@ -43,6 +43,10 @@ jobs:
       - name: Lint with dotnet format
         run: dotnet format marginalia-service/Marginalia.slnx --verify-no-changes --severity error
 
+      - name: Validate logging safety
+        shell: pwsh
+        run: ./.github/scripts/Test-LoggingSafety.ps1 -RepositoryRoot "${{ github.workspace }}"
+
   build-test-backend-service:
     runs-on: ubuntu-latest
     needs: lint-backend-service
@@ -57,7 +61,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: "10.0.x"
 
       - name: Cache NuGet packages
         uses: actions/cache@v5
@@ -151,7 +155,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v5
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: "10.0.x"
 
       - name: Cache NuGet packages
         uses: actions/cache@v5

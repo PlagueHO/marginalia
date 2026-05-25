@@ -29,12 +29,12 @@ public sealed class CosmosSessionRepository : ISessionRepository
                 new PartitionKey(userId),
                 cancellationToken: cancellationToken);
 
-            _logger.LogInformation("Session retrieved from Cosmos: {SessionId}, UserId: {UserId}", sessionId, userId);
+            _logger.LogInformation("Session retrieved from Cosmos.");
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            _logger.LogInformation("Session not found in Cosmos: {SessionId}, UserId: {UserId}", sessionId, userId);
+            _logger.LogInformation("Session not found in Cosmos.");
             return null;
         }
     }
@@ -46,7 +46,7 @@ public sealed class CosmosSessionRepository : ISessionRepository
             new PartitionKey(session.UserId),
             cancellationToken: cancellationToken);
 
-        _logger.LogInformation("Session saved to Cosmos: {SessionId}, UserId: {UserId}", session.SessionId, session.UserId);
+        _logger.LogInformation("Session saved to Cosmos.");
     }
 
     public async Task AddDocumentToSessionAsync(string userId, string sessionId, string documentId, CancellationToken cancellationToken = default)
@@ -74,6 +74,6 @@ public sealed class CosmosSessionRepository : ISessionRepository
         }
 
         await SaveAsync(session, cancellationToken);
-        _logger.LogInformation("Document added to session: {SessionId}, DocumentId: {DocumentId}, UserId: {UserId}", sessionId, documentId, userId);
+        _logger.LogInformation("Document added to session.");
     }
 }

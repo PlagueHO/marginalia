@@ -29,12 +29,12 @@ public sealed class CosmosDocumentRepository : IDocumentRepository
                 new PartitionKey(userId),
                 cancellationToken: cancellationToken);
 
-            _logger.LogInformation("Document retrieved from Cosmos: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogInformation("Document retrieved from Cosmos.");
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            _logger.LogInformation("Document not found in Cosmos: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogInformation("Document not found in Cosmos.");
             return null;
         }
     }
@@ -55,7 +55,7 @@ public sealed class CosmosDocumentRepository : IDocumentRepository
             documents.AddRange(response);
         }
 
-        _logger.LogInformation("Retrieved {Count} documents from Cosmos for UserId: {UserId}", documents.Count, userId);
+        _logger.LogInformation("Retrieved {Count} documents from Cosmos for current user partition", documents.Count);
         return documents.AsReadOnly();
     }
 
@@ -82,7 +82,7 @@ public sealed class CosmosDocumentRepository : IDocumentRepository
             new PartitionKey(document.UserId),
             cancellationToken: cancellationToken);
 
-        _logger.LogInformation("Document saved to Cosmos: {DocumentId}, UserId: {UserId}", document.Id, document.UserId);
+        _logger.LogInformation("Document saved to Cosmos.");
     }
 
     public async Task DeleteAsync(string userId, string id, CancellationToken cancellationToken = default)
@@ -94,11 +94,11 @@ public sealed class CosmosDocumentRepository : IDocumentRepository
                 new PartitionKey(userId),
                 cancellationToken: cancellationToken);
 
-            _logger.LogInformation("Document deleted from Cosmos: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogInformation("Document deleted from Cosmos.");
         }
         catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
-            _logger.LogWarning("Document not found for deletion: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for deletion.");
         }
     }
 }

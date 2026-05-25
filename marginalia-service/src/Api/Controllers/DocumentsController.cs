@@ -74,7 +74,7 @@ public sealed class DocumentsController : ControllerBase
             .ToList()
             .AsReadOnly();
 
-        _logger.LogInformation("Listed {Count} documents for UserId: {UserId}", summaries.Count, userId);
+        _logger.LogInformation("Listed {Count} documents.", summaries.Count);
 
         return Ok(new DocumentListResponse { Documents = summaries });
     }
@@ -93,7 +93,7 @@ public sealed class DocumentsController : ControllerBase
 
         if (!file.FileName.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
         {
-            _logger.LogWarning("Upload rejected — unsupported file type: {FileName}", file.FileName);
+            _logger.LogWarning("Upload rejected — unsupported file type. ContentLengthBytes: {ContentLengthBytes}", file.Length);
             return BadRequest(new { error = "Only .docx files are supported." });
         }
 
@@ -124,7 +124,7 @@ public sealed class DocumentsController : ControllerBase
         };
         await _sessionRepository.SaveAsync(session, cancellationToken);
 
-        _logger.LogInformation("Document uploaded: {DocumentId}, FileName: {FileName}, Size: {Size} bytes, SessionId: {SessionId}, UserId: {UserId}", document.Id, file.FileName, file.Length, session.SessionId, userId);
+        _logger.LogInformation("Document uploaded. SizeBytes: {SizeBytes}", file.Length);
 
         var response = new UploadDocumentResponse { Document = document, SessionId = session.SessionId };
         return CreatedAtAction(nameof(GetById), new { id = document.Id }, response);
@@ -172,7 +172,7 @@ public sealed class DocumentsController : ControllerBase
         };
         await _sessionRepository.SaveAsync(session, cancellationToken);
 
-        _logger.LogInformation("Document created from paste: {DocumentId}, FileName: {FileName}, SessionId: {SessionId}, UserId: {UserId}", document.Id, document.Filename, session.SessionId, userId);
+        _logger.LogInformation("Document created from paste. ParagraphCount: {ParagraphCount}", document.Paragraphs.Count);
 
         var response = new UploadDocumentResponse { Document = document, SessionId = session.SessionId };
         return CreatedAtAction(nameof(GetById), new { id = document.Id }, response);
@@ -188,7 +188,7 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
@@ -205,7 +205,7 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found for suggestions: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for suggestions.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
@@ -229,7 +229,7 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found for analysis: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for analysis.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
@@ -257,11 +257,9 @@ public sealed class DocumentsController : ControllerBase
             }
 
             _logger.LogInformation(
-                "Re-analysis requested for document: {DocumentId}, Merged: {MergedCount}, Cleared: {ClearedCount}, UserId: {UserId}",
-                id,
+                "Re-analysis requested. Merged: {MergedCount}, Cleared: {ClearedCount}",
                 mergedSuggestionCount,
-                nonAcceptedSuggestions.Count,
-                userId);
+                nonAcceptedSuggestions.Count);
 
             document = document with
             {
@@ -271,7 +269,7 @@ public sealed class DocumentsController : ControllerBase
         }
         else
         {
-            _logger.LogInformation("Analysis requested for document: {DocumentId}, ParagraphCount: {ParagraphCount}, UserId: {UserId}", id, document.Paragraphs.Count, userId);
+            _logger.LogInformation("Analysis requested. ParagraphCount: {ParagraphCount}", document.Paragraphs.Count);
         }
 
         var userGuidance = CombineGuidance(request?.EffectiveUserInstructions, request?.EffectiveToneGuidance);
@@ -298,9 +296,7 @@ public sealed class DocumentsController : ControllerBase
                 : "(none)";
 
             _logger.LogWarning(
-                "Content filter triggered for document: {DocumentId}, UserId: {UserId}, Categories: {Categories}",
-                id,
-                userId,
+                "Content filter triggered for document analysis. Categories: {Categories}",
                 categorySummary);
 
             return UnprocessableEntity(new
@@ -312,7 +308,7 @@ public sealed class DocumentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Analysis failed for document: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogError(ex, "Analysis failed.");
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Analysis failed. Please try again." });
         }
 
@@ -324,7 +320,7 @@ public sealed class DocumentsController : ControllerBase
         };
         await _documentRepository.SaveAsync(updatedDocument, cancellationToken);
 
-        _logger.LogInformation("Analysis complete for document: {DocumentId}, SuggestionsGenerated: {Count}, MergedSuggestions: {MergedCount}", id, suggestions.Count, mergedSuggestionCount);
+        _logger.LogInformation("Analysis complete. SuggestionsGenerated: {Count}, MergedSuggestions: {MergedCount}", suggestions.Count, mergedSuggestionCount);
 
         return Ok(suggestions);
     }
@@ -345,14 +341,14 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found for paragraph analysis: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for paragraph analysis.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
         var targetParagraph = document.Paragraphs.FirstOrDefault(p => p.Id == paragraphId);
         if (targetParagraph is null)
         {
-            _logger.LogWarning("Paragraph not found for analysis: {ParagraphId}, DocumentId: {DocumentId}", paragraphId, id);
+            _logger.LogWarning("Paragraph not found for analysis.");
             return NotFound(new { error = $"Paragraph '{paragraphId}' not found in document '{id}'." });
         }
 
@@ -394,10 +390,7 @@ public sealed class DocumentsController : ControllerBase
                 : "(none)";
 
             _logger.LogWarning(
-                "Content filter triggered for paragraph: {ParagraphId}, DocumentId: {DocumentId}, UserId: {UserId}, Categories: {Categories}",
-                paragraphId,
-                id,
-                userId,
+                "Content filter triggered for paragraph analysis. Categories: {Categories}",
                 categorySummary);
 
             return UnprocessableEntity(new
@@ -409,7 +402,7 @@ public sealed class DocumentsController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Paragraph analysis failed: {ParagraphId}, DocumentId: {DocumentId}, UserId: {UserId}", paragraphId, id, userId);
+            _logger.LogError(ex, "Paragraph analysis failed.");
             return StatusCode(StatusCodes.Status500InternalServerError, new { error = "Analysis failed. Please try again." });
         }
 
@@ -438,8 +431,8 @@ public sealed class DocumentsController : ControllerBase
         await _documentRepository.SaveAsync(updatedDocument, cancellationToken);
 
         _logger.LogInformation(
-            "Paragraph analysis complete: {ParagraphId}, DocumentId: {DocumentId}, NewSuggestions: {Count}, UserId: {UserId}",
-            paragraphId, id, newSuggestions.Count, userId);
+            "Paragraph analysis complete. NewSuggestions: {Count}",
+            newSuggestions.Count);
 
         return Ok(newSuggestions);
     }
@@ -522,7 +515,7 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found for title update: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for title update.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
@@ -533,7 +526,7 @@ public sealed class DocumentsController : ControllerBase
         };
         await _documentRepository.SaveAsync(updatedDocument, cancellationToken);
 
-        _logger.LogInformation("Document title updated: {DocumentId}, Title: {Title}, UserId: {UserId}", id, request.Title, userId);
+        _logger.LogInformation("Document title updated. TitleLength: {TitleLength}", request.Title.Length);
 
         return Ok(updatedDocument);
     }
@@ -548,13 +541,13 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found for deletion: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for deletion.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
         await _documentRepository.DeleteAsync(userId, id, cancellationToken);
 
-        _logger.LogInformation("Document deleted: {DocumentId}, UserId: {UserId}", id, userId);
+        _logger.LogInformation("Document deleted.");
 
         return NoContent();
     }
@@ -570,11 +563,11 @@ public sealed class DocumentsController : ControllerBase
         var document = await _documentRepository.GetByIdAsync(userId, id, cancellationToken);
         if (document is null)
         {
-            _logger.LogWarning("Document not found for export: {DocumentId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Document not found for export.");
             return NotFound(new { error = $"Document '{id}' not found." });
         }
 
-        _logger.LogInformation("Export requested for document: {DocumentId}, FileName: {FileName}, UserId: {UserId}", id, document.Filename, userId);
+        _logger.LogInformation("Export requested for document.");
 
         var stream = await _wordDocumentService.ExportAsync(document, cancellationToken);
         var exportFilename = Path.GetFileNameWithoutExtension(document.Filename) + "-revised.docx";

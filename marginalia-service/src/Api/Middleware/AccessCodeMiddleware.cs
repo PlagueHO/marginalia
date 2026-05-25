@@ -53,7 +53,7 @@ public sealed class AccessCodeMiddleware
         var providedCode = context.Request.Headers["X-Access-Code"].ToString();
         if (string.IsNullOrEmpty(providedCode) || !FixedTimeEquals(accessCode, providedCode))
         {
-            _logger.LogWarning("Access code validation failed for {Method} {Path}", context.Request.Method, path);
+            _logger.LogWarning("Access code validation failed for protected endpoint.");
 
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             context.Response.ContentType = "application/json";

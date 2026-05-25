@@ -49,7 +49,7 @@ public sealed class SessionsController : ControllerBase
 
         await _sessionRepository.SaveAsync(session, cancellationToken);
 
-        _logger.LogInformation("Session created: {SessionId}, UserId: {UserId}", session.SessionId, userId);
+        _logger.LogInformation("Session created.");
 
         return CreatedAtAction(nameof(GetById), new { id = session.SessionId }, session);
     }
@@ -64,11 +64,11 @@ public sealed class SessionsController : ControllerBase
         var session = await _sessionRepository.GetByIdAsync(userId, id, cancellationToken);
         if (session is null)
         {
-            _logger.LogWarning("Session not found: {SessionId}, UserId: {UserId}", id, userId);
+            _logger.LogWarning("Session not found.");
             return NotFound(new { error = $"Session '{id}' not found." });
         }
 
-        _logger.LogInformation("Session retrieved: {SessionId}, DocumentCount: {DocumentCount}, UserId: {UserId}", id, session.DocumentIds.Count, userId);
+        _logger.LogInformation("Session retrieved with DocumentCount: {DocumentCount}", session.DocumentIds.Count);
 
         var documents = new List<Document>();
         foreach (var docId in session.DocumentIds)

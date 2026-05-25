@@ -10,6 +10,7 @@ See [AGENTS.md](../AGENTS.md) for layout, commands, and CI pipeline.
 - **User identity**: extract from `X-User-Id` header; default to `"_anonymous"` — never accept identity from the request body.
 - **File uploads**: validate `.docx` type and 50 MB size limit before processing.
 - **Secrets**: never log or return connection strings, API keys, or access codes.
+- **Logging safety**: never log raw user-derived text, titles, file names, or file paths; log metadata only (counts, lengths, durations, booleans, IDs).
 
 ## .NET Backend Patterns
 
@@ -44,6 +45,7 @@ See [AGENTS.md](../AGENTS.md) for layout, commands, and CI pipeline.
 - Options pattern via `.Configure<T>(configuration.GetSection(...))`.
 - CORS allowed origins from `CORS:AllowedOrigins`; JSON serialization camelCase; request body limit 50 MB.
 - `AppHost` registers all services with `WaitFor()` dependencies; frontend is a Vite app with `pnpm`.
+- OpenTelemetry logging in ServiceDefaults must keep the centralized sanitizing processor enabled.
 
 ## React Frontend Patterns
 

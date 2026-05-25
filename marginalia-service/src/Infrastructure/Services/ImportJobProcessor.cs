@@ -133,7 +133,7 @@ public sealed class ImportJobProcessor
             }
             catch (IOException ex)
             {
-                _logger.LogWarning(ex, "Unable to delete import source archive after processing: {Path}", sourceFilePath);
+                _logger.LogWarning(ex, "Unable to delete import source archive after processing: {JobId}, UserId: {UserId}", job.Id, job.UserId);
             }
         }
     }
