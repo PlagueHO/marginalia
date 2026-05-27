@@ -117,7 +117,7 @@
       "label": "app: lint",
       "type": "shell",
       "command": "pnpm",
-      "args": ["lint"],
+      "args": ["run", "lint"],
       "options": {
         "cwd": "${workspaceFolder}/marginalia-app"
       },
@@ -132,7 +132,7 @@
       "label": "app: lint (fix)",
       "type": "shell",
       "command": "pnpm",
-      "args": ["lint", "--fix"],
+      "args": ["run", "lint", "--fix"],
       "options": {
         "cwd": "${workspaceFolder}/marginalia-app"
       },
