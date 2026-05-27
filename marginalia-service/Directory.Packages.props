@@ -3,7 +3,7 @@
     <!-- Web -->
     <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.3.3" />
     <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.3.3" />
-    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.58.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.3.1" />
