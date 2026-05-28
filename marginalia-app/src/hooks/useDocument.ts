@@ -89,7 +89,7 @@ export function useDocument() {
       setState((prev) => ({ ...prev, isLoading: false, error: message }));
       throw err;
     }
-  }, [state.document?.id]);
+  }, [state.document]);
 
   const deleteDocument = useCallback(async () => {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -104,7 +104,7 @@ export function useDocument() {
       setState((prev) => ({ ...prev, isLoading: false, error: message }));
       throw err;
     }
-  }, [state.document?.id]);
+  }, [state.document]);
 
   const clearDocument = useCallback(() => {
     setState({ document: null, isLoading: false, error: null });
