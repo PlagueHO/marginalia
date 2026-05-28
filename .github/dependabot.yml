@@ -6,8 +6,9 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: daily
+    versioning-strategy: increase
+    open-pull-requests-limit: 20
     commit-message:
       prefix: "ci"
     labels:
@@ -22,8 +23,9 @@ updates:
   - package-ecosystem: nuget
     directory: /marginalia-service
     schedule:
-      interval: weekly
-      day: monday
+      interval: daily
+    versioning-strategy: increase
+    open-pull-requests-limit: 20
     commit-message:
       prefix: "deps(nuget)"
     labels:
@@ -51,8 +53,9 @@ updates:
   - package-ecosystem: npm
     directory: /marginalia-app
     schedule:
-      interval: weekly
-      day: monday
+      interval: daily
+    versioning-strategy: increase
+    open-pull-requests-limit: 20
     commit-message:
       prefix: "deps(npm)"
     labels:
@@ -90,8 +93,22 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: daily
+    versioning-strategy: increase
+    open-pull-requests-limit: 20
+    commit-message:
+      prefix: "deps(npm)"
+    labels:
+      - dependencies
+      - npm
+
+  # npm/pnpm (docs site)
+  - package-ecosystem: npm
+    directory: /docs
+    schedule:
+      interval: daily
+    versioning-strategy: increase
+    open-pull-requests-limit: 20
     commit-message:
       prefix: "deps(npm)"
     labels:
