@@ -4,7 +4,7 @@
     <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.3.5" />
     <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.3.5" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
-    <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.58.0" />
+    <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.60.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.3.1" />
     <!-- Document Processing -->
@@ -12,14 +12,14 @@
     <!-- CLI -->
     <PackageVersion Include="System.CommandLine" Version="2.0.8" />
     <!-- HTTP -->
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.3" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.8" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.8" />
     <!-- Aspire -->
     <PackageVersion Include="Aspire.AppHost.Sdk" Version="13.2.4" />
     <PackageVersion Include="Aspire.Hosting.Foundry" Version="13.3.3-preview.1.26264.13" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.3.5" />
-    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
-    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.3.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.6.0" />
+    <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.6.0" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.5.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
