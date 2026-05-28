@@ -1,2 +1,5 @@
 allowBuilds:
+  msw: set this to true or false
   protobufjs: true
+minimumReleaseAgeExclude:
+  - shadcn@4.8.2

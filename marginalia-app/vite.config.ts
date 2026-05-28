@@ -46,6 +46,14 @@ export default defineConfig({
         if (log.code === 'EVAL' && log.id?.includes('@protobufjs/inquire')) {
           return
         }
+        // Suppress known invalid pure annotation warnings from transitive telemetry dependencies.
+        if (
+          log.code === 'INVALID_ANNOTATION' &&
+          (log.id?.includes('@microsoft/applicationinsights') ||
+            log.id?.includes('@nevware21/ts-utils'))
+        ) {
+          return
+        }
         defaultHandler(level, log)
       },
       output: {
