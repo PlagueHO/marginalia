@@ -7,6 +7,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-05-29
+
+### Added
+
+- AI evaluation suite for `FoundrySuggestionService`, including compressed-history and
+  full-document scenarios with quality metric assertions.
+- Segmented pill-shaped theme toggle replacing the previous single-button header control,
+  with the full pill area clickable to cycle modes.
+- CodeQL analysis workflow with a custom logging-safety query.
+
+### Changed
+
+- Reorganized documentation pages into `docs/design/` subtree with updated VitePress routes.
+- Refactored logging and improved sanitization in the OpenTelemetry pipeline.
+- Added optional access-code guard for test environments.
+- Normalized VS Code frontend lint tasks to explicit `pnpm run` invocations.
+- Updated Dependabot configuration: daily schedules and grouped ecosystems for devcontainer,
+  NuGet, npm, and GitHub Actions.
+- Updated `.editorconfig` line-ending rules.
+- Refreshed pull request template for clarity.
+- Updated CI/CD workflows for backend and frontend, including reformatted GitHub App commands.
+- Added best-practice instruction files for C#, PowerShell, TypeScript, and React.
+
+### Fixed
+
+- Removed `aspire.cli` from the tool manifest to resolve AI Evaluation CI failures.
+- Fixed dotnet tool restore failures caused by tool ordering in `dotnet-tools.json`.
+- Hardened AI evaluation: relaxed flaky scenario bounds, fixed quality metric lookup, fixed
+  judge model provisioning, accepted `output_text` chat parts, and handled nested
+  `text.value` payloads and `temperature=0`-rejecting judge models.
+- Fixed race condition in `CliRunnerResolveTests` by disabling parallel execution on that class.
+- Fixed AI evaluation test failures caused by VSTest incompatibility with the .NET 10 SDK.
+
+### Dependencies
+
+- Bump `dotnet-sdk` from 10.0.201 to 10.0.300.
+- Bump `DocumentFormat.OpenXml` from 3.3.0 to 3.5.1.
+- Bump `Microsoft.AspNetCore.OpenApi` from 10.0.0 to 10.0.8.
+- Bump Microsoft packages group (5 updates) including `Azure.Identity` and
+  `Azure.Monitor.OpenTelemetry.AspNetCore`.
+- Bump `coverlet.collector` and 2 other NuGet packages.
+- Bump `aspire.cli` and 4 other NuGet packages.
+- Bump `linkify-it` from 5.0.0 to 5.0.1.
+- Bump `katex` from 0.16.40 to 0.16.47.
+- Bump `get-east-asian-width` from 1.5.0 to 1.6.0.
+- Bump `lucide-react` (ui-utilities group).
+- Bump `picomatch` (npm_and_yarn group).
+- Bump `markdownlint-cli2` from 0.21.0 to 0.22.1.
+- Bump React group with 3 updates.
+- Bump Vite from 8.0.1 to 8.0.5, plus Vite group with 2 updates.
+- Bump ESLint group with 4 updates.
+- Bump Tailwind group with 2 updates.
+- Bump testing group with 3 updates.
+- Bump GitHub Actions group with 4 updates.
+- Bump devcontainer-dependencies group with 3 updates.
+
 ## [1.2.2] - 2026-05-18
 
 ### Changed
