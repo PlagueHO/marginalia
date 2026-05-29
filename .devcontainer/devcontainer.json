@@ -48,7 +48,7 @@
   "postCreateCommand": {
     "pnpm-setup": "corepack enable && corepack prepare pnpm@latest --activate",
     "dotnet-workloads": "dotnet workload install aspire",
-    "dotnet-tools": "dotnet tool restore && dotnet tool install --global aspire.cli --version 13.3.5",
+    "dotnet-tools": "dotnet tool restore && (dotnet tool update --global aspire.cli --version 13.3.5 || dotnet tool install --global aspire.cli --version 13.3.5)",
     "root-deps": "pnpm install",
     "app-deps": "cd marginalia-app && pnpm install",
     "service-restore": "cd marginalia-service && dotnet restore Marginalia.slnx"
