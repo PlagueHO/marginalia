@@ -25,14 +25,14 @@ internal sealed record FoundrySuggestionEvaluationEnvironment
         var projectEndpoint = FirstNonEmpty(
             Environment.GetEnvironmentVariable("AI_EVAL_FOUNDRY_PROJECT_ENDPOINT"),
             Environment.GetEnvironmentVariable("AZURE_AI_FOUNDRY_PROJECT_ENDPOINT"),
-            ParseEndpointFromConnectionString(Environment.GetEnvironmentVariable("ConnectionStrings__ai-foundry")),
+            ParseEndpointFromConnectionString(Environment.GetEnvironmentVariable("ConnectionStrings__foundryProject")),
             Environment.GetEnvironmentVariable("FOUNDRY_ENDPOINT"));
 
         if (string.IsNullOrWhiteSpace(projectEndpoint) ||
             !Uri.TryCreate(projectEndpoint, UriKind.Absolute, out var foundryProjectEndpoint))
         {
             throw new InvalidOperationException(
-                "A Foundry project endpoint is required. Set AI_EVAL_FOUNDRY_PROJECT_ENDPOINT, AZURE_AI_FOUNDRY_PROJECT_ENDPOINT, ConnectionStrings__ai-foundry, or FOUNDRY_ENDPOINT.");
+                "A Foundry project endpoint is required. Set AI_EVAL_FOUNDRY_PROJECT_ENDPOINT, AZURE_AI_FOUNDRY_PROJECT_ENDPOINT, ConnectionStrings__foundryProject, or FOUNDRY_ENDPOINT.");
         }
 
         var modelName = FirstNonEmpty(

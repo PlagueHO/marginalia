@@ -58,24 +58,34 @@ git clone https://github.com/PlagueHO/marginalia.git
 cd marginalia
 ```
 
-## 2. Configure Azure credentials
+## 2. Set required Azure user secrets for local provisioning
 
-Aspire provisions Azure AI Foundry resources on your behalf. You need to configure your Azure subscription and tenant so Aspire knows where to create them.
+Aspire provisions Azure AI Foundry resources automatically on first run. Authenticate and provide subscription settings via [dotnet user secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) so values stay out of source control.
 
-Set user secrets for the AppHost project:
+```bash
+# Sign in to Azure CLI for the target tenant
+az login --tenant <tenant-id>
+
+# Verify the correct subscription
+az account show --query "{name:name, id:id, tenantId:tenantId}" -o table
+```
+
+Set required AppHost user secrets:
 
 ```bash
 cd marginalia-service/src/Orchestration/AppHost
-
-dotnet user-secrets set "Azure:SubscriptionId" "<your-subscription-id>" \
-  --project src/Orchestration/AppHost
-dotnet user-secrets set "Azure:TenantId" "<your-tenant-id>" \
-  --project src/Orchestration/AppHost
-
-cd ../../../..
+dotnet user-secrets set "Azure:SubscriptionId" "<subscription-id>"
+dotnet user-secrets set "Azure:TenantId" "<tenant-id>"
+dotnet user-secrets set "Azure:Location" "<azure-region>"
 ```
 
-> **Tip:** Find your subscription and tenant IDs with `az account show --query "{subscriptionId:id, tenantId:tenantId}"`.
+> **Tip:** Get your subscription and tenant IDs with `az account show`. Use `swedencentral` to match the default local configuration, or set another supported Azure region if you update the AppHost settings accordingly.
+
+Ensure all three keys are set:
+
+- `Azure:SubscriptionId`
+- `Azure:TenantId`
+- `Azure:Location`
 
 ## 3. Run the app
 
@@ -126,22 +136,14 @@ The dedicated `judge` deployment used by the AI evaluation pipeline is provision
 
 ### Override model settings
 
-You can change the model name and version via environment variables or user secrets:
+You can change the model name and version via environment variables:
 
 | Setting | Environment variable | Default |
 | --- | --- | --- |
 | Model name | `MicrosoftFoundry__modelName` | `gpt-5.3-chat` |
 | Model version | `MicrosoftFoundry__modelVersion` | `2026-03-03` |
 
-Set overrides with user secrets:
-
-```bash
-cd marginalia-service/src/Orchestration/AppHost
-dotnet user-secrets set MicrosoftFoundry:modelName "gpt-5.3-chat"
-dotnet user-secrets set MicrosoftFoundry:modelVersion "2026-03-03"
-```
-
-Or with environment variables:
+Set overrides with environment variables:
 
 ```bash
 export MicrosoftFoundry__modelName="gpt-5.3-chat"
@@ -176,13 +178,6 @@ Or on Windows:
 
 ```powershell
 $env:ACCESS_CODE = "your-access-code-here"
-```
-
-### Configure via user secrets
-
-```bash
-cd marginalia-service/src/Api
-dotnet user-secrets set AccessControl:AccessCode "your-access-code-here"
 ```
 
 ### Configure for production deployment

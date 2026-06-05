@@ -1,7 +1,7 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
 var foundry = builder.AddFoundry("foundry");
-var foundryProject = foundry.AddProject("ai-foundry");
+var foundryProject = foundry.AddProject("foundryProject");
 
 var reviewerDeployment = foundryProject.AddModelDeployment(
     "reviewer",

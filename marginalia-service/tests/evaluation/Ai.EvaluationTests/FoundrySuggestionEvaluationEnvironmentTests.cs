@@ -44,7 +44,7 @@ public sealed class FoundrySuggestionEvaluationEnvironmentTests
         [
             "AI_EVAL_FOUNDRY_PROJECT_ENDPOINT",
             "AZURE_AI_FOUNDRY_PROJECT_ENDPOINT",
-            "ConnectionStrings__ai-foundry",
+            "ConnectionStrings__foundryProject",
             "FOUNDRY_ENDPOINT",
             "AI_EVAL_MODEL_NAME",
             "FOUNDRY_MODEL_NAME",

@@ -149,7 +149,7 @@ The test harness requires both metrics to be present and passing. Metric lookup 
 
 | Variable | Required | Purpose | Fallbacks and defaults |
 |---|---|---|---|
-| `AI_EVAL_FOUNDRY_PROJECT_ENDPOINT` | ✅ | Foundry project endpoint URL | Falls back to `AZURE_AI_FOUNDRY_PROJECT_ENDPOINT`, `ConnectionStrings__ai-foundry` (`Endpoint=` segment), then `FOUNDRY_ENDPOINT` |
+| `AI_EVAL_FOUNDRY_PROJECT_ENDPOINT` | ✅ | Foundry project endpoint URL | Falls back to `AZURE_AI_FOUNDRY_PROJECT_ENDPOINT`, `ConnectionStrings__foundryProject` (`Endpoint=` segment), then `FOUNDRY_ENDPOINT` |
 | `AI_EVAL_MODEL_NAME` | ✅ | Runtime model deployment name | Falls back to `FOUNDRY_MODEL_NAME` |
 | `AI_EVAL_JUDGE_MODEL_NAME` | ❌ | Judge model deployment name | Defaults to runtime model name |
 | `AI_EVAL_API_BASE_URL` | ❌ | Deployed API base URL | Falls back to `AZURE_CONTAINER_APP_FQDN` and normalizes missing scheme to `https://` |

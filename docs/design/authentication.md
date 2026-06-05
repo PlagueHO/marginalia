@@ -20,13 +20,6 @@ All documents, sessions, and suggestions are stored in Cosmos DB under the `_ano
 
 No configuration is needed. Start the app normally and it runs in anonymous mode.
 
-If a previously set access code is present in your user secrets, remove it:
-
-```bash
-cd marginalia-service/src/Api
-dotnet user-secrets remove AccessControl:AccessCode
-```
-
 Ensure the `ACCESS_CODE` environment variable is not set, then run:
 
 ```bash
@@ -68,14 +61,7 @@ The user identity remains `_anonymous` — this mode protects access to a single
 
 ### Configure for local development
 
-**Option 1 — User secrets (recommended for development)**
-
-```bash
-cd marginalia-service/src/Api
-dotnet user-secrets set AccessControl:AccessCode "your-access-code"
-```
-
-**Option 2 — `appsettings.Development.json`**
+Use `appsettings.Development.json`:
 
 Add or update the `AccessControl` section in `marginalia-service/src/Api/appsettings.Development.json`:
 
@@ -89,7 +75,7 @@ Add or update the `AccessControl` section in `marginalia-service/src/Api/appsett
 
 > Do not commit access codes to source control. Prefer user secrets for local development.
 
-**Option 3 — Environment variable**
+Or use an environment variable:
 
 On Linux/macOS:
 

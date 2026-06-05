@@ -108,7 +108,7 @@ builder.Services.AddHttpClient("foundry-llm", client =>
 // Aspire Azure AI Inference integration — active when running under Aspire AppHost.
 // In non-development environments (ACA), use ManagedIdentityCredential directly
 // to avoid the same DefaultAzureCredential cold-start caching issue as Cosmos DB.
-var aiConnectionString = builder.Configuration.GetConnectionString("ai-foundry");
+var aiConnectionString = builder.Configuration.GetConnectionString("foundryProject");
 if (!string.IsNullOrWhiteSpace(aiConnectionString))
 {
     var aiTokenCredential = new AiFoundryTokenCredential(
@@ -118,7 +118,7 @@ if (!string.IsNullOrWhiteSpace(aiConnectionString))
 
     builder.Services.AddSingleton<TokenCredential>(aiTokenCredential);
 
-    builder.AddAzureChatCompletionsClient("ai-foundry",
+    builder.AddAzureChatCompletionsClient("foundryProject",
         configureSettings: settings =>
         {
             settings.TokenCredential = aiTokenCredential;
@@ -134,7 +134,7 @@ else
 // Health checks for dependency monitoring
 builder.Services.AddHealthChecks()
     .AddCheck<CosmosDbHealthCheck>("cosmosdb", tags: ["ready"])
-    .AddCheck<AiFoundryHealthCheck>("ai-foundry", tags: ["ready"]);
+    .AddCheck<AiFoundryHealthCheck>("foundryProject", tags: ["ready"]);
 
 // Managed identity health check only runs in deployed environments
 if (!builder.Environment.IsDevelopment())
@@ -193,7 +193,7 @@ builder.WebHost.ConfigureKestrel(options =>
 // Startup diagnostic logging
 var startupLogger = LoggerFactory.Create(b => b.AddConsole()).CreateLogger("Startup");
 startupLogger.LogInformation("AI Foundry connection string: {Status}",
-    string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("ai-foundry")) ? "(not set)" : "(set)");
+    string.IsNullOrWhiteSpace(builder.Configuration.GetConnectionString("foundryProject")) ? "(not set)" : "(set)");
 startupLogger.LogInformation("FOUNDRY_ENDPOINT: {Status}",
     string.IsNullOrEmpty(Environment.GetEnvironmentVariable("FOUNDRY_ENDPOINT")) ? "(not set)" : "(set)");
 startupLogger.LogInformation("CORS mode: {CorsMode}",
