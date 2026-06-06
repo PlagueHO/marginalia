@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-06-06
+
+### Changed
+
+- Renamed AI Foundry project references from `ai-foundry` to `foundryProject` across
+  AppHost, API startup, evaluation environment setup, and related docs/configuration.
+- Updated AppHost project SDK version and added a dedicated `nuget.config` for service
+  package source configuration.
+
+### Dependencies
+
+- Bump `@shadcn/ui` from 4.8.2 to 4.8.3.
+- Bump `react-router-dom` from 7.15.1 to 7.16.0.
+- Bump ESLint group in `marginalia-app` with 2 updates.
+
 ## [1.3.0] - 2026-05-29
 
 ### Added
