@@ -2,7 +2,7 @@
   <ItemGroup>
     <!-- Web -->
     <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.4.5" />
-    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.4.2" />
+    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.4.5" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
     <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.61.0" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
