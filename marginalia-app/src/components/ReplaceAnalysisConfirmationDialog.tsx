@@ -47,7 +47,7 @@ export function ReplaceAnalysisConfirmationDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="sm:max-w-md"
+        className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-md"
         aria-describedby="replace-analysis-dialog-description"
       >
         <DialogHeader>
@@ -113,13 +113,14 @@ export function ReplaceAnalysisConfirmationDialog({
         <DialogFooter className="flex gap-2">
           <Button
             variant="outline"
+            className="w-full min-h-11 sm:w-auto sm:min-h-8"
             onClick={() => onOpenChange(false)}
           >
             Cancel
           </Button>
           <Button
             onClick={handleConfirm}
-            className="bg-amber-600 hover:bg-amber-700"
+            className="w-full min-h-11 bg-amber-600 hover:bg-amber-700 sm:w-auto sm:min-h-8"
           >
             Replace & Analyze
           </Button>
@@ -128,4 +129,3 @@ export function ReplaceAnalysisConfirmationDialog({
     </Dialog>
   );
 }
-

@@ -15,7 +15,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={toggleTheme}
       aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
       className={cn(
-        "inline-flex items-center rounded-full border border-border bg-muted/40 p-0.5 gap-0.5 cursor-pointer",
+        "inline-flex min-h-11 items-center rounded-full border border-border bg-muted/40 p-1 gap-1 cursor-pointer",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className
       )}
@@ -23,7 +23,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       <span
         aria-hidden="true"
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200",
+          "flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200",
           !isDark
             ? "bg-background shadow-sm text-amber-500"
             : "text-muted-foreground"
@@ -35,7 +35,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       <span
         aria-hidden="true"
         className={cn(
-          "flex h-7 w-7 items-center justify-center rounded-full transition-all duration-200",
+          "flex h-8 w-8 items-center justify-center rounded-full transition-all duration-200",
           isDark
             ? "bg-background shadow-sm text-violet-400 dark:bg-zinc-800"
             : "text-muted-foreground"

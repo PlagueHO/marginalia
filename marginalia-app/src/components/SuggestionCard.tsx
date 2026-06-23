@@ -222,11 +222,11 @@ export function SuggestionCard({
           </CardContent>
 
           {suggestion.status === "Pending" && (
-            <CardFooter className="gap-2 pt-0">
+            <CardFooter className="gap-2 pt-0 flex-wrap">
               <Button
                 size="sm"
                 variant="accept"
-                className="gap-1"
+                className="min-h-11 gap-1 sm:min-h-8"
                 onClick={handleAccept}
               >
                 <Check className="h-3 w-3" aria-hidden="true" />
@@ -235,7 +235,7 @@ export function SuggestionCard({
               <Button
                 size="sm"
                 variant="destructive"
-                className="gap-1"
+                className="min-h-11 gap-1 sm:min-h-8"
                 onClick={handleReject}
               >
                 <X className="h-3 w-3" aria-hidden="true" />
@@ -244,7 +244,7 @@ export function SuggestionCard({
               <Button
                 size="sm"
                 variant="outline"
-                className="gap-1"
+                className="min-h-11 gap-1 sm:min-h-8"
                 onClick={handleModify}
               >
                 <Pencil className="h-3 w-3" aria-hidden="true" />
@@ -253,6 +253,7 @@ export function SuggestionCard({
               {isEditing && (
                 <Button
                   size="sm"
+                  className="min-h-11 sm:min-h-8"
                   variant="ghost"
                   onClick={() => {
                     setIsEditing(false);
@@ -265,7 +266,7 @@ export function SuggestionCard({
               {onReanalyze && (
                 <Button
                   size="sm"
-                  className="gap-1"
+                  className="min-h-11 gap-1 sm:min-h-8"
                   onClick={handleReanalyze}
                 >
                   <Sparkles className="h-3 w-3" aria-hidden="true" />
@@ -276,11 +277,11 @@ export function SuggestionCard({
           )}
 
           {(suggestion.status === "Accepted" || suggestion.status === "Rejected" || suggestion.status === "Modified") && (
-            <CardFooter className="gap-2 pt-0">
+            <CardFooter className="gap-2 pt-0 flex-wrap">
               <Button
                 size="sm"
                 variant="default"
-                className="gap-1 bg-linear-to-r from-amber-500/90 to-orange-500/90 text-white border-0 shadow-sm hover:from-amber-500 hover:to-orange-500"
+                className="min-h-11 gap-1 border-0 bg-linear-to-r from-amber-500/90 to-orange-500/90 text-white shadow-sm hover:from-amber-500 hover:to-orange-500 sm:min-h-8"
                 onClick={handleRevertToPending}
               >
                 <Undo2 className="h-3 w-3" aria-hidden="true" />
@@ -289,7 +290,7 @@ export function SuggestionCard({
               {onReanalyze && (
                 <Button
                   size="sm"
-                  className="gap-1"
+                  className="min-h-11 gap-1 sm:min-h-8"
                   onClick={handleReanalyze}
                 >
                   <Sparkles className="h-3 w-3" aria-hidden="true" />

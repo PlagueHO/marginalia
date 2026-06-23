@@ -74,7 +74,7 @@ export function DocumentUploader({
   }, [pasteContent, onPaste, title]);
 
   return (
-    <div className="flex flex-col items-center gap-6 w-full max-w-2xl mx-auto">
+    <div className="mx-auto flex w-full max-w-2xl flex-col items-center gap-6 px-3 sm:px-0">
       <Input
         type="text"
         placeholder="Enter manuscript title (optional)"
@@ -105,7 +105,7 @@ export function DocumentUploader({
           }
         }}
       >
-        <CardContent className="flex flex-col items-center justify-center py-12 gap-4">
+        <CardContent className="flex flex-col items-center justify-center gap-4 py-8 sm:py-12">
           <div className="rounded-full bg-linear-to-br from-violet-600 to-indigo-600 p-4 shadow-md shadow-violet-900/30">
             <Upload
               className="h-8 w-8 text-white"
@@ -159,7 +159,7 @@ export function DocumentUploader({
               aria-label="Manuscript text input"
               disabled={isLoading}
             />
-            <div className="flex gap-2 justify-end">
+            <div className="flex flex-col justify-end gap-2 sm:flex-row">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -167,12 +167,14 @@ export function DocumentUploader({
                   setPasteContent("");
                 }}
                 disabled={isLoading}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handlePasteSubmit}
                 disabled={!pasteContent.trim() || isLoading}
+                className="w-full sm:w-auto"
               >
                 {isLoading ? "Processing…" : "Load Text"}
               </Button>
@@ -182,7 +184,7 @@ export function DocumentUploader({
       ) : (
         <Button
           onClick={() => setShowPaste(true)}
-          className="gap-2"
+          className="min-h-11 w-full gap-2 sm:w-auto"
           disabled={isLoading}
         >
           <ClipboardPaste className="h-4 w-4" aria-hidden="true" />

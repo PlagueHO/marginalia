@@ -72,7 +72,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
   );
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 border-b bg-linear-to-r from-muted/20 via-muted/10 to-transparent">
+    <div className="flex flex-wrap items-center gap-2 border-b bg-linear-to-r from-muted/20 via-muted/10 to-transparent px-3 py-2.5 sm:gap-3 sm:px-4">
       <FileText className="h-5 w-5 text-violet-400 shrink-0" aria-hidden="true" />
       {isEditing ? (
         <div className="flex items-center gap-1 flex-1 min-w-0">
@@ -88,7 +88,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10"
+            className="h-11 w-11 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 sm:h-9 sm:w-9"
             onClick={() => void confirmEdit()}
             aria-label="Confirm title"
           >
@@ -97,7 +97,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
           <Button
             variant="ghost"
             size="icon"
-            className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
+            className="h-11 w-11 shrink-0 text-muted-foreground hover:text-foreground sm:h-9 sm:w-9"
             onClick={cancelEditing}
             aria-label="Cancel editing"
           >
@@ -105,13 +105,13 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
           </Button>
         </div>
       ) : (
-        <div className="flex items-center gap-1 min-w-0">
+        <div className="flex flex-1 min-w-0 items-center gap-1">
           <h2 className="text-sm font-medium truncate">{displayTitle}</h2>
           {onRename && (
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 shrink-0 text-muted-foreground hover:text-foreground"
+              className="h-11 w-11 shrink-0 text-muted-foreground hover:text-foreground sm:h-9 sm:w-9"
               onClick={startEditing}
               aria-label="Edit document title"
             >
@@ -124,7 +124,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
         <Hash className="h-3 w-3" aria-hidden="true" />
         {document.source}
       </Badge>
-      <div className="ml-auto flex items-center gap-2 shrink-0 text-xs">
+      <div className="flex w-full flex-wrap items-center gap-2 text-xs sm:ml-auto sm:w-auto">
         <span className="inline-flex items-center gap-1 rounded-full border border-border/70 bg-muted/50 px-2.5 py-1 text-muted-foreground">
           <Hash className="h-3 w-3" aria-hidden="true" />
           <span className="font-medium text-foreground">Original</span>
@@ -140,7 +140,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
             <TooltipTrigger asChild>
               <Button
                 size="sm"
-                className="gap-2"
+                className="min-h-11 gap-2 sm:min-h-8"
                 onClick={onAnalyze}
                 aria-label="Analyze manuscript"
               >
@@ -165,7 +165,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
               <Button
                 variant="destructive"
                 size="sm"
-                className="gap-2"
+                className="min-h-11 gap-2 sm:min-h-8"
                 onClick={onDelete}
                 aria-label="Delete manuscript"
               >

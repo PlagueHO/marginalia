@@ -39,8 +39,8 @@ export function SettingsPage() {
     <div className="flex flex-col h-screen">
       <AppHeader />
 
-      <div className="flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-4xl px-4 py-8 space-y-6">
+      <main id="main-content" className="flex-1 overflow-auto">
+        <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:py-8">
           <div>
             <h1 className={cn(gradientText, "text-2xl")}>Settings</h1>
             <p className="text-sm text-muted-foreground">
@@ -55,7 +55,7 @@ export function SettingsPage() {
             <div className="space-y-2">
               <Label htmlFor="theme-select">Theme</Label>
               <Select value={theme} onValueChange={(v) => setTheme(v as "system" | "light" | "dark")}>
-                <SelectTrigger id="theme-select" className="w-50">
+                <SelectTrigger id="theme-select" className="w-full sm:max-w-64">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -110,11 +110,11 @@ export function SettingsPage() {
                       Include revision history
                     </label>
                   </div>
-                  <div className="mt-auto flex items-center gap-2">
+                  <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Button
                       onClick={() => void handleExport()}
                       disabled={isStartingExport || isStartingImport || isExportRunning || isImportRunning}
-                      className="gap-2"
+                      className="min-h-11 gap-2"
                     >
                       {(isStartingExport || isExportRunning) ? <Spinner /> : <Download className="size-4" aria-hidden="true" />}
                       {(isStartingExport || isExportRunning) ? "Exporting..." : "Start Export"}
@@ -123,6 +123,7 @@ export function SettingsPage() {
                       variant="outline"
                       onClick={() => void handleDownload()}
                       disabled={exportJob?.status !== "Completed" || isStartingExport || isExportRunning}
+                      className="min-h-11"
                     >
                       Download ZIP
                     </Button>
@@ -168,7 +169,7 @@ export function SettingsPage() {
                     />
                     Overwrite existing records
                   </label>
-                  <div className="mt-auto flex items-center gap-2">
+                  <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Button
                       onClick={() => {
                         if (importFile) {
@@ -176,7 +177,7 @@ export function SettingsPage() {
                         }
                       }}
                       disabled={!importFile || isStartingImport || isStartingExport || isImportRunning || isExportRunning}
-                      className="gap-2"
+                      className="min-h-11 gap-2"
                     >
                       {(isStartingImport || isImportRunning) ? <Spinner /> : <Upload className="size-4" aria-hidden="true" />}
                       {(isStartingImport || isImportRunning) ? "Importing..." : "Start Import"}
@@ -213,7 +214,7 @@ export function SettingsPage() {
               <CardDescription>Monitor connections to the AI backend and authentication service.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1 space-y-3">
                   <div className="space-y-1">
                     {llmConfig.isCheckingHealth ? (
@@ -265,6 +266,7 @@ export function SettingsPage() {
                   size="sm"
                   onClick={() => void llmConfig.checkHealth()}
                   disabled={llmConfig.isCheckingHealth || llmConfig.isCheckingAccess}
+                  className="min-h-11 w-full sm:w-auto"
                 >
                   <RefreshCw className="size-4" aria-hidden="true" />
                   <span>Check Connection</span>
@@ -273,7 +275,7 @@ export function SettingsPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
