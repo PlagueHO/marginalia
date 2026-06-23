@@ -59,11 +59,11 @@ export function SuggestionBatchActions({
       {hasPending && (
         <>
           <Separator />
-          <div className="flex gap-2 justify-center">
+          <div className="flex flex-col justify-center gap-2 sm:flex-row">
             <Button
               size="sm"
               variant="accept"
-              className="gap-1 flex-1"
+              className="min-h-11 flex-1 gap-1 sm:min-h-8"
               onClick={handleAcceptAll}
               disabled={isDisabled}
             >
@@ -73,7 +73,7 @@ export function SuggestionBatchActions({
             <Button
               size="sm"
               variant="destructive"
-              className="gap-1 flex-1"
+              className="min-h-11 flex-1 gap-1 sm:min-h-8"
               onClick={handleRejectAll}
               disabled={isDisabled}
             >

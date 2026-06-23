@@ -38,7 +38,7 @@ export function AccessCodeDialog({
   return (
     <Dialog open={open} onOpenChange={() => { /* non-dismissible */ }}>
       <DialogContent
-        className="sm:max-w-md"
+        className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-md"
         aria-describedby="access-code-description"
         showCloseButton={false}
         onPointerDownOutside={(e) => e.preventDefault()}
@@ -80,7 +80,7 @@ export function AccessCodeDialog({
             <Button
               type="submit"
               disabled={isLoading || !code.trim()}
-              className="gap-2"
+              className="w-full min-h-11 gap-2 sm:w-auto sm:min-h-8"
             >
               {isLoading && (
                 <Spinner />

@@ -67,7 +67,7 @@ export function AnalysisDialog({
   return (
     <Dialog open={open} onOpenChange={isAnalyzing ? undefined : onOpenChange}>
       <DialogContent
-        className="sm:max-w-md"
+        className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-md"
         aria-describedby="analysis-dialog-description"
         onInteractOutside={(e) => {
           if (isAnalyzing) e.preventDefault();
@@ -148,6 +148,7 @@ export function AnalysisDialog({
         <DialogFooter>
           <Button
             variant="outline"
+            className="w-full min-h-11 sm:w-auto sm:min-h-8"
             onClick={() => onOpenChange(false)}
             disabled={isAnalyzing}
           >
@@ -156,7 +157,7 @@ export function AnalysisDialog({
           <Button
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="gap-2"
+            className="w-full min-h-11 gap-2 sm:w-auto sm:min-h-8"
           >
             {isAnalyzing ? (
               <Spinner />

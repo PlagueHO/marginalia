@@ -28,7 +28,7 @@ export function DeleteConfirmationDialog({
   return (
     <Dialog open={open} onOpenChange={isDeleting ? undefined : onOpenChange}>
       <DialogContent
-        className="sm:max-w-md"
+        className="max-h-[calc(100vh-2rem)] overflow-y-auto sm:max-w-md"
         aria-describedby="delete-dialog-description"
         onInteractOutside={(e) => {
           if (isDeleting) e.preventDefault();
@@ -52,6 +52,7 @@ export function DeleteConfirmationDialog({
         <DialogFooter>
           <Button
             variant="outline"
+            className="w-full min-h-11 sm:w-auto sm:min-h-8"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
@@ -61,7 +62,7 @@ export function DeleteConfirmationDialog({
             variant="destructive"
             onClick={onConfirm}
             disabled={isDeleting}
-            className="gap-2"
+            className="w-full min-h-11 gap-2 sm:w-auto sm:min-h-8"
           >
             {isDeleting ? (
               <Spinner />

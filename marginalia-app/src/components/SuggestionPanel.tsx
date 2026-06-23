@@ -85,7 +85,7 @@ export function SuggestionPanel({
   }, [filteredSuggestions]);
 
   return (
-    <div className="flex flex-col h-full border-l bg-card/80 backdrop-blur-sm" role="complementary" aria-label="Suggestions panel">
+    <div className="flex h-full flex-col border-t bg-card/80 backdrop-blur-sm lg:border-l lg:border-t-0" role="complementary" aria-label="Suggestions panel">
       <div className="p-4 pb-2">
         <h3 className="text-sm font-semibold mb-3 text-center">Suggestions</h3>
         {!isUnanalyzed && (
@@ -107,7 +107,7 @@ export function SuggestionPanel({
             Analyze the manuscript to generate suggestions
           </p>
           {onAnalyze && (
-            <Button onClick={onAnalyze} className="gap-2">
+            <Button onClick={onAnalyze} className="min-h-11 gap-2">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
               Analyze
             </Button>
@@ -121,20 +121,20 @@ export function SuggestionPanel({
           }
           className="flex-1 flex flex-col"
         >
-        <TabsList className="mx-4 mt-2 grid grid-cols-5 h-9 justify-center">
-          <TabsTrigger value="All" className="text-xs data-[state=active]:shadow-sm">
+        <TabsList className="mx-2 mt-2 grid h-auto min-h-11 grid-cols-5 justify-center sm:mx-4">
+          <TabsTrigger value="All" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             All ({counts.total})
           </TabsTrigger>
-          <TabsTrigger value="Pending" className="text-xs data-[state=active]:shadow-sm">
+          <TabsTrigger value="Pending" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             Pending
           </TabsTrigger>
-          <TabsTrigger value="Accepted" className="text-xs data-[state=active]:shadow-sm">
+          <TabsTrigger value="Accepted" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             ✓
           </TabsTrigger>
-          <TabsTrigger value="Rejected" className="text-xs data-[state=active]:shadow-sm">
+          <TabsTrigger value="Rejected" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             ✗
           </TabsTrigger>
-          <TabsTrigger value="Modified" className="text-xs data-[state=active]:shadow-sm">
+          <TabsTrigger value="Modified" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             ✎
           </TabsTrigger>
         </TabsList>
