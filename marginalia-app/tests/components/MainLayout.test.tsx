@@ -39,4 +39,42 @@ describe("MainLayout", () => {
     expect(screen.queryByRole("button", { name: "Editor" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Suggestions" })).not.toBeInTheDocument();
   });
+
+  it("resets to editor view after document is cleared", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <MainLayout
+        hasDocument={true}
+        editor={<div>Editor content</div>}
+        panel={<div>Suggestion content</div>}
+      />
+    );
+
+    await user.click(screen.getByRole("button", { name: "Suggestions" }));
+
+    rerender(
+      <MainLayout
+        hasDocument={false}
+        editor={<div>Uploader content</div>}
+        panel={null}
+      />
+    );
+
+    rerender(
+      <MainLayout
+        hasDocument={true}
+        editor={<div>Editor content</div>}
+        panel={<div>Suggestion content</div>}
+      />
+    );
+
+    expect(screen.getByRole("button", { name: "Editor" })).toHaveAttribute(
+      "aria-pressed",
+      "true"
+    );
+    expect(screen.getByRole("button", { name: "Suggestions" })).toHaveAttribute(
+      "aria-pressed",
+      "false"
+    );
+  });
 });

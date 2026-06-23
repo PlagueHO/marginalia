@@ -88,7 +88,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 sm:h-6 sm:w-6"
+            className="h-11 w-11 shrink-0 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-500/10 sm:h-9 sm:w-9"
             onClick={() => void confirmEdit()}
             aria-label="Confirm title"
           >
@@ -97,7 +97,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
           <Button
             variant="ghost"
             size="icon"
-            className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground sm:h-6 sm:w-6"
+            className="h-11 w-11 shrink-0 text-muted-foreground hover:text-foreground sm:h-9 sm:w-9"
             onClick={cancelEditing}
             aria-label="Cancel editing"
           >
@@ -111,7 +111,7 @@ export function DocumentHeader({ document, suggestions, onRename, onAnalyze, onD
             <Button
               variant="ghost"
               size="icon"
-              className="h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground sm:h-6 sm:w-6"
+              className="h-11 w-11 shrink-0 text-muted-foreground hover:text-foreground sm:h-9 sm:w-9"
               onClick={startEditing}
               aria-label="Edit document title"
             >

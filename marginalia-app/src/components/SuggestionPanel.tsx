@@ -85,7 +85,11 @@ export function SuggestionPanel({
   }, [filteredSuggestions]);
 
   return (
-    <div className="flex h-full flex-col border-t bg-card/80 backdrop-blur-sm lg:border-l lg:border-t-0" role="complementary" aria-label="Suggestions panel">
+    <div
+      className="flex h-full flex-col bg-card/80 backdrop-blur-sm lg:border-l"
+      role="complementary"
+      aria-label="Suggestions panel"
+    >
       <div className="p-4 pb-2">
         <h3 className="text-sm font-semibold mb-3 text-center">Suggestions</h3>
         {!isUnanalyzed && (
