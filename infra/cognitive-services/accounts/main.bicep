@@ -587,9 +587,9 @@ module cognitiveService_projects './project/main.bicep' = [
       cognitiveService_deployments
     ]
     scope: az.resourceGroup(
-        split(project.?resourceGroupResourceId ?? resourceGroup().id, '/')[2],
-        split(project.?resourceGroupResourceId ?? resourceGroup().id, '/')[4]
-      )
+      split(project.?resourceGroupResourceId ?? resourceGroup().id, '/')[2],
+      split(project.?resourceGroupResourceId ?? resourceGroup().id, '/')[4]
+    )
     params: {
       accountName: cognitiveService.name
       name: project.?name ?? '${name}-project-${index}'
@@ -644,13 +644,22 @@ module cognitiveServices_capabilityHosts 'capabilityHost/main.bicep' = [
       name: capabilityHost.name
       capabilityHostKind: capabilityHost.capabilityHostKind
       threadStorageConnections: capabilityHost.?threadStorageConnectionNames != null
-        ? map(capabilityHost.threadStorageConnectionNames!, connName => buildConnectionResourceId(cognitiveService.id, connName))
+        ? map(
+            capabilityHost.threadStorageConnectionNames!,
+            connName => buildConnectionResourceId(cognitiveService.id, connName)
+          )
         : null
       vectorStoreConnections: capabilityHost.?vectorStoreConnectionNames != null
-        ? map(capabilityHost.vectorStoreConnectionNames!, connName => buildConnectionResourceId(cognitiveService.id, connName))
+        ? map(
+            capabilityHost.vectorStoreConnectionNames!,
+            connName => buildConnectionResourceId(cognitiveService.id, connName)
+          )
         : null
       storageConnections: capabilityHost.?storageConnectionNames != null
-        ? map(capabilityHost.storageConnectionNames!, connName => buildConnectionResourceId(cognitiveService.id, connName))
+        ? map(
+            capabilityHost.storageConnectionNames!,
+            connName => buildConnectionResourceId(cognitiveService.id, connName)
+          )
         : null
     }
   }
@@ -672,7 +681,7 @@ resource cognitiveService_roleAssignments 'Microsoft.Authorization/roleAssignmen
   }
 ]
 
-module secretsExport 'modules/keyVaultExport.bicep' = if (secretsExportConfiguration != null) {
+module secretsExport 'modules/key-vault-export.bicep' = if (secretsExportConfiguration != null) {
   name: '${uniqueString(deployment().name, location)}-secrets-kv'
   scope: az.resourceGroup(
     split(secretsExportConfiguration.?keyVaultResourceId!, '/')[2],
@@ -832,7 +841,6 @@ type capabilityHostOutputType = {
   @description('The resource ID of the capability host.')
   resourceId: string
 }
-
 
 @export()
 @description('The type for a cognitive services account deployment.')
