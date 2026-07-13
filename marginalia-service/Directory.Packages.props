@@ -26,7 +26,7 @@
     <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.16.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.16.0" />
     <!-- Azure / AI (Aspire client integrations) -->
     <PackageVersion Include="Aspire.Azure.AI.Inference" Version="13.4.5-preview.1.26316.12" />
     <PackageVersion Include="Azure.Identity" Version="1.21.0" />
