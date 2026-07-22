@@ -8,6 +8,7 @@
     <PackageReference Include="Aspire.Hosting.Foundry" />
     <PackageReference Include="Aspire.Hosting.Azure.CosmosDB" />
     <PackageReference Include="Aspire.Hosting.JavaScript" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" />
     <PackageReference Include="Microsoft.Extensions.AI.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.Http" />
     <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
