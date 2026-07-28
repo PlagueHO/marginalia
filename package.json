@@ -9,7 +9,7 @@
     "lint:md:ci": "markdownlint-cli2 \"**/*.md\" \"#node_modules\" \"#marginalia-app\" \"#marginalia-service\""
   },
   "devDependencies": {
-    "markdownlint-cli2": "^0.23.1"
+    "markdownlint-cli2": "^0.23.2"
   },
   "description": "Marginalia - Document analysis and annotation web application",
   "repository": {
