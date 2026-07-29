@@ -74,7 +74,7 @@ public sealed class SuggestionServiceContractTests
     [TestMethod]
     public async Task AnalyzeAsync_WithEmptyParagraphs_ReturnsEmptyList()
     {
-        _service.AnalyzeAsync(Arg.Any<string>(), Arg.Is<IReadOnlyList<Paragraph>>(p => p.Count == 0), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _service.AnalyzeAsync(Arg.Any<string>(), Arg.Is<IReadOnlyList<Paragraph>>(p => p != null && p.Count == 0), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
         var result = await _service.AnalyzeAsync("doc-1", Array.Empty<Paragraph>(), null);
@@ -220,7 +220,7 @@ public sealed class SuggestionServiceContractTests
             .ToList()
             .AsReadOnly();
 
-        _service.AnalyzeAsync(Arg.Any<string>(), Arg.Is<IReadOnlyList<Paragraph>>(p => p.Count > 20), Arg.Any<string?>(), Arg.Any<CancellationToken>())
+        _service.AnalyzeAsync(Arg.Any<string>(), Arg.Is<IReadOnlyList<Paragraph>>(p => p != null && p.Count > 20), Arg.Any<string?>(), Arg.Any<CancellationToken>())
             .Returns([]);
 
         var act = () => _service.AnalyzeAsync("doc-1", paragraphs, null);

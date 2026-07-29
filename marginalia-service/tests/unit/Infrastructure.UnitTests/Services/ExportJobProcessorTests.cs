@@ -38,6 +38,7 @@ public sealed class ExportJobProcessorTests
 
         await _jobRepository.Received().UpdateAsync(
             Arg.Is<ImportExportJob>(updated =>
+                updated != null &&
                 updated.Status == JobStatus.Failed &&
                 updated.CurrentStage == "Failed" &&
                 updated.ErrorMessage == "query failed"),
@@ -66,6 +67,7 @@ public sealed class ExportJobProcessorTests
 
         await _jobRepository.Received().UpdateAsync(
             Arg.Is<ImportExportJob>(updated =>
+                updated != null &&
                 updated.Status == JobStatus.Running &&
                 updated.CurrentStage == "Creating archive" &&
                 updated.ProgressPercentage == 70 &&
@@ -75,6 +77,7 @@ public sealed class ExportJobProcessorTests
 
         await _jobRepository.Received().UpdateAsync(
             Arg.Is<ImportExportJob>(updated =>
+                updated != null &&
                 updated.Status == JobStatus.Completed &&
                 updated.CurrentStage == "Completed" &&
                 updated.ProgressPercentage == 100 &&
@@ -96,7 +99,11 @@ public sealed class ExportJobProcessorTests
 
         _jobRepository
             .When(repo => repo.UpdateAsync(Arg.Any<ImportExportJob>(), Arg.Any<CancellationToken>()))
-            .Do(callInfo => updates.Add(callInfo.Arg<ImportExportJob>()));
+            .Do(callInfo =>
+            {
+                if (callInfo.Arg<ImportExportJob>() is { } job)
+                    updates.Add(job);
+            });
 
         _documentRepository
             .GetAllAsync(Arg.Any<CancellationToken>())
