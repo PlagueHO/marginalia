@@ -36,6 +36,7 @@ public sealed class ImportJobProcessorTests
 
         await _jobRepository.Received(1).UpdateAsync(
             Arg.Is<ImportExportJob>(updated =>
+                updated != null &&
                 updated.Status == JobStatus.Failed &&
                 updated.CurrentStage == "Failed" &&
                 updated.ErrorMessage == "Import source archive was not found."),
@@ -54,6 +55,7 @@ public sealed class ImportJobProcessorTests
 
         await _jobRepository.Received().UpdateAsync(
             Arg.Is<ImportExportJob>(updated =>
+                updated != null &&
                 updated.Status == JobStatus.Failed &&
                 updated.ErrorMessage == "Archive must contain exactly one manuscripts.json file with valid document data."),
             Arg.Any<CancellationToken>());
@@ -69,7 +71,11 @@ public sealed class ImportJobProcessorTests
 
         _jobRepository
             .When(repo => repo.UpdateAsync(Arg.Any<ImportExportJob>(), Arg.Any<CancellationToken>()))
-            .Do(callInfo => updates.Add(callInfo.Arg<ImportExportJob>()));
+            .Do(callInfo =>
+            {
+                if (callInfo.Arg<ImportExportJob>() is { } job)
+                    updates.Add(job);
+            });
 
         var documents = new List<Document>
         {

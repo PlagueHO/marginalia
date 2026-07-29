@@ -31,6 +31,7 @@ public sealed class ExportServiceTests
 
         await _jobRepository.Received(1).CreateAsync(
             Arg.Is<ImportExportJob>(job =>
+                job != null &&
                 job.Id == jobId &&
                 job.UserId == "user-a" &&
                 job.JobType == ImportExportJobType.Export &&
@@ -41,6 +42,7 @@ public sealed class ExportServiceTests
 
         await _jobQueue.Received(1).EnqueueAsync(
             Arg.Is<ImportExportJobQueueItem>(item =>
+                item != null &&
                 item.JobId == jobId &&
                 item.UserId == "user-a" &&
                 item.JobType == ImportExportJobType.Export),
