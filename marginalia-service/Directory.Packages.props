@@ -11,7 +11,7 @@
     <!-- Document Processing -->
     <PackageVersion Include="DocumentFormat.OpenXml" Version="3.5.1" />
     <!-- CLI -->
-    <PackageVersion Include="System.CommandLine" Version="2.0.10" />
+    <PackageVersion Include="System.CommandLine" Version="2.0.11" />
     <!-- HTTP -->
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.10" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.10" />
