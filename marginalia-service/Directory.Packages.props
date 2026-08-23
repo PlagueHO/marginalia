@@ -1,8 +1,8 @@
 <Project>
   <ItemGroup>
     <!-- Web -->
-    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.4.6" />
-    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.4.6" />
+    <PackageVersion Include="Aspire.Hosting.Azure.CosmosDB" Version="13.5.2" />
+    <PackageVersion Include="Aspire.Microsoft.Azure.Cosmos" Version="13.5.2" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Azure.Cosmos" Version="3.62.1" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
@@ -18,7 +18,7 @@
     <!-- Aspire -->
     <PackageVersion Include="Aspire.AppHost.Sdk" Version="13.4.5" />
     <PackageVersion Include="Aspire.Hosting.Foundry" Version="13.4.5-preview.1.26316.12" />
-    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.4.6" />
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.5.2" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.9.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.9.0" />
     <PackageVersion Include="Azure.Monitor.OpenTelemetry.AspNetCore" Version="1.6.0" />
@@ -40,7 +40,7 @@
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
     <PackageVersion Include="FluentAssertions" Version="8.10.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.11" />
-    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.4.6" />
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.5.2" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
   </ItemGroup>
 </Project>
