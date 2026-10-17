@@ -5,8 +5,8 @@ var foundryProject = foundry.AddProject("foundryProject");
 
 var reviewerDeployment = foundryProject.AddModelDeployment(
     "reviewer",
-    builder.Configuration["MicrosoftFoundry:modelName"] ?? "gpt-5.3-chat",
-    builder.Configuration["MicrosoftFoundry:modelVersion"] ?? "2026-03-03",
+    builder.Configuration["MicrosoftFoundry:modelName"] ?? "gpt-6-luna",
+    builder.Configuration["MicrosoftFoundry:modelVersion"] ?? "2026-09-22",
     "OpenAI")
     .WithProperties(deployment =>
     {
