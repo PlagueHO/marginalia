@@ -187,7 +187,7 @@ jobs:
           {
             echo "## AI evaluation"
             echo ""
-            echo "- Dataset version: \`v1\`"
+            echo "- Dataset version: \`v2\`"
             echo "- Runtime deployment: \`${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_RUNTIME_MODEL_DEPLOYMENT_NAME }}\`"
             echo "- Judge deployment: \`${{ needs.provision-infrastructure.outputs.AZURE_AI_FOUNDRY_JUDGE_MODEL_DEPLOYMENT_NAME }}\`"
             echo "- Storage path: \`marginalia-service/TestResults/AiEvaluationStorage\`"

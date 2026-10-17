@@ -1,10 +1,10 @@
 {
-  "version": "v1",
+  "version": "v2",
   "scenarios": [
     {
       "id": "compressed-history",
-      "description": "A passage of formal, AI-like historical prose should produce at least one meaningful editorial suggestion.",
-      "userGuidance": "Lean into vivid narrative detail while staying factual and grounded in the original meaning.",
+      "description": "Formal, compressed historical prose should produce at least one meaningful, fact-preserving editorial suggestion.",
+      "userGuidance": "Make the historical account more direct and less bureaucratic, with clear chronology and a focus on the workers where the source supports it. Preserve the original facts and meaning. Do not invent scenes, quotations, sensory details, or historical claims.",
       "paragraphs": [
         {
           "id": "p1",

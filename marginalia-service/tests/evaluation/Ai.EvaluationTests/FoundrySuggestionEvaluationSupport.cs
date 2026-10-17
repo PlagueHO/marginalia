@@ -151,8 +151,12 @@ internal static class FoundrySuggestionEvaluationSupport
     public static IReadOnlyList<ChatMessage> BuildEvaluationMessages(FoundrySuggestionScenario scenario)
     {
         var prompt = new StringBuilder();
-        prompt.AppendLine("Review the editorial suggestions produced for the manuscript excerpt below.");
-        prompt.AppendLine("The suggestions should be relevant to the text and the guidance, and they should provide coherent replacement paragraphs.");
+        prompt.AppendLine("Provide paragraph-level editorial suggestions for the manuscript excerpt below.");
+        prompt.AppendLine("For each paragraph you select, provide its ID, a concise factual rationale, and a coherent, complete replacement paragraph.");
+        prompt.AppendLine("Follow the author guidance in the replacement text, while keeping the rationale objective and analytical.");
+        prompt.AppendLine("Preserve the facts and meaning supported by the source. Do not invent scenes, quotations, sensory details, or historical claims.");
+        prompt.AppendLine("Improve expression using the available source material rather than adding unsupported detail.");
+        prompt.AppendLine("Leave paragraphs that do not need improvement unchanged; they do not require a suggestion.");
         prompt.AppendLine();
         prompt.AppendLine($"Scenario: {scenario.Description}");
         if (!string.IsNullOrWhiteSpace(scenario.UserGuidance))
@@ -171,7 +175,7 @@ internal static class FoundrySuggestionEvaluationSupport
         [
             new ChatMessage(
                 ChatRole.System,
-                "You are grading the quality of editorial suggestions for a long-form non-fiction manuscript."),
+                "You are an expert editorial assistant for long-form non-fiction manuscripts."),
             new ChatMessage(ChatRole.User, prompt.ToString())
         ];
     }
