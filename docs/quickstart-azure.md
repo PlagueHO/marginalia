@@ -138,7 +138,7 @@ The deployment provisions these AI model deployments by default:
 To override the model configuration, set environment variables before deploying:
 
 ```bash
-azd env set MicrosoftFoundry__modelName "gpt-4o"
+azd env set MicrosoftFoundry__modelName "gpt-6-luna"
 azd env set MicrosoftFoundry__modelVersion "2026-09-22"
 azd up
 ```
