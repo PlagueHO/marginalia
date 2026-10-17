@@ -16,8 +16,8 @@
         "Azure__Location": "swedencentral",
         "Azure__CredentialSource": "AzureCli",
         "Azure__AllowResourceGroupCreation": "true",
-        "MicrosoftFoundry__modelName": "gpt-5.3-chat",
-        "MicrosoftFoundry__modelVersion": "2026-03-03"
+        "MicrosoftFoundry__modelName": "gpt-6-luna",
+        "MicrosoftFoundry__modelVersion": "2026-09-22"
       }
     },
     "http": {
@@ -35,8 +35,8 @@
         "Azure__Location": "swedencentral",
         "Azure__CredentialSource": "AzureCli",
         "Azure__AllowResourceGroupCreation": "true",
-        "MicrosoftFoundry__modelName": "gpt-5.3-chat",
-        "MicrosoftFoundry__modelVersion": "2026-03-03"
+        "MicrosoftFoundry__modelName": "gpt-6-luna",
+        "MicrosoftFoundry__modelVersion": "2026-09-22"
       }
     }
   }

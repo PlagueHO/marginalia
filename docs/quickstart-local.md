@@ -49,7 +49,7 @@ az login
 
 ### Azure subscription
 
-You need an active Azure subscription with access to deploy Azure AI Foundry resources. The default region is **swedencentral** — ensure your subscription has quota for `gpt-5.3-chat` (GlobalStandard SKU) in that region.
+You need an active Azure subscription with access to deploy Azure AI Foundry resources. The default region is **swedencentral** — ensure your subscription has quota for `gpt-6-luna` (GlobalStandard SKU) in that region.
 
 ## 1. Clone the repository
 
@@ -101,7 +101,7 @@ Aspire will:
 1. Install frontend dependencies (`pnpm install`)
 1. Build the .NET API project
 1. Provision Azure Microsoft Foundry resource with Foundry Project.
-1. Deploy the `reviewer` (`gpt-5.3-chat`) model to the provisioned Foundry Project.
+1. Deploy the `reviewer` (`gpt-6-luna`) model to the provisioned Foundry Project.
 1. Start the API and frontend dev server.
 1. Open the Aspire Dashboard
 
@@ -130,7 +130,7 @@ Aspire provisions this AI model deployment by default:
 
 | Deployment | Model | Version | SKU | Capacity |
 | --- | --- | --- | --- | --- |
-| `reviewer` | `gpt-5.3-chat` | `2026-03-03` | GlobalStandard | 50 |
+| `reviewer` | `gpt-6-luna` | `2026-09-22` | GlobalStandard | 50 |
 
 The dedicated `judge` deployment used by the AI evaluation pipeline is provisioned by the shared Azure infrastructure described in [quickstart-azure.md](quickstart-azure.md), not by the local Aspire AppHost.
 
@@ -140,14 +140,14 @@ You can change the model name and version via environment variables:
 
 | Setting | Environment variable | Default |
 | --- | --- | --- |
-| Model name | `MicrosoftFoundry__modelName` | `gpt-5.3-chat` |
-| Model version | `MicrosoftFoundry__modelVersion` | `2026-03-03` |
+| Model name | `MicrosoftFoundry__modelName` | `gpt-6-luna` |
+| Model version | `MicrosoftFoundry__modelVersion` | `2026-09-22` |
 
 Set overrides with environment variables:
 
 ```bash
-export MicrosoftFoundry__modelName="gpt-5.3-chat"
-export MicrosoftFoundry__modelVersion="2026-03-03"
+export MicrosoftFoundry__modelName="gpt-6-luna"
+export MicrosoftFoundry__modelVersion="2026-09-22"
 ```
 
 ## Access code protection
@@ -221,7 +221,7 @@ pnpm test
 | Symptom | Fix |
 | --- | --- |
 | `aspire` command not found | Install with `dotnet tool install --global Microsoft.Aspire.Cli --prerelease` |
-| Azure provisioning fails with quota error | Ensure your subscription has `gpt-5.3-chat` GlobalStandard quota in `swedencentral`. Try a different region by setting `Azure__Location` in launchSettings. |
+| Azure provisioning fails with quota error | Ensure your subscription has `gpt-6-luna` GlobalStandard quota in `swedencentral`. Try a different region by setting `Azure__Location` in launchSettings. |
 | `pnpm: command not found` | Run `corepack enable && corepack prepare pnpm@latest --activate` |
 | Frontend shows connection errors | Ensure the API is running — check the Aspire Dashboard for service health. The frontend waits for the API via `WaitFor`. |
 | Port conflicts | Another process is using the default ports. Stop conflicting processes or update `launchSettings.json` in the AppHost and API projects. |
