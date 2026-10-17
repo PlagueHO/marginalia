@@ -90,7 +90,7 @@ The implementation flow is:
 1. Load scenario set from `Scenarios/foundry-suggestion-scenarios.json`
 1. Create `DiskBasedReportingConfiguration` with structural and quality evaluators
 1. Execute scenario through in-process or deployed path
-1. Build evaluator input as synthetic chat messages and assistant response rendered from `Suggestion` objects
+1. Build evaluator input as a synthetic editorial request and assistant response rendered from `Suggestion` objects
 1. Evaluate with shared evaluator pipeline
 1. Assert each required metric reports `Interpretation.Failed == false`
 
@@ -116,7 +116,11 @@ Each scenario supports the following fields:
 - `maximumSuggestionCount`
 - `runInDeployedCanary`
 
-Current dataset version is `v1` and includes two scenarios.
+Current dataset version is `v2` and includes two scenarios.
+
+The `compressed-history` scenario asks for direct, less bureaucratic historical prose with clearer chronology and a focus on workers where supported by the source. It requires preservation of the original facts and meaning, not invented narrative detail. The source paragraphs, allowed targets, minimum suggestion count, and deployed canary coverage are unchanged from `v1`.
+
+The shared evaluation request describes the editorial task that the suggestions answer, rather than asking the assistant to grade suggestions. It includes the source paragraphs and author guidance; the rendered response includes the original text, rationale, and complete replacement for each target. A paragraph that does not need improvement does not require a suggestion. Structural evaluators independently enforce each scenario's coverage requirements.
 
 ## Evaluations Performed
 
@@ -144,6 +148,26 @@ These are provided by `Microsoft.Extensions.AI.Evaluation.Quality` and run for e
 | CoherenceEvaluator | `Coherence` |
 
 The test harness requires both metrics to be present and passing. Metric lookup uses exact-name, case-insensitive, and contains matching to tolerate naming variations.
+
+### Interpreting Results
+
+The suite combines deterministic checks with LLM judges, following [Microsoft's .NET evaluation guidance](https://learn.microsoft.com/dotnet/ai/evaluation/libraries). Unit tests cover scenario loading, prompt construction, response rendering, and unchanged-text rejection independently of model variability. They do not establish that the live model meets the semantic quality bar.
+
+Keep the existing Relevance and Coherence passing interpretations: both require a score of at least 4. Inspect metric values, interpretations, reasons, and error diagnostics in the stored results, not only the test exit code. Informational judge diagnostics are expected and do not themselves indicate failure.
+
+[Microsoft's reporting tutorial](https://learn.microsoft.com/dotnet/ai/evaluation/evaluate-with-reporting) recommends considering score trends across scenarios rather than necessarily blocking builds on individual variable LLM scores. This suite deliberately retains per-scenario CI gates. Its two scenarios provide focused regression coverage, not evidence of broad production quality.
+
+### Calibration and Fresh Validation
+
+Judge behavior depends on the model. The [Relevance evaluator reference](https://learn.microsoft.com/dotnet/api/microsoft.extensions.ai.evaluation.quality.relevanceevaluator) lists GPT-4o as tested and tuned; it does not establish calibration for every other deployment. Keep the runtime and judge deployments fixed when comparing evaluation-contract changes.
+
+Before accepting a revised contract, review source-grounded examples of acceptable direct and narrative rewrites alongside unchanged, off-topic, and invented-fact responses. Human review establishes which edits preserve meaning; structural checks should reject unchanged text, and Relevance should distinguish responsive from off-topic edits. Do not assume that an originally failing response must pass after a rubric change.
+
+For fresh regression evidence, set `AI_EVAL_ENABLE_CACHE=false`, choose distinct `AI_EVAL_EXECUTION_NAME` values, and run a predeclared sample of three in-process executions. Retain all scores and disagreements, including failures, and inspect the generated reports. Do not rerun until a lucky pass or lower the passing thresholds. Three executions are a bounded regression check, not statistical proof of stability.
+
+The reporting cache applies to judge requests. Runtime suggestions come from the service's separate HTTP path and are not cached by the reporting configuration. Keep `await using` disposal of scenario runs so results are persisted even when validation fails.
+
+Relevance and Coherence are not dedicated factual-grounding metrics. Factual-preservation instructions and human review do not provide comprehensive hallucination detection. Dedicated grounding and safety metrics, broader datasets, and aggregate trend-based gates remain separate improvements; see [Microsoft's AI testing guidance](https://learn.microsoft.com/azure/well-architected/ai/test).
 
 ## Environment Variables
 
@@ -236,5 +260,9 @@ If the command fails, verify the storage root path exists and contains evaluatio
 ## References
 
 - [Microsoft.Extensions.AI.Evaluation on GitHub](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.AI.Evaluation)
+- [Microsoft.Extensions.AI.Evaluation libraries](https://learn.microsoft.com/dotnet/ai/evaluation/libraries)
+- [Evaluate response quality with caching and reporting](https://learn.microsoft.com/dotnet/ai/evaluation/evaluate-with-reporting)
+- [RelevanceEvaluator reference](https://learn.microsoft.com/dotnet/api/microsoft.extensions.ai.evaluation.quality.relevanceevaluator)
+- [Test and evaluate AI workloads](https://learn.microsoft.com/azure/well-architected/ai/test)
 - [Testing Guide](./testing.md) — Overview of all Marginalia test suites
 - [Local Development](../quickstart-local.md) — Setting up local Foundry credentials and model access
