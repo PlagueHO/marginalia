@@ -19,7 +19,7 @@ scripts:
 - name: 'app: test (accessibility)'
   command: pnpm --dir marginalia-app test -- -t accessibility
 - name: 'aspire: run'
-  command: dotnet run --project marginalia-service\src\Orchestration\AppHost\AppHost.csproj
+  command: aspire run --apphost marginalia-service\src\Orchestration\AppHost\Marginalia.AppHost.csproj
 - name: 'service: build'
   command: dotnet build marginalia-service\Marginalia.slnx
 - name: 'service: test'

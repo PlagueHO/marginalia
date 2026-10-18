@@ -1,6 +1,18 @@
+using Azure.Provisioning.CognitiveServices;
+using Azure.Provisioning.Expressions;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-var foundry = builder.AddFoundry("foundry");
+var foundry = builder.AddFoundry("foundry")
+    .ConfigureInfrastructure(infra =>
+    {
+        var account = infra.GetProvisionableResources().OfType<CognitiveServicesAccount>().Single();
+
+        // Azure subdomains are immutable; retain the naming expression used before the Aspire upgrade.
+        account.Properties.CustomSubDomainName = BicepFunction.ToLower(BicepFunction.Take(
+            BicepFunction.Concat("foundry", BicepFunction.GetUniqueString(BicepFunction.GetResourceGroup().Id)),
+            24));
+    });
 var foundryProject = foundry.AddProject("foundryProject");
 
 var reviewerDeployment = foundryProject.AddModelDeployment(
@@ -14,13 +26,11 @@ var reviewerDeployment = foundryProject.AddModelDeployment(
         deployment.SkuCapacity = 50;
     });
 
-#pragma warning disable ASPIRECOSMOSDB001
 var cosmos = builder.AddAzureCosmosDB("cosmos")
-    .RunAsPreviewEmulator(emulator =>
+    .RunAsEmulator(emulator =>
     {
         emulator.WithDataExplorer();
     });
-#pragma warning restore ASPIRECOSMOSDB001
 
 var cosmosDb = cosmos.AddCosmosDatabase("marginalia");
 var documentsContainer = cosmosDb.AddContainer("documents", "/userId");

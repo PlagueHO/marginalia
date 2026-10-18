@@ -1,9 +1,29 @@
+using Aspire.Hosting.Azure;
+
 namespace Marginalia.Orchestration.IntegrationTests;
 
 [TestClass]
 [TestCategory("Integration")]
 public class AppHostTests
 {
+    [TestMethod]
+    [TestCategory("Unit")]
+    public async Task FoundryResource_ShouldPreserveExistingSubdomainNaming()
+    {
+        var builder = await DistributedApplicationTestingBuilder
+            .CreateAsync<Projects.Marginalia_AppHost>();
+
+        await using var app = await builder.BuildAsync();
+
+        var model = app.Services.GetRequiredService<DistributedApplicationModel>();
+        var foundry = model.Resources.OfType<AzureProvisioningResource>()
+            .Single(resource => resource.Name == "foundry");
+
+        foundry.GetBicepTemplateString().Should().Contain(
+            "customSubDomainName: toLower(take(concat('foundry', uniqueString(resourceGroup().id)), 24))",
+            "the existing Foundry account's immutable subdomain must not change during an upgrade");
+    }
+
     [TestMethod]
     public async Task ApiResource_ShouldExist()
     {
