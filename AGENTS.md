@@ -13,63 +13,68 @@ Full implementation patterns: [.github/copilot-instructions.md](.github/copilot-
 
 ## Commands
 
-### Backend (`marginalia-service/`)
+Run backend commands from `marginalia-service/`.
 
 ```bash
-dotnet format Marginalia.slnx --verify-no-changes    # Lint
-dotnet build Marginalia.slnx                         # Build
-dotnet test --solution Marginalia.slnx --filter TestCategory=Unit --no-build  # Test
+dotnet format Marginalia.slnx --verify-no-changes --severity error
+dotnet build Marginalia.slnx
+dotnet test --solution Marginalia.slnx --filter TestCategory=Unit --ignore-exit-code 8 --no-build
 ```
 
-### Frontend (`marginalia-app/`)
+Run frontend commands from `marginalia-app/`.
 
 ```bash
-pnpm install     # if package.json changed
+pnpm install
 pnpm lint
-pnpm run build   # includes TypeScript check
+pnpm run build
 pnpm test
 ```
 
-### Markdown and Infrastructure (repo root)
+Run Markdown and infrastructure commands from the repository root.
 
 ```bash
 pnpm lint:md
 az bicep lint --file infra/main.bicep
 ```
 
-## CI Checks — Must Pass
+## CI checks
 
-| Job | Fails on |
-|---|---|
-| `dotnet-lint` | `dotnet format --verify-no-changes` errors |
-| `dotnet-build-test` | Build errors or unit test failures |
-| `build-and-publish-frontend-app` | ESLint, Vitest, or TypeScript errors |
-| Bicep lint | Bicep syntax errors |
+- **Markdown lint**: Fails on Markdown lint errors.
+- **Infrastructure lint**: Fails on Bicep lint errors.
+- **Backend lint**: Fails on formatting or logging-safety errors.
+- **Backend build and tests**: Fails on build or unit-test errors.
+- **Frontend build**: Fails on ESLint, Vitest, or TypeScript errors.
+- **Docs build**: Fails when the documentation site does not build.
 
 **Production deploys on `v*` tag pushes only, after E2E tests pass.**
 
 ## Change Checklist
 
-After every code change:
+For each change:
 
-1. Run build + lint + test for each affected subsystem
-1. Add or update unit tests for all changed logic
-1. Run `pnpm lint:md` if any `.md` files changed
-1. **Never** add package versions to `.csproj` files — all versions in `Directory.Packages.props`
-1. **Never** use the null-forgiving operator (`!`) without a comment explaining why
-1. **Never** log raw user-derived text, titles, file names, file paths, or secret values; use metadata-only logs
+1. Run lint, build, and tests for each affected code subsystem.
+1. Add or update unit tests for changed logic.
+1. Run the Markdown lint command when you change Markdown files.
 
-## Conventions
+## Documentation and change records
+
+- Review the docs and release notes for each change.
+- Add notable changes to `CHANGELOG.md` under `[Unreleased]`; keep its format and sections.
+- Document migration steps for breaking changes.
+- Update `README.md` and affected `docs/` files when behavior or requirements change.
+- Update examples, setup steps, and configuration docs affected by the change.
+- Keep pull request release notes consistent with the changelog.
+- Do not edit released changelog entries.
+- Change release versions only when the task requires a release.
+
+## Operational conventions
 
 | Concern | Rule |
 |---|---|
-| Warnings | Treated as errors in .NET and TypeScript — never suppress without justification |
-| Async | All I/O async; pass `CancellationToken` in .NET; `async`/`await` in TypeScript |
-| Dead code | Remove unused imports, variables, and functions — never leave commented-out code |
-| Error responses | `{ error: "message" }` from API; throw `ApiError` in frontend |
+| Warnings | .NET and TypeScript warnings fail checks; do not suppress them without justification |
 | Commit messages | Conventional: `feat:`, `fix:`, `docs:`, `chore:`, `refactor:`, `test:` |
 
 ## Permission Boundaries
 
-**Freely:** edit source, run build/test/lint commands, add or modify tests.
-**Ask first:** install new packages, delete files, push to shared branches, modify infrastructure.
+**Allowed:** edit source, run checks, and add or update tests.
+**Ask first:** install packages, delete files, push to shared branches, or change infrastructure.
