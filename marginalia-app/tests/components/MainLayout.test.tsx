@@ -2,8 +2,31 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import { MainLayout } from "@/components/MainLayout";
+import { axe } from "jest-axe";
 
 describe("MainLayout", () => {
+  it("resizes panels using the keyboard and clamps both limits", async () => {
+    const user = userEvent.setup();
+    render(<MainLayout hasDocument editor={<div>Manuscript</div>} panel={<div>Review</div>} />);
+    const separator = screen.getByRole("separator", { name: "Resize panels" });
+    separator.focus();
+    expect(separator).toHaveAttribute("aria-valuenow", "65");
+    await user.keyboard("{ArrowLeft}");
+    expect(separator).toHaveAttribute("aria-valuenow", "60");
+    await user.keyboard("{ArrowRight}");
+    expect(separator).toHaveAttribute("aria-valuenow", "65");
+    await user.keyboard("{Home}{ArrowLeft}");
+    expect(separator).toHaveAttribute("aria-valuenow", "20");
+    await user.keyboard("{End}{ArrowRight}");
+    expect(separator).toHaveAttribute("aria-valuenow", "80");
+    expect(document.getElementById(separator.getAttribute("aria-controls") ?? "")).toBeInTheDocument();
+  });
+
+  it("provides an accessible main target and separator", async () => {
+    const { container } = render(<MainLayout hasDocument editor={<div>Manuscript</div>} panel={<div>Review</div>} />);
+    expect(screen.getByRole("main")).toHaveAttribute("tabindex", "-1");
+    expect(await axe(container)).toHaveNoViolations();
+  });
   it("shows mobile view toggles when a document is loaded", async () => {
     const user = userEvent.setup();
 

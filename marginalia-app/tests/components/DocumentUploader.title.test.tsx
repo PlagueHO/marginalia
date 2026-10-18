@@ -72,7 +72,7 @@ describe('DocumentUploader - Title Support', () => {
     // Switch to paste mode, enter text, and submit
     await user.click(screen.getByRole('button', { name: /paste text instead/i }))
 
-    const textarea = screen.getByLabelText(/manuscript text input/i)
+    const textarea = screen.getByLabelText(/paste your text/i)
     await user.type(textarea, 'Some pasted manuscript content.')
 
     await user.click(screen.getByRole('button', { name: /load text/i }))

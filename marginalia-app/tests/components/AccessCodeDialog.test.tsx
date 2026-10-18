@@ -63,10 +63,17 @@ describe('AccessCodeDialog', () => {
       expect(onSubmit).toHaveBeenCalledWith('my-access-code')
     })
 
-    it('disables continue button when input is empty', () => {
+    it('explains an empty submission and focuses the required input', async () => {
+      const user = userEvent.setup()
       render(<AccessCodeDialog {...defaultProps} />)
-
-      expect(screen.getByRole('button', { name: /continue/i })).toBeDisabled()
+      await user.click(screen.getByRole('button', { name: /continue/i }))
+      const input = screen.getByTestId('access-code-input')
+      expect(screen.getByRole('alert')).toHaveTextContent('Enter an access code to continue.')
+      expect(input).toHaveFocus()
+      expect(input).toHaveAttribute('aria-invalid', 'true')
+      expect(input).toHaveAttribute('aria-describedby', 'access-code-error')
+      expect(input).toHaveAttribute('aria-required', 'true')
+      expect(defaultProps.onSubmit).not.toHaveBeenCalled()
     })
 
     it('enables continue button when input has text', async () => {
@@ -136,7 +143,7 @@ describe('AccessCodeDialog', () => {
     it('input has associated label', () => {
       render(<AccessCodeDialog {...defaultProps} />)
 
-      expect(screen.getByLabelText('Access Code')).toBeInTheDocument()
+      expect(screen.getByLabelText(/Access Code/, { selector: "input" })).toHaveAccessibleName("Access Code")
     })
 
     it('input uses password type for masking', () => {

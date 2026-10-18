@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
+import { toast } from "sonner";
 import * as documentService from "@/services/documentService";
 
 interface ExportControlsProps {
@@ -28,7 +29,7 @@ export function ExportControls({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch {
-      // Error is handled by the caller via toast
+      toast.error("Export failed. Please try again.");
     } finally {
       setIsExporting(false);
     }
@@ -37,7 +38,8 @@ export function ExportControls({
   return (
     <Button
       size="sm"
-      className="gap-2 w-24 justify-center"
+      variant="outline"
+      className="min-w-24 gap-2 justify-center"
       onClick={handleExport}
       disabled={isExporting}
     >

@@ -113,14 +113,14 @@ export function ReplaceAnalysisConfirmationDialog({
         <DialogFooter className="flex gap-2">
           <Button
             variant="outline"
-            className="w-full min-h-11 sm:w-auto sm:min-h-8"
+            className="w-full sm:w-auto"
             onClick={() => onOpenChange(false)}
           >
             Cancel
           </Button>
           <Button
             onClick={handleConfirm}
-            className="w-full min-h-11 bg-amber-600 hover:bg-amber-700 sm:w-auto sm:min-h-8"
+            className="w-full bg-amber-600 hover:bg-amber-700 sm:w-auto"
           >
             Replace & Analyze
           </Button>

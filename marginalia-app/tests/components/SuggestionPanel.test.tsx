@@ -122,12 +122,53 @@ describe('SuggestionPanel', () => {
 
       expect(screen.getByRole('tab', { name: /all/i })).toBeInTheDocument()
       expect(screen.getByRole('tab', { name: /pending/i })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: /accepted/i })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: /rejected/i })).toBeInTheDocument()
+      expect(screen.getByRole('tab', { name: /modified/i })).toBeInTheDocument()
     })
 
     it('shows total count in All tab', () => {
       render(<SuggestionPanel {...defaultProps} />)
 
       expect(screen.getByText(/all \(4\)/i)).toBeInTheDocument()
+    })
+
+    it('keeps filters in one scrollable row without compressing their labels', () => {
+      render(<SuggestionPanel {...defaultProps} />)
+
+      expect(
+        screen.getByRole('tablist', { name: /filter suggestions by status/i })
+      ).toHaveClass('flex', 'flex-nowrap', 'overflow-x-auto', 'overflow-y-hidden')
+      for (const tab of screen.getAllByRole('tab')) {
+        expect(tab).toHaveClass(
+          'min-w-max',
+          'shrink-0',
+          'min-h-10',
+          'pointer-coarse:min-h-11',
+          'pointer-coarse:min-w-11',
+        )
+      }
+    })
+
+    it('supports arrow, Home, and End keys across the single-row filters', async () => {
+      const user = userEvent.setup()
+      render(<SuggestionPanel {...defaultProps} />)
+
+      const allTab = screen.getByRole('tab', { name: /all/i })
+      await user.click(allTab)
+      await user.keyboard('{ArrowRight}')
+
+      expect(screen.getByRole('tab', { name: /pending/i })).toHaveFocus()
+      expect(defaultProps.onFilterChange).toHaveBeenLastCalledWith('Pending')
+
+      await user.keyboard('{End}')
+
+      expect(screen.getByRole('tab', { name: /modified/i })).toHaveFocus()
+      expect(defaultProps.onFilterChange).toHaveBeenLastCalledWith('Modified')
+
+      await user.keyboard('{Home}')
+
+      expect(allTab).toHaveFocus()
     })
 
     it('calls onFilterChange when a tab is clicked', async () => {
@@ -240,6 +281,16 @@ describe('SuggestionPanel', () => {
   })
 
   describe('batch actions', () => {
+    it('shares batch-action width only when the actions are in a horizontal row', () => {
+      render(<SuggestionPanel {...defaultProps} />)
+
+      for (const name of [/accept all/i, /reject all/i]) {
+        const button = screen.getByRole('button', { name })
+        expect(button).toHaveClass('sm:flex-1')
+        expect(button).not.toHaveClass('flex-1')
+      }
+    })
+
     it('renders Accept All button with pending count', () => {
       render(<SuggestionPanel {...defaultProps} />)
 
@@ -309,15 +360,10 @@ describe('SuggestionPanel', () => {
   })
 
   describe('accessibility', () => {
-    it('passes axe accessibility checks (excluding nested-interactive)', async () => {
-      // NOTE: SuggestionCard has a known nested-interactive issue
-      // (button inside focusable card header) that propagates here.
-      // Filed as a follow-up for Dinesh to resolve.
+    it('passes axe accessibility checks', async () => {
       const { container } = render(<SuggestionPanel {...defaultProps} />)
 
-      const results = await axe(container, {
-        rules: { 'nested-interactive': { enabled: false } },
-      })
+      const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
   })

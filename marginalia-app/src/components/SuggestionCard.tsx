@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useId } from "react";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,17 +35,17 @@ interface SuggestionCardProps {
 }
 
 const statusBadge = {
-  Pending: { variant: "default" as const, icon: AlertCircle, className: "bg-linear-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-700/95 dark:to-orange-700/95 text-white border-0 shadow-sm" },
-  Accepted: { variant: "secondary" as const, icon: Check, className: "bg-linear-to-r from-emerald-500/90 to-teal-500/90 text-white border-0 shadow-sm" },
-  Rejected: { variant: "destructive" as const, icon: X, className: "bg-linear-to-r from-rose-500/90 to-pink-500/90 text-white border-0 shadow-sm" },
-  Modified: { variant: "outline" as const, icon: Pencil, className: "bg-linear-to-r from-sky-500/90 to-indigo-500/90 text-white border-0 shadow-sm" },
+  Pending: { variant: "outline" as const, icon: AlertCircle, className: "bg-status-pending/10 text-status-pending border-transparent" },
+  Accepted: { variant: "outline" as const, icon: Check, className: "bg-status-accepted/10 text-status-accepted border-transparent" },
+  Rejected: { variant: "outline" as const, icon: X, className: "bg-status-rejected/10 text-status-rejected border-transparent" },
+  Modified: { variant: "outline" as const, icon: Pencil, className: "bg-status-modified/10 text-status-modified border-transparent" },
 };
 
 const statusNumberColors = {
-  Pending: "bg-amber-500 dark:bg-amber-700 text-white",
-  Accepted: "bg-emerald-500 text-white",
-  Rejected: "bg-rose-500 text-white",
-  Modified: "bg-sky-500 text-white",
+  Pending: "bg-status-pending text-status-foreground",
+  Accepted: "bg-status-accepted text-status-foreground",
+  Rejected: "bg-status-rejected text-status-foreground",
+  Modified: "bg-status-modified text-status-foreground",
 } as const;
 
 export function SuggestionCard({
@@ -60,6 +60,7 @@ export function SuggestionCard({
   onReanalyze,
 }: SuggestionCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const contentId = useId();
   const [isEditing, setIsEditing] = useState(false);
   const [modifiedText, setModifiedText] = useState(suggestion.proposedChange);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -75,7 +76,10 @@ export function SuggestionCard({
 
   useEffect(() => {
     if (isActive && cardRef.current) {
-      cardRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      cardRef.current.scrollIntoView({
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+        block: "nearest",
+      });
     }
   }, [isActive]);
 
@@ -118,26 +122,14 @@ export function SuggestionCard({
     <Card
       ref={cardRef}
       className={`transition-all duration-200 ${
-        isActive ? "ring-2 ring-primary shadow-lg scale-[1.01]" : isHovered ? "ring-1 ring-primary/40 shadow-md" : "hover:shadow-md hover:border-muted-foreground/20"
+        isActive ? "ring-2 ring-primary shadow-sm" : isHovered ? "ring-1 ring-primary/40" : "hover:border-input"
       }`}
       role="article"
       aria-label={`Suggestion${number != null ? ` ${number}` : ""}: ${suggestion.rationale.slice(0, 50)}`}
       onMouseEnter={() => onHoverChange?.(suggestion.id)}
       onMouseLeave={() => onHoverChange?.(null)}
     >
-      <CardHeader
-        className="pb-2 cursor-pointer"
-        onClick={handleClick}
-        onKeyDown={(e: React.KeyboardEvent) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            handleClick();
-          }
-        }}
-        tabIndex={0}
-        role="button"
-        aria-expanded={isOpen}
-      >
+      <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
             {number != null && (
@@ -155,8 +147,9 @@ export function SuggestionCard({
           </div>
           <Button
             variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0"
+            size="icon-sm"
+            aria-expanded={isOpen}
+            aria-controls={isOpen ? contentId : undefined}
             onClick={(e: React.MouseEvent) => {
               e.stopPropagation();
               if (isOpen) {
@@ -170,19 +163,20 @@ export function SuggestionCard({
               aria-label={isOpen ? "Collapse suggestion" : "Expand suggestion"}
           >
             {isOpen ? (
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-4 w-4" aria-hidden="true" />
             ) : (
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-4 w-4" aria-hidden="true" />
             )}
           </Button>
         </div>
-        <p className={cn(mutedText, "mt-1")}>
+        <button type="button" onClick={handleClick}
+          className={cn(mutedText, "mt-1 rounded-sm text-left hover:text-foreground")}>
           {suggestion.rationale}
-        </p>
+        </button>
       </CardHeader>
 
       {isOpen && (
-        <>
+        <div id={contentId} className="flex flex-col gap-4">
           <Separator />
           <CardContent className="pt-3">
             <div className="flex items-start gap-2 text-sm">
@@ -226,7 +220,7 @@ export function SuggestionCard({
               <Button
                 size="sm"
                 variant="accept"
-                className="min-h-11 gap-1 sm:min-h-8"
+                className="gap-1"
                 onClick={handleAccept}
               >
                 <Check className="h-3 w-3" aria-hidden="true" />
@@ -235,7 +229,7 @@ export function SuggestionCard({
               <Button
                 size="sm"
                 variant="destructive"
-                className="min-h-11 gap-1 sm:min-h-8"
+                className="gap-1"
                 onClick={handleReject}
               >
                 <X className="h-3 w-3" aria-hidden="true" />
@@ -244,7 +238,7 @@ export function SuggestionCard({
               <Button
                 size="sm"
                 variant="outline"
-                className="min-h-11 gap-1 sm:min-h-8"
+                className="gap-1"
                 onClick={handleModify}
               >
                 <Pencil className="h-3 w-3" aria-hidden="true" />
@@ -253,7 +247,6 @@ export function SuggestionCard({
               {isEditing && (
                 <Button
                   size="sm"
-                  className="min-h-11 sm:min-h-8"
                   variant="ghost"
                   onClick={() => {
                     setIsEditing(false);
@@ -266,7 +259,7 @@ export function SuggestionCard({
               {onReanalyze && (
                 <Button
                   size="sm"
-                  className="min-h-11 gap-1 sm:min-h-8"
+                  className="gap-1"
                   onClick={handleReanalyze}
                 >
                   <Sparkles className="h-3 w-3" aria-hidden="true" />
@@ -280,8 +273,8 @@ export function SuggestionCard({
             <CardFooter className="gap-2 pt-0 flex-wrap">
               <Button
                 size="sm"
-                variant="default"
-                className="min-h-11 gap-1 border-0 bg-linear-to-r from-amber-500/90 to-orange-500/90 text-white shadow-sm hover:from-amber-500 hover:to-orange-500 sm:min-h-8"
+                variant="outline"
+                className="gap-1"
                 onClick={handleRevertToPending}
               >
                 <Undo2 className="h-3 w-3" aria-hidden="true" />
@@ -290,7 +283,7 @@ export function SuggestionCard({
               {onReanalyze && (
                 <Button
                   size="sm"
-                  className="min-h-11 gap-1 sm:min-h-8"
+                  className="gap-1"
                   onClick={handleReanalyze}
                 >
                   <Sparkles className="h-3 w-3" aria-hidden="true" />
@@ -299,7 +292,7 @@ export function SuggestionCard({
               )}
             </CardFooter>
           )}
-        </>
+        </div>
       )}
     </Card>
   );

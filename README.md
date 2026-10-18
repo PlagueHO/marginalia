@@ -48,7 +48,9 @@ az login
 aspire run
 ```
 
-Aspire provisions a local Cosmos DB emulator and connects to your AI Foundry endpoint, then starts the backend API and Vite dev server. Open <http://localhost:5173> to begin editing.
+Aspire provisions a local Cosmos DB emulator and connects to your AI Foundry endpoint, then starts the backend API and Vite dev server. Open the `frontend` resource URL in the Aspire dashboard to begin editing.
+
+When running multiple worktrees, use `aspire run --isolated` to avoid fixed-port conflicts. The Copilot app and VS Code `aspire: run` scripts use this mode. Ports change between isolated runs, so reopen the current `frontend` URL rather than reusing an old preview. To leave Aspire running after the terminal command exits, use `aspire run --isolated --detach`.
 
 For troubleshooting, credential configuration, and model overrides, see [Local Development](docs/QUICKSTART-LOCAL.md).
 

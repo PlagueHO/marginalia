@@ -36,20 +36,20 @@ export function SuggestionBatchActions({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap gap-2 justify-center">
-        <Badge variant="default" className="bg-linear-to-r from-amber-500/90 to-orange-500/90 dark:from-amber-700/95 dark:to-orange-700/95 text-white border-0 shadow-sm pl-1.5">
+        <Badge variant="secondary" className="bg-status-pending/10 text-status-pending border-0 pl-1.5">
           <Clock className="h-3 w-3" aria-hidden="true" />
           {counts.Pending} pending
         </Badge>
-        <Badge variant="secondary" className="bg-linear-to-r from-emerald-500/90 to-teal-500/90 text-white border-0 shadow-sm pl-1.5">
+        <Badge variant="secondary" className="bg-status-accepted/10 text-status-accepted border-0 pl-1.5">
           <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
           {counts.Accepted} accepted
         </Badge>
-        <Badge variant="secondary" className="bg-linear-to-r from-rose-500/90 to-pink-500/90 text-white border-0 shadow-sm pl-1.5">
+        <Badge variant="secondary" className="bg-status-rejected/10 text-status-rejected border-0 pl-1.5">
           <Ban className="h-3 w-3" aria-hidden="true" />
           {counts.Rejected} rejected
         </Badge>
         {counts.Modified > 0 && (
-          <Badge variant="secondary" className="bg-linear-to-r from-sky-500/90 to-indigo-500/90 text-white border-0 shadow-sm pl-1.5">
+          <Badge variant="secondary" className="bg-status-modified/10 text-status-modified border-0 pl-1.5">
             <PenLine className="h-3 w-3" aria-hidden="true" />
             {counts.Modified} modified
           </Badge>
@@ -63,7 +63,7 @@ export function SuggestionBatchActions({
             <Button
               size="sm"
               variant="accept"
-              className="min-h-11 flex-1 gap-1 sm:min-h-8"
+              className="gap-1 sm:flex-1"
               onClick={handleAcceptAll}
               disabled={isDisabled}
             >
@@ -73,7 +73,7 @@ export function SuggestionBatchActions({
             <Button
               size="sm"
               variant="destructive"
-              className="min-h-11 flex-1 gap-1 sm:min-h-8"
+              className="gap-1 sm:flex-1"
               onClick={handleRejectAll}
               disabled={isDisabled}
             >

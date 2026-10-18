@@ -52,7 +52,7 @@ export function DeleteConfirmationDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            className="w-full min-h-11 sm:w-auto sm:min-h-8"
+            className="w-full sm:w-auto"
             onClick={() => onOpenChange(false)}
             disabled={isDeleting}
           >
@@ -62,7 +62,7 @@ export function DeleteConfirmationDialog({
             variant="destructive"
             onClick={onConfirm}
             disabled={isDeleting}
-            className="w-full min-h-11 gap-2 sm:w-auto sm:min-h-8"
+            className="w-full gap-2 sm:w-auto"
           >
             {isDeleting ? (
               <Spinner />

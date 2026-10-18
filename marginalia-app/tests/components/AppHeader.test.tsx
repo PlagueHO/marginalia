@@ -80,8 +80,19 @@ describe("AppHeader", () => {
     );
 
     await user.click(screen.getByRole("button", { name: /open navigation menu/i }));
-    await user.click(screen.getByRole("button", { name: /^settings$/i }));
+    const settings = screen.getByRole("link", { name: /^settings$/i });
+    expect(settings).toHaveAttribute("href", "/settings");
+    await user.click(settings);
 
-    expect(mockNavigate).toHaveBeenCalledWith("/settings");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+
+  it("uses current-page native links and keeps branding out of the heading hierarchy", () => {
+    mockPathname = "/settings";
+    render(<MemoryRouter><TooltipProvider><AppHeader /></TooltipProvider></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "Settings" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Marginalia" })).toHaveAttribute("href", "/");
+    expect(screen.queryByRole("heading", { level: 1 })).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /skip to main content/i })).toHaveAttribute("href", "#main-content");
   });
 });

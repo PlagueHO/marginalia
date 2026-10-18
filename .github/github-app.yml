@@ -1,4 +1,4 @@
-instructions: Use `aspire run` to start the application. Use aspire MCP server tools to select AppHost and open `frontend` resource.
+instructions: Use `aspire run --isolated` to start the application without port conflicts between worktrees. Use aspire MCP server tools to select AppHost and open `frontend` resource.
 scripts:
 - name: 'app: dev'
   command: pnpm --dir marginalia-app dev
@@ -19,7 +19,7 @@ scripts:
 - name: 'app: test (accessibility)'
   command: pnpm --dir marginalia-app test -- -t accessibility
 - name: 'aspire: run'
-  command: aspire run --apphost marginalia-service\src\Orchestration\AppHost\Marginalia.AppHost.csproj
+  command: aspire run --isolated --apphost marginalia-service\src\Orchestration\AppHost\Marginalia.AppHost.csproj
 - name: 'service: build'
   command: dotnet build marginalia-service\Marginalia.slnx
 - name: 'service: test'

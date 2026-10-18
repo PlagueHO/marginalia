@@ -200,15 +200,12 @@ describe('HomePage', () => {
   })
 
   describe('navigation', () => {
-    it('clicking a document navigates to editor page', async () => {
-      const user = userEvent.setup()
+    it('provides native document links to the editor page', async () => {
       mockFetchDocuments()
       renderHomePage()
 
-      const firstDoc = await screen.findByText(/chapter 1 draft/i)
-      await user.click(firstDoc)
-
-      expect(mockNavigate).toHaveBeenCalledWith('/editor/doc-1')
+      const firstDoc = await screen.findByRole('link', { name: /chapter 1 draft/i })
+      expect(firstDoc).toHaveAttribute('href', '/editor/doc-1')
     })
 
     it('"New Manuscript" button navigates to new page', async () => {

@@ -96,8 +96,9 @@ export function EditorPage() {
         suggestions.setParagraphs(response.document.paragraphs);
         toast.success("Document loaded successfully");
         navigate(`/editor/${response.document.id}`, { replace: true });
-      } catch {
+      } catch (err) {
         toast.error("Failed to upload document");
+        throw err;
       }
     },
     [doc, suggestions, navigate]
@@ -111,8 +112,9 @@ export function EditorPage() {
         suggestions.setParagraphs(response.document.paragraphs);
         toast.success("Text loaded successfully");
         navigate(`/editor/${response.document.id}`, { replace: true });
-      } catch {
+      } catch (err) {
         toast.error("Failed to process text");
+        throw err;
       }
     },
     [doc, suggestions, navigate]
