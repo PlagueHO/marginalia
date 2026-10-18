@@ -1,9 +1,11 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
   type ReactNode,
+  type CSSProperties,
   type RefObject,
 } from "react";
 import { Button } from "@/components/ui/button";
@@ -25,6 +27,7 @@ interface LoadedDocumentLayoutProps {
   splitPct: number;
   containerRef: RefObject<HTMLDivElement | null>;
   onResizeStart: (event: React.MouseEvent) => void;
+  onResizeKeyDown: (event: React.KeyboardEvent) => void;
 }
 
 function LoadedDocumentLayout({
@@ -33,18 +36,23 @@ function LoadedDocumentLayout({
   splitPct,
   containerRef,
   onResizeStart,
+  onResizeKeyDown,
 }: LoadedDocumentLayoutProps) {
   const [mobileView, setMobileView] = useState<"editor" | "suggestions">("editor");
   const hasPanel = panel != null;
+  const editorId = useId();
+  const panelStyle: CSSProperties & Record<"--editor-width" | "--panel-width", string> = {
+    "--editor-width": `${splitPct}%`,
+    "--panel-width": `${100 - splitPct}%`,
+  };
 
   return (
-    <main id="main-content" className="flex-1 flex flex-col overflow-hidden">
+    <main id="main-content" tabIndex={-1} className="flex-1 flex flex-col overflow-hidden">
       {hasPanel && (
         <div className="border-b px-3 py-2 lg:hidden">
           <div className="grid grid-cols-2 gap-2">
             <Button
               variant={mobileView === "editor" ? "secondary" : "ghost"}
-              className="min-h-11"
               onClick={() => setMobileView("editor")}
               aria-pressed={mobileView === "editor"}
             >
@@ -52,7 +60,6 @@ function LoadedDocumentLayout({
             </Button>
             <Button
               variant={mobileView === "suggestions" ? "secondary" : "ghost"}
-              className="min-h-11"
               onClick={() => setMobileView("suggestions")}
               aria-pressed={mobileView === "suggestions"}
             >
@@ -64,14 +71,16 @@ function LoadedDocumentLayout({
 
       <div
         ref={containerRef}
+        style={panelStyle}
         className="flex flex-1 flex-col overflow-hidden lg:flex-row"
       >
         <div
+          id={editorId}
           className={cn(
-            "flex flex-1 min-w-0 flex-col overflow-hidden",
+            "flex w-full flex-1 min-w-0 flex-col overflow-hidden",
+            hasPanel && "lg:w-(--editor-width) lg:flex-none",
             hasPanel && mobileView !== "editor" && "hidden lg:flex"
           )}
-          style={hasPanel ? { width: `${splitPct}%` } : undefined}
         >
           <div className="flex-1 overflow-hidden">{editor}</div>
         </div>
@@ -82,8 +91,15 @@ function LoadedDocumentLayout({
             role="separator"
             aria-orientation="vertical"
             aria-label="Resize panels"
-            className="group hidden w-1.5 shrink-0 cursor-col-resize items-stretch lg:flex"
+            aria-controls={editorId}
+            aria-valuemin={MIN_PCT}
+            aria-valuemax={MAX_PCT}
+            aria-valuenow={splitPct}
+            aria-valuetext={`Editor ${Math.round(splitPct)} percent`}
+            tabIndex={0}
+            className="group hidden w-2 shrink-0 cursor-col-resize items-stretch focus-visible:outline-offset-[-2px] lg:flex"
             onMouseDown={onResizeStart}
+            onKeyDown={onResizeKeyDown}
           >
             <div className="mx-auto w-px bg-border/50 transition-colors group-hover:bg-primary/50 group-active:bg-primary" />
           </div>
@@ -92,10 +108,9 @@ function LoadedDocumentLayout({
         {hasPanel && (
           <div
             className={cn(
-              "h-full shrink-0 overflow-y-auto border-t lg:h-auto lg:border-t-0",
+              "h-full w-full min-w-0 flex-1 overflow-y-auto border-t lg:h-auto lg:w-(--panel-width) lg:border-t-0",
               mobileView !== "suggestions" && "hidden lg:block"
             )}
-            style={{ width: `${100 - splitPct}%` }}
           >
             {panel}
           </div>
@@ -121,6 +136,17 @@ export function MainLayout({
     document.body.style.userSelect = "none";
   }, []);
 
+  const handleResizeKeyDown = useCallback((event: React.KeyboardEvent) => {
+    const adjustments: Record<string, number> = { ArrowLeft: -5, ArrowRight: 5 };
+    if (event.key === "Home" || event.key === "End") {
+      event.preventDefault();
+      setSplitPct(event.key === "Home" ? MIN_PCT : MAX_PCT);
+    } else if (event.key in adjustments) {
+      event.preventDefault();
+      setSplitPct((current) => Math.min(MAX_PCT, Math.max(MIN_PCT, current + adjustments[event.key])));
+    }
+  }, []);
+
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current || !containerRef.current) return;
@@ -141,6 +167,7 @@ export function MainLayout({
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      handleMouseUp();
     };
   }, []);
 
@@ -148,7 +175,8 @@ export function MainLayout({
     return (
       <main
         id="main-content"
-        className="flex-1 flex items-center justify-center p-4 sm:p-8"
+        tabIndex={-1}
+        className="flex-1 overflow-auto p-4 sm:p-8"
       >
         {editor}
       </main>
@@ -162,6 +190,7 @@ export function MainLayout({
       splitPct={splitPct}
       containerRef={containerRef}
       onResizeStart={handleMouseDown}
+      onResizeKeyDown={handleResizeKeyDown}
     />
   );
 }

@@ -147,7 +147,7 @@
       "label": "aspire: run",
       "type": "shell",
       "command": "aspire",
-      "args": ["run"],
+      "args": ["run", "--isolated"],
       "options": {
         "cwd": "${workspaceFolder}/marginalia-service/src/Orchestration/AppHost"
       },

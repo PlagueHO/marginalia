@@ -86,12 +86,12 @@ export function SuggestionPanel({
 
   return (
     <div
-      className="flex h-full flex-col bg-card/80 backdrop-blur-sm lg:border-l"
+      className="flex h-full min-h-0 flex-col bg-muted/20 lg:border-l"
       role="complementary"
       aria-label="Suggestions panel"
     >
       <div className="p-4 pb-2">
-        <h3 className="text-sm font-semibold mb-3 text-center">Suggestions</h3>
+        <h2 className="text-base font-semibold mb-3">Suggestions</h2>
         {!isUnanalyzed && (
           <SuggestionBatchActions
             counts={counts}
@@ -106,12 +106,12 @@ export function SuggestionPanel({
 
       {isUnanalyzed ? (
         <div className="flex flex-col items-center justify-center flex-1 gap-4 p-8 text-center">
-          <Sparkles className="h-8 w-8 text-violet-400/50" aria-hidden="true" />
+          <Sparkles className="h-8 w-8 text-primary" aria-hidden="true" />
           <p className={cn(mutedText, "text-sm max-w-[180px]")}>
             Analyze the manuscript to generate suggestions
           </p>
           {onAnalyze && (
-            <Button onClick={onAnalyze} className="min-h-11 gap-2">
+            <Button onClick={onAnalyze} className="gap-2">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
               Analyze
             </Button>
@@ -123,28 +123,28 @@ export function SuggestionPanel({
           onValueChange={(val: string) =>
             onFilterChange(val as SuggestionStatus | "All")
           }
-          className="flex-1 flex flex-col"
+          className="min-h-0 flex-1 flex flex-col"
         >
-        <TabsList className="mx-2 mt-2 grid h-auto min-h-11 grid-cols-5 justify-center sm:mx-4">
-          <TabsTrigger value="All" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
+        <TabsList aria-label="Filter suggestions by status" className="mx-2 mt-2 flex min-h-11 w-auto shrink-0 flex-nowrap justify-start gap-1 overflow-x-auto overflow-y-hidden group-data-[orientation=horizontal]/tabs:h-auto sm:mx-4">
+          <TabsTrigger value="All" className="min-h-10 min-w-max shrink-0 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             All ({counts.total})
           </TabsTrigger>
-          <TabsTrigger value="Pending" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
+          <TabsTrigger value="Pending" className="min-h-10 min-w-max shrink-0 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
             Pending
           </TabsTrigger>
-          <TabsTrigger value="Accepted" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
-            ✓
+          <TabsTrigger value="Accepted" className="min-h-10 min-w-max shrink-0 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
+            Accepted
           </TabsTrigger>
-          <TabsTrigger value="Rejected" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
-            ✗
+          <TabsTrigger value="Rejected" className="min-h-10 min-w-max shrink-0 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
+            Rejected
           </TabsTrigger>
-          <TabsTrigger value="Modified" className="min-h-10 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
-            ✎
+          <TabsTrigger value="Modified" className="min-h-10 min-w-max shrink-0 px-1 text-[11px] data-[state=active]:shadow-sm sm:text-xs">
+            Modified
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value={filter} className="flex-1 m-0 overflow-hidden">
-          <ScrollArea className="h-full max-h-[calc(100vh-16rem)]">
+        <TabsContent value={filter} className="min-h-0 flex-1 m-0 overflow-hidden">
+          <ScrollArea className="h-full">
             <div className="flex flex-col gap-3 p-4">
               {filteredSuggestions.length === 0 ? (
                 <p className={cn(mutedText, "text-center py-8")}>

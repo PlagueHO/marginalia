@@ -79,6 +79,26 @@ describe('SuggestionCard', () => {
   })
 
   describe('expand/collapse', () => {
+    it.each([true, false])('respects reduced motion (%s) when scrolling an active suggestion', (reducedMotion) => {
+      const scrollIntoView = vi.fn()
+      const originalScroll = HTMLElement.prototype.scrollIntoView
+      HTMLElement.prototype.scrollIntoView = scrollIntoView
+      const media = vi.spyOn(window, 'matchMedia').mockImplementation((query) => ({
+        matches: reducedMotion, media: query, onchange: null,
+        addListener: vi.fn(), removeListener: vi.fn(),
+        addEventListener: vi.fn(), removeEventListener: vi.fn(), dispatchEvent: vi.fn(),
+      }))
+      try {
+        render(<SuggestionCard {...defaultProps} isActive />)
+        expect(scrollIntoView).toHaveBeenCalledWith({
+          behavior: reducedMotion ? 'instant' : 'smooth', block: 'nearest',
+        })
+      } finally {
+        media.mockRestore()
+        HTMLElement.prototype.scrollIntoView = originalScroll
+      }
+    })
+
     it('shows expand button', () => {
       render(<SuggestionCard {...defaultProps} />)
 
@@ -208,35 +228,31 @@ describe('SuggestionCard', () => {
       const user = userEvent.setup()
       render(<SuggestionCard {...defaultProps} />)
 
-      // The card header has role="button" and contains the rationale text
-      const rationale = screen.getByText(/overly compressed/i)
-      const header = rationale.closest('[role="button"]')
-      expect(header).not.toBeNull()
-
-      await user.click(header!)
+      await user.click(screen.getByRole('button', { name: /overly compressed/i }))
       expect(defaultProps.onClick).toHaveBeenCalledWith('sug-1')
     })
   })
 
   describe('keyboard accessibility', () => {
-    it('card header is keyboard focusable', () => {
+    it('selects the suggestion with the keyboard independently of its disclosure', async () => {
+      const user = userEvent.setup()
       render(<SuggestionCard {...defaultProps} />)
-
-      const header = screen.getByText(/overly compressed/i).closest('[tabindex="0"]')
-      expect(header).toBeInTheDocument()
+      screen.getByRole('button', { name: /overly compressed/i }).focus()
+      await user.keyboard('{Enter}')
+      expect(defaultProps.onClick).toHaveBeenCalledWith('sug-1')
+      const disclosure = screen.getByRole('button', { name: /expand suggestion/i })
+      expect(disclosure).toHaveAttribute('aria-expanded', 'false')
+      await user.click(disclosure)
+      expect(disclosure).toHaveAttribute('aria-expanded', 'true')
+      expect(document.getElementById(disclosure.getAttribute('aria-controls') ?? '')).toBeInTheDocument()
     })
   })
 
   describe('accessibility', () => {
-    it('passes axe accessibility checks (excluding nested-interactive)', async () => {
-      // NOTE: SuggestionCard has a known nested-interactive issue:
-      // the expand/collapse button sits inside a focusable card header.
-      // Filed as a follow-up for Dinesh to resolve.
+    it('passes axe accessibility checks', async () => {
       const { container } = render(<SuggestionCard {...defaultProps} />)
 
-      const results = await axe(container, {
-        rules: { 'nested-interactive': { enabled: false } },
-      })
+      const results = await axe(container)
       expect(results).toHaveNoViolations()
     })
   })

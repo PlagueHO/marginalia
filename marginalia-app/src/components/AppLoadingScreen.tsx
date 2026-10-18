@@ -16,7 +16,8 @@ export function AppLoadingScreen({
   iconClassName,
 }: AppLoadingScreenProps) {
   return (
-    <div className={cn("flex h-screen items-center justify-center", className)}>
+    <div role="status" className={cn("flex h-screen flex-col items-center justify-center gap-6", className)}>
+      <span className="text-sm text-muted-foreground">Loading Marginalia...</span>
       <div className="relative flex h-24 w-24 items-center justify-center">
         <div
           className={cn(
@@ -25,7 +26,7 @@ export function AppLoadingScreen({
           )}
         />
         <Icon
-          className={cn("absolute h-9 w-9 text-violet-400", iconClassName)}
+          className={cn("absolute h-9 w-9 text-primary", iconClassName)}
           aria-hidden="true"
         />
       </div>

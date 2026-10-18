@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -27,11 +27,19 @@ export function AccessCodeDialog({
   error,
 }: AccessCodeDialogProps) {
   const [code, setCode] = useState("");
+  const [validationError, setValidationError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const displayedError = validationError || error;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (isLoading) return;
     if (code.trim()) {
+      setValidationError(null);
       await onSubmit(code.trim());
+    } else {
+      setValidationError("Enter an access code to continue.");
+      inputRef.current?.focus();
     }
   }
 
@@ -57,20 +65,27 @@ export function AccessCodeDialog({
         <form onSubmit={handleSubmit}>
           <div className="flex flex-col gap-4 py-4">
             <div className="flex flex-col gap-2">
-              <Label htmlFor="access-code-input">Access Code</Label>
+              <Label htmlFor="access-code-input">Access Code <span aria-hidden="true">*</span></Label>
               <Input
+                ref={inputRef}
                 id="access-code-input"
                 type="password"
                 value={code}
-                onChange={(e) => setCode(e.target.value)}
+                onChange={(e) => {
+                  setCode(e.target.value);
+                  setValidationError(null);
+                }}
                 placeholder="Enter access code"
                 disabled={isLoading}
                 autoFocus
+                aria-required="true"
+                aria-invalid={displayedError ? true : undefined}
+                aria-describedby={displayedError ? "access-code-error" : undefined}
                 data-testid="access-code-input"
               />
-              {error && (
-                <p className="text-sm text-destructive" data-testid="access-code-error">
-                  {error}
+              {displayedError && (
+                <p id="access-code-error" role="alert" className="text-sm text-destructive" data-testid="access-code-error">
+                  {displayedError}
                 </p>
               )}
             </div>
@@ -79,8 +94,8 @@ export function AccessCodeDialog({
           <DialogFooter>
             <Button
               type="submit"
-              disabled={isLoading || !code.trim()}
-              className="w-full min-h-11 gap-2 sm:w-auto sm:min-h-8"
+              disabled={isLoading}
+              className="w-full gap-2 sm:w-auto"
             >
               {isLoading && (
                 <Spinner />

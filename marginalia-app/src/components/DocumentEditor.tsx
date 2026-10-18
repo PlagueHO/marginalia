@@ -1,6 +1,6 @@
 import { useMemo, useCallback, useRef, type ReactNode } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { SuggestionMarker } from "./SuggestionHighlight";
+import { SuggestionMarkerGroup } from "./SuggestionHighlight";
 import type { Document, Suggestion, Paragraph } from "@/types";
 
 interface DocumentEditorProps {
@@ -97,17 +97,13 @@ export function DocumentEditor({
       return (
         <div key={paragraph.id} className="relative rounded-md transition-colors duration-150 hover:bg-muted/30">
           <div className="absolute -left-8 top-1 flex flex-col gap-1">
-            {markers.map((marker) => (
-              <SuggestionMarker
-                key={marker.suggestion.id}
-                suggestion={marker.suggestion}
-                number={marker.number}
-                isActive={marker.suggestion.id === activeSuggestionId}
-                isHovered={marker.suggestion.id === hoveredSuggestionId}
-                onClick={onSuggestionClick}
-                onHoverChange={onSuggestionHover}
-              />
-            ))}
+            <SuggestionMarkerGroup
+              markers={markers}
+              activeSuggestionId={activeSuggestionId}
+              hoveredSuggestionId={hoveredSuggestionId}
+              onClick={onSuggestionClick}
+              onHoverChange={onSuggestionHover}
+            />
           </div>
           <p
             className={`${highlightClass} cursor-pointer rounded-sm px-0.5 transition-all duration-200 ${
@@ -124,7 +120,8 @@ export function DocumentEditor({
                 onSuggestionClick(primary.id);
               }
             }}
-            role="mark"
+            role="button"
+            aria-label={`Review suggestion ${suggestionNumbers.get(primary.id) ?? ""}: ${displayText}`}
             tabIndex={0}
           >
             {displayText}

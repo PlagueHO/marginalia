@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { gradientText, mutedText } from "@/lib/utils";
+import { headingText, mutedText } from "@/lib/utils";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Dialog,
@@ -78,8 +78,8 @@ export function AnalysisDialog({
       >
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-violet-400" aria-hidden="true" />
-            <span className={gradientText}>
+            <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
+            <span className={headingText}>
               {paragraphMode ? "Analyze Paragraph" : "Analyze Manuscript"}
             </span>
           </DialogTitle>
@@ -92,10 +92,11 @@ export function AnalysisDialog({
 
         <div className="flex flex-col gap-4 py-2">
           <div className="flex flex-col gap-2">
-            <Label className="text-sm font-medium">Tone</Label>
+            <Label htmlFor="analysis-tone" className="text-sm font-medium">Tone</Label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
+                  id="analysis-tone"
                   variant="outline"
                   className="justify-between gap-2 w-full"
                   disabled={isAnalyzing}
@@ -138,8 +139,8 @@ export function AnalysisDialog({
           </div>
 
           {isAnalyzing && progress && (
-            <div className="flex items-center gap-3 rounded-md border bg-muted/50 px-4 py-3">
-              <Spinner className="text-violet-400 shrink-0" />
+            <div role="status" className="flex items-center gap-3 rounded-md border bg-muted/50 px-4 py-3">
+              <Spinner className="text-primary shrink-0" />
               <p className={mutedText}>{progress}</p>
             </div>
           )}
@@ -148,7 +149,7 @@ export function AnalysisDialog({
         <DialogFooter>
           <Button
             variant="outline"
-            className="w-full min-h-11 sm:w-auto sm:min-h-8"
+            className="w-full sm:w-auto"
             onClick={() => onOpenChange(false)}
             disabled={isAnalyzing}
           >
@@ -157,7 +158,7 @@ export function AnalysisDialog({
           <Button
             onClick={handleAnalyze}
             disabled={isAnalyzing}
-            className="w-full min-h-11 gap-2 sm:w-auto sm:min-h-8"
+            className="w-full gap-2 sm:w-auto"
           >
             {isAnalyzing ? (
               <Spinner />

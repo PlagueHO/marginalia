@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AppHeader } from "@/components/AppHeader";
 import { useLlmConfig } from "@/hooks/useLlmConfig";
 import { useExportImport } from "@/hooks/useExportImport";
@@ -7,9 +7,10 @@ import { useTheme } from "@/hooks/useTheme";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { cn, gradientText } from "@/lib/utils";
+import { cn, headingText } from "@/lib/utils";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle2, Download, Moon, Monitor, RefreshCw, Sun, Upload, XCircle } from "lucide-react";
 
@@ -20,6 +21,9 @@ export function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [importFile, setImportFile] = useState<File | null>(null);
   const [overwrite, setOverwrite] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const importInputRef = useRef<HTMLInputElement>(null);
   const {
     exportJob,
     importJob,
@@ -39,10 +43,10 @@ export function SettingsPage() {
     <div className="flex flex-col h-screen">
       <AppHeader />
 
-      <main id="main-content" className="flex-1 overflow-auto">
-        <div className="mx-auto w-full max-w-4xl space-y-6 px-4 py-6 sm:py-8">
+      <main id="main-content" tabIndex={-1} className="flex-1 overflow-auto">
+        <div className="mx-auto w-full max-w-4xl space-y-8 px-4 py-8 sm:px-6 sm:py-10">
           <div>
-            <h1 className={cn(gradientText, "text-2xl")}>Settings</h1>
+            <h1 className={cn(headingText, "text-3xl")}>Settings</h1>
             <p className="text-sm text-muted-foreground">
               Appearance, backend status, and manuscript backup controls.
             </p>
@@ -51,11 +55,11 @@ export function SettingsPage() {
           <Separator />
 
           <section className="space-y-4">
-            <h2 className={cn(gradientText, "text-lg")}>Appearance</h2>
+            <h2 className={cn(headingText, "text-lg")}>Appearance</h2>
             <div className="space-y-2">
               <Label htmlFor="theme-select">Theme</Label>
               <Select value={theme} onValueChange={(v) => setTheme(v as "system" | "light" | "dark")}>
-                <SelectTrigger id="theme-select" className="w-full sm:max-w-64">
+                <SelectTrigger id="theme-select" aria-describedby="theme-help" className="w-full sm:max-w-64">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -73,7 +77,7 @@ export function SettingsPage() {
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
+              <p id="theme-help" className="text-sm text-muted-foreground">
                 Select &quot;System&quot; to automatically match your browser or OS preference.
               </p>
             </div>
@@ -82,7 +86,7 @@ export function SettingsPage() {
           <Separator />
 
           <section className="space-y-4">
-            <h2 className={cn(gradientText, "text-lg")}>Data</h2>
+            <h2 className={cn(headingText, "text-lg")}>Data</h2>
             <p className="text-sm text-muted-foreground">
               Export all manuscripts and settings to a ZIP backup, or restore from an existing backup.
             </p>
@@ -90,46 +94,41 @@ export function SettingsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Export</CardTitle>
+                  <CardTitle className="text-base"><h3>Export</h3></CardTitle>
                 </CardHeader>
                 <CardContent className="flex h-full flex-col space-y-3">
                   <p className="text-sm text-muted-foreground">
                     Download a backup ZIP of your manuscripts and their suggestions.
                   </p>
-                  <div className="space-y-2">
-                    <label className="flex items-center gap-2 text-sm font-medium">
-                      <input type="checkbox" defaultChecked readOnly className="h-4 w-4 accent-primary" />
-                      Manuscripts
-                    </label>
-                    <label className="flex items-center gap-2 text-sm font-medium">
-                      <input type="checkbox" defaultChecked readOnly className="h-4 w-4 accent-primary" />
-                      Suggestions
-                    </label>
-                    <label className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                      <input type="checkbox" disabled className="h-4 w-4" />
-                      Include revision history
-                    </label>
-                  </div>
+                  <p className="text-sm">Includes manuscripts and suggestions. Revision history is not included.</p>
                   <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Button
                       onClick={() => void handleExport()}
                       disabled={isStartingExport || isStartingImport || isExportRunning || isImportRunning}
-                      className="min-h-11 gap-2"
+                      className="gap-2"
                     >
                       {(isStartingExport || isExportRunning) ? <Spinner /> : <Download className="size-4" aria-hidden="true" />}
                       {(isStartingExport || isExportRunning) ? "Exporting..." : "Start Export"}
                     </Button>
                     <Button
                       variant="outline"
-                      onClick={() => void handleDownload()}
+                      onClick={async () => {
+                        setDownloadError(null);
+                        try {
+                          await handleDownload();
+                        } catch (err) {
+                          setDownloadError(err instanceof Error ? err.message : "Download failed. Please try again.");
+                        }
+                      }}
                       disabled={exportJob?.status !== "Completed" || isStartingExport || isExportRunning}
-                      className="min-h-11"
+                      aria-describedby="export-download-help"
                     >
                       Download ZIP
                     </Button>
                   </div>
+                  <p id="export-download-help" className="text-sm text-muted-foreground">Download ZIP becomes available when the export completes.</p>
                   {exportJob && (
-                    <p className="text-sm text-muted-foreground" data-testid="export-job-status">
+                    <p role="status" className="text-sm text-muted-foreground" data-testid="export-job-status">
                       {exportJob.status} ({exportJob.progressPercentage}%)
                       {exportJob.currentStage ? ` - ${exportJob.currentStage}` : ""}
                     </p>
@@ -139,24 +138,30 @@ export function SettingsPage() {
 
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-base">Import</CardTitle>
+                  <CardTitle className="text-base"><h3>Import</h3></CardTitle>
                 </CardHeader>
                 <CardContent className="flex h-full flex-col space-y-3">
                   <p className="text-sm text-muted-foreground">
                     Restore manuscripts from a previously exported ZIP backup.
                   </p>
                   <div className="space-y-2">
-                    <Label htmlFor="import-file">Backup ZIP</Label>
-                    <input
+                    <Label htmlFor="import-file">Backup ZIP <span aria-hidden="true">*</span></Label>
+                    <Input
+                      ref={importInputRef}
                       id="import-file"
                       type="file"
                       accept=".zip"
                       onChange={(event) => {
                         clearStatus();
+                        setFileError(null);
                         setImportFile(event.target.files?.[0] ?? null);
                       }}
-                      className="block w-full text-sm"
+                      aria-invalid={fileError ? true : undefined}
+                      aria-required="true"
+                      aria-describedby={fileError ? "import-file-error" : undefined}
+                      disabled={isStartingImport || isStartingExport || isImportRunning || isExportRunning}
                     />
+                    {fileError && <p id="import-file-error" role="alert" className="text-sm text-destructive">{fileError}</p>}
                   </div>
                   <label className="flex items-center gap-2 text-sm font-medium">
                     <input
@@ -172,19 +177,23 @@ export function SettingsPage() {
                   <div className="mt-auto flex flex-col gap-2 sm:flex-row sm:items-center">
                     <Button
                       onClick={() => {
-                        if (importFile) {
-                          void handleImport(importFile, overwrite);
+                        if (!importFile || !importFile.name.toLowerCase().endsWith(".zip")) {
+                          setFileError("Choose a ZIP backup before starting the import.");
+                          importInputRef.current?.focus();
+                          return;
                         }
+                        setFileError(null);
+                        void handleImport(importFile, overwrite);
                       }}
-                      disabled={!importFile || isStartingImport || isStartingExport || isImportRunning || isExportRunning}
-                      className="min-h-11 gap-2"
+                      disabled={isStartingImport || isStartingExport || isImportRunning || isExportRunning}
+                      className="gap-2"
                     >
                       {(isStartingImport || isImportRunning) ? <Spinner /> : <Upload className="size-4" aria-hidden="true" />}
                       {(isStartingImport || isImportRunning) ? "Importing..." : "Start Import"}
                     </Button>
                   </div>
                   {importJob && (
-                    <p className="text-sm text-muted-foreground" data-testid="import-job-status">
+                    <p role={dataMessage ? undefined : "status"} className="text-sm text-muted-foreground" data-testid="import-job-status">
                       {importJob.status} ({importJob.progressPercentage}%)
                       {importJob.currentStage ? ` - ${importJob.currentStage}` : ""}
                     </p>
@@ -194,14 +203,14 @@ export function SettingsPage() {
             </div>
 
             {dataMessage && (
-              <div className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-800 dark:bg-green-900/20 dark:text-green-200">
+              <div role="status" className="rounded-md bg-status-accepted/10 px-3 py-2 text-sm text-status-accepted">
                 {dataMessage}
               </div>
             )}
 
-            {error && (
-              <div className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
-                {error}
+            {(error || downloadError) && (
+              <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                {error || downloadError}
               </div>
             )}
           </section>
@@ -210,12 +219,12 @@ export function SettingsPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle className={cn(gradientText, "text-lg")}>Backend Status</CardTitle>
+              <CardTitle className={cn(headingText, "text-lg")}><h2>Backend Status</h2></CardTitle>
               <CardDescription>Monitor connections to the AI backend and authentication service.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <div className="flex-1 space-y-3">
+                <div aria-live="polite" className="flex-1 space-y-3">
                   <div className="space-y-1">
                     {llmConfig.isCheckingHealth ? (
                       <div className="flex items-center gap-2 text-sm">
@@ -263,10 +272,9 @@ export function SettingsPage() {
 
                 <Button
                   variant="outline"
-                  size="sm"
                   onClick={() => void llmConfig.checkHealth()}
                   disabled={llmConfig.isCheckingHealth || llmConfig.isCheckingAccess}
-                  className="min-h-11 w-full sm:w-auto"
+                  className="w-full sm:w-auto"
                 >
                   <RefreshCw className="size-4" aria-hidden="true" />
                   <span>Check Connection</span>

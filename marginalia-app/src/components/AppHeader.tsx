@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { cn, gradientText } from "@/lib/utils";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn, headingText } from "@/lib/utils";
 import {
   BookOpen,
   CircleUser,
@@ -65,14 +65,14 @@ export function AppHeader() {
   );
 
   const tabBase =
-    "inline-flex min-h-11 items-center gap-1.5 rounded-md px-3 text-sm font-medium transition-colors cursor-pointer";
+    cn(buttonVariants({ variant: "ghost" }), "gap-1.5 rounded-md px-3 cursor-pointer");
   const tabActive =
     "bg-accent text-foreground";
   const tabInactive =
     "text-muted-foreground hover:text-foreground hover:bg-accent/50";
 
   return (
-    <header className="sticky top-0 z-50 flex items-center justify-between border-b border-border/50 bg-linear-to-r from-background via-background to-muted/30 px-2 py-2 dark:from-zinc-950 dark:via-zinc-900/80 dark:to-zinc-800/40 shadow-sm backdrop-blur-md supports-backdrop-filter:bg-background/60 sm:px-4 sm:py-2.5">
+    <header className="sticky top-0 z-50 flex items-center justify-between border-b bg-background px-2 py-2 sm:px-6 sm:py-3">
       <a
         href="#main-content"
         className="sr-only rounded-md focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50 focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:shadow"
@@ -99,7 +99,7 @@ export function AppHeader() {
             aria-describedby="mobile-navigation-description"
           >
             <SheetHeader className="border-b">
-              <SheetTitle className={cn(gradientText, "text-left text-base")}>
+              <SheetTitle className={cn(headingText, "text-left text-base")}>
                 Navigation
               </SheetTitle>
               <SheetDescription id="mobile-navigation-description">
@@ -110,12 +110,14 @@ export function AppHeader() {
               {navItems.map(({ label, path, icon: Icon, isActive: active }) => (
                 <SheetClose key={path} asChild>
                   <Button
+                    asChild
                     variant={active ? "secondary" : "ghost"}
-                    className="min-h-11 justify-start gap-2"
-                    onClick={() => navigate(path)}
+                    className="justify-start gap-2"
                   >
-                    <Icon className="size-4" aria-hidden="true" />
-                    <span>{label}</span>
+                    <Link to={path} aria-current={active ? "page" : undefined}>
+                      <Icon className="size-4" aria-hidden="true" />
+                      <span>{label}</span>
+                    </Link>
                   </Button>
                 </SheetClose>
               ))}
@@ -126,33 +128,24 @@ export function AppHeader() {
         <Link
           to="/"
           className="flex items-center gap-2.5 hover:opacity-80 transition-opacity mr-2"
+          aria-label="Marginalia"
         >
-          <BookOpen className="h-5 w-5 text-violet-400" aria-hidden="true" />
-          <h1 className={cn(gradientText, "text-lg hidden min-[380px]:block")}>
+          <BookOpen className="h-5 w-5 text-primary" aria-hidden="true" />
+          <span className={cn(headingText, "text-lg hidden min-[380px]:block")}>
             Marginalia
-          </h1>
+          </span>
         </Link>
 
         <Separator orientation="vertical" className="mx-1 hidden h-6 md:block" />
 
         <nav className="hidden items-center gap-0.5 md:flex" aria-label="Primary navigation">
-          <button
-            aria-current={isHome ? "page" : undefined}
-            className={cn(tabBase, isHome ? tabActive : tabInactive)}
-            onClick={() => navigate("/")}
-          >
-            <Home className="h-4 w-4" aria-hidden="true" />
-            <span>Manuscripts</span>
-          </button>
-
-          <button
-            aria-current={isNew ? "page" : undefined}
-            className={cn(tabBase, isNew ? tabActive : tabInactive)}
-            onClick={() => navigate("/new")}
-          >
-            <PlusCircle className="h-4 w-4" aria-hidden="true" />
-            <span>New</span>
-          </button>
+          {navItems.map(({ label, path, icon: Icon, isActive: active }) => (
+            <Link key={path} to={path} aria-current={active ? "page" : undefined}
+              className={cn(tabBase, active ? tabActive : tabInactive)}>
+              <Icon className="h-4 w-4" aria-hidden="true" />
+              <span>{label}</span>
+            </Link>
+          ))}
         </nav>
       </div>
 
@@ -164,12 +157,11 @@ export function AppHeader() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              size="sm"
-              aria-label="User menu"
-              className="gap-2 px-2 opacity-60 sm:px-3"
+              aria-label="Anonymous user menu"
+              className="gap-2 px-2 sm:px-3"
               title="Entra ID SSO is not enabled. Running in anonymous single-user mode."
             >
-              <CircleUser className="size-5" />
+              <CircleUser className="size-5" aria-hidden="true" />
               <span className="hidden text-sm sm:inline">Anonymous</span>
             </Button>
           </DropdownMenuTrigger>

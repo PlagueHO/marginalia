@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-jade-600: hsl(160 84% 32%);
@@ -9,19 +10,24 @@
   --color-card-foreground: hsl(0 0% 3.9%);
   --color-popover: hsl(0 0% 100%);
   --color-popover-foreground: hsl(0 0% 3.9%);
-  --color-primary: hsl(0 0% 9%);
+  --color-primary: hsl(263 65% 42%);
   --color-primary-foreground: hsl(0 0% 98%);
   --color-secondary: hsl(0 0% 96.1%);
   --color-secondary-foreground: hsl(0 0% 9%);
   --color-muted: hsl(0 0% 96.1%);
-  --color-muted-foreground: hsl(0 0% 45.1%);
+  --color-muted-foreground: hsl(0 0% 42%);
   --color-accent: hsl(0 0% 96.1%);
   --color-accent-foreground: hsl(0 0% 9%);
-  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive: hsl(0 72% 42%);
   --color-destructive-foreground: hsl(0 0% 98%);
   --color-border: hsl(0 0% 89.8%);
-  --color-input: hsl(0 0% 89.8%);
-  --color-ring: hsl(0 0% 3.9%);
+  --color-input: hsl(0 0% 52%);
+  --color-ring: hsl(263 65% 42%);
+  --color-status-pending: hsl(32 90% 28%);
+  --color-status-accepted: hsl(153 75% 25%);
+  --color-status-rejected: hsl(347 70% 38%);
+  --color-status-modified: hsl(204 80% 32%);
+  --color-status-foreground: hsl(0 0% 100%);
   --color-chart-1: hsl(12 76% 61%);
   --color-chart-2: hsl(173 58% 39%);
   --color-chart-3: hsl(197 37% 24%);
@@ -81,17 +87,36 @@
   --color-card-foreground: hsl(0 0% 98%);
   --color-popover: hsl(0 0% 3.9%);
   --color-popover-foreground: hsl(0 0% 98%);
-  --color-primary: hsl(0 0% 98%);
-  --color-primary-foreground: hsl(0 0% 9%);
+  --color-primary: hsl(263 90% 82%);
+  --color-primary-foreground: hsl(263 55% 15%);
   --color-secondary: hsl(0 0% 14.9%);
   --color-secondary-foreground: hsl(0 0% 98%);
   --color-muted: hsl(0 0% 14.9%);
   --color-muted-foreground: hsl(0 0% 63.9%);
   --color-accent: hsl(0 0% 14.9%);
   --color-accent-foreground: hsl(0 0% 98%);
-  --color-destructive: hsl(0 62.8% 30.6%);
-  --color-destructive-foreground: hsl(0 0% 98%);
+  --color-destructive: hsl(0 90% 80%);
+  --color-destructive-foreground: hsl(0 60% 15%);
   --color-border: hsl(0 0% 14.9%);
-  --color-input: hsl(0 0% 14.9%);
-  --color-ring: hsl(0 0% 83.1%);
+  --color-input: hsl(0 0% 52%);
+  --color-ring: hsl(263 90% 82%);
+  --color-status-pending: hsl(43 95% 75%);
+  --color-status-accepted: hsl(153 65% 72%);
+  --color-status-rejected: hsl(347 90% 82%);
+  --color-status-modified: hsl(204 90% 78%);
+  --color-status-foreground: hsl(0 0% 9%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
