@@ -4,6 +4,9 @@
 # Please see the documentation for more information:
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
 # https://containers.dev/guide/dependabot
+#
+# dependabot-monthly-v1: monthly version updates on the first of the month;
+# security updates remain event-driven.
 
 version: 2
 updates:
@@ -11,40 +14,59 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "github-actions"
-      - "ci-cd"
     rebase-strategy: "auto"
     groups:
-      actions-dependencies:
+      github-actions-minor-and-patch:
+        applies-to: "version-updates"
         patterns:
           - "*"
         update-types:
           - "minor"
           - "patch"
+      github-actions-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
 
   # DevContainer features and configuration
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
-      - "devcontainer"
+      - "devcontainers"
     rebase-strategy: "auto"
-    # Dependabot groups all devcontainer-related dependency updates into one PR.
     groups:
-      devcontainer-dependencies:
+      devcontainers-minor-and-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      devcontainers-security:
+        applies-to: "security-updates"
         patterns:
           - "*"
 
@@ -52,94 +74,121 @@ updates:
   - package-ecosystem: "docker"
     directory: "/.devcontainer"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "docker"
     rebase-strategy: "auto"
+    groups:
+      docker-minor-and-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      docker-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
 
   # Docker dependencies for containerization of API service
   - package-ecosystem: "docker"
     directory: "/marginalia-service/src/Api"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "docker"
     rebase-strategy: "auto"
+    groups:
+      docker-minor-and-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      docker-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
 
   # .NET SDK and MSBuild SDK versions (global.json)
   - package-ecosystem: "dotnet-sdk"
     directory: "/marginalia-service"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "dotnet-sdk"
-      - ".net"
     rebase-strategy: "auto"
+    groups:
+      dotnet-sdk-minor-and-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      dotnet-sdk-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
 
-  # .NET 10+ dependencies (backend services)
+  # .NET dependencies (backend services)
   - package-ecosystem: "nuget"
     directory: "/marginalia-service"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "nuget"
-      - ".net"
     rebase-strategy: "auto"
     groups:
-      aspire-packages:
+      nuget-minor-and-patch:
+        applies-to: "version-updates"
         patterns:
-          - "Aspire.*"
+          - "*"
         update-types:
           - "minor"
           - "patch"
-      microsoft-packages:
+      nuget-security:
+        applies-to: "security-updates"
         patterns:
-          - "Microsoft.*"
-        update-types:
-          - "minor"
-          - "patch"
-      opentelemetry:
-        patterns:
-          - "OpenTelemetry.*"
-        update-types:
-          - "minor"
-          - "patch"
-      testing:
-        patterns:
-          - "Microsoft.AspNetCore.Mvc.Testing"
-          - "MSTest.*"
-          - "FluentAssertions"
-          - "NSubstitute"
-          - "coverlet.*"
-        update-types:
-          - "minor"
-          - "patch"
-      azure:
-        patterns:
-          - "Azure.*"
-        update-types:
-          - "minor"
-          - "patch"
+          - "*"
     allow:
       - dependency-type: "all"
 
@@ -147,16 +196,31 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "npm"
-      - "tooling"
     rebase-strategy: "auto"
+    groups:
+      npm-minor-and-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      npm-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
     allow:
       - dependency-type: "all"
 
@@ -164,16 +228,31 @@ updates:
   - package-ecosystem: "npm"
     directory: "/docs"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "npm"
-      - "docs"
     rebase-strategy: "auto"
+    groups:
+      npm-minor-and-patch:
+        applies-to: "version-updates"
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      npm-security:
+        applies-to: "security-updates"
+        patterns:
+          - "*"
     allow:
       - dependency-type: "all"
 
@@ -181,88 +260,31 @@ updates:
   - package-ecosystem: "npm"
     directory: "/marginalia-app"
     schedule:
-      interval: "weekly"
-      time: "06:00"
+      interval: "monthly"
+      time: "09:00"
+      timezone: "Pacific/Auckland"
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5
     commit-message:
       prefix: "deps"
+      prefix-development: "deps"
     labels:
       - "dependencies"
       - "npm"
-      - "react"
-      - "frontend"
     rebase-strategy: "auto"
     groups:
-      react-ecosystem:
+      npm-minor-and-patch:
+        applies-to: "version-updates"
         patterns:
-          - "react"
-          - "react-dom"
-          - "@types/react"
-          - "@types/react-dom"
+          - "*"
         update-types:
           - "minor"
           - "patch"
-      opentelemetry:
+      npm-security:
+        applies-to: "security-updates"
         patterns:
-          - "@opentelemetry/*"
-        update-types:
-          - "minor"
-          - "patch"
-      vite-build:
-        patterns:
-          - "vite"
-          - "vitest"
-          - "@vitejs/*"
-          - "@vitest/*"
-          - "@tailwindcss/*"
-          - "tailwindcss"
-          - "postcss"
-          - "autoprefixer"
-        update-types:
-          - "minor"
-          - "patch"
-      testing-libraries:
-        patterns:
-          - "@testing-library/*"
-          - "jest-axe"
-          - "@axe-core/*"
-          - "msw"
-          - "jsdom"
-          - "@playwright/test"
-        update-types:
-          - "minor"
-          - "patch"
-      typescript-types:
-        patterns:
-          - "typescript"
-          - "typescript-eslint"
-          - "@types/*"
-        update-types:
-          - "minor"
-          - "patch"
-      eslint:
-        patterns:
-          - "eslint"
-          - "eslint-*"
-          - "@eslint/*"
-        update-types:
-          - "minor"
-          - "patch"
-      ui-utilities:
-        patterns:
-          - "lucide-react"
-          - "class-variance-authority"
-          - "clsx"
-          - "tailwind-merge"
-          - "sonner"
-          - "vaul"
-          - "date-fns"
-          - "axios"
-          - "axios-retry"
-          - "globals"
-        update-types:
-          - "minor"
-          - "patch"
+          - "*"
     allow:
       - dependency-type: "all"
     ignore:
