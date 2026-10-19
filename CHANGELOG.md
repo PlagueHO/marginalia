@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Aligned Dependabot version updates with the shared monthly maintenance policy
+  while keeping security updates event-driven.
+
 ## [1.3.1] - 2026-06-06
 
 ### Changed
